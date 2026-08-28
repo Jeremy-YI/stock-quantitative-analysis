@@ -148,8 +148,6 @@ export default function DetailTable({ results }: DetailTableProps) {
     []
   )
 
-
-
   const table = useReactTable({
     data,
     columns,
