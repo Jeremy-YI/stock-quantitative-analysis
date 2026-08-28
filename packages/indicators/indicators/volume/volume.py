@@ -25,6 +25,7 @@ from typing import NamedTuple, Sequence
 MAVOL1_PERIOD = 5  # 量能均线 1（短）
 MAVOL2_PERIOD = 10  # 量能均线 2（长）
 VOLUME_RATIO_PERIOD = 5  # 量比基准：过去 N 日平均成交量（不含当日）
+VOLUME_RATIO_60_PERIOD = 60  # 60 日基准量比（阶段 8 实测推荐默认）
 NEUTRAL_RATIO = 1.0  # 无前日可比时量比的中性值
 
 # 价量关系标签（语义串，供策略判定与前端展示）
@@ -78,6 +79,19 @@ def calc_volume_ratio(
         avg = sum(window) / len(window)
         result.append(volumes[i] / avg if avg > 0 else NEUTRAL_RATIO)
     return result
+
+
+def calc_volume_ratio_60(volumes: Sequence[float]) -> list[float]:
+    """计算 60 日基准量比（当日量 / 过去 60 日平均量，不含当日）。
+
+    与 ``calc_volume_ratio`` 同公式，仅基准窗口不同（60 日）。
+
+    实测依据（/tmp/vol_factor.py，74,945 样本，持有 5 日，基线 44.57%）：
+    60 日基准的量比对持有 5 日收益呈完全单调关系（<0.6 → +2.96pp，
+    >3.0 → -5.11pp），而 5 日基准（vr5）缩量区间方向相反。故推荐
+    60 日作为量比基准（见 docs/因子研究报告.md）。
+    """
+    return calc_volume_ratio(volumes, period=VOLUME_RATIO_60_PERIOD)
 
 
 def classify_price_volume(

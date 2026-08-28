@@ -11,6 +11,7 @@ from strategies import (
     double_bottom,
     etf_accumulation,
     macd_resonance,
+    macd_volume_washout,
     pin30,
     stealth_rally,
 )
@@ -26,6 +27,7 @@ REGISTRY = {
     pin30.NAME: pin30,
     stealth_rally.NAME: stealth_rally,
     etf_accumulation.NAME: etf_accumulation,
+    macd_volume_washout.NAME: macd_volume_washout,
 }
 
 __all__ = [
@@ -41,6 +43,7 @@ __all__ = [
     "double_bottom",
     "etf_accumulation",
     "macd_resonance",
+    "macd_volume_washout",
     "pin30",
     "should_include",
     "stealth_rally",

@@ -12,9 +12,11 @@ from indicators.volume.volume import (
     REL_PRICE_UP_VOLUME_UP,
     REL_VOLUME_FLAT,
     VOLUME_RATIO_PERIOD,
+    VOLUME_RATIO_60_PERIOD,
     VolumeMaResult,
     calc_volume_ma,
     calc_volume_ratio,
+    calc_volume_ratio_60,
     classify_price_volume,
 )
 
@@ -30,8 +32,10 @@ __all__ = [
     "REL_PRICE_UP_VOLUME_UP",
     "REL_VOLUME_FLAT",
     "VOLUME_RATIO_PERIOD",
+    "VOLUME_RATIO_60_PERIOD",
     "VolumeMaResult",
     "calc_volume_ma",
     "calc_volume_ratio",
+    "calc_volume_ratio_60",
     "classify_price_volume",
 ]

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-research"
+version = "0.1.0"
+description = "因子研究模块（单因子超额 / 因子交叉矩阵 / regime 分层分析）"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "stock-indicators",
+    "stock-market",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["research*"]

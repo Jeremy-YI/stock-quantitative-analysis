@@ -16,6 +16,7 @@ from indicators.volume import (
     REL_PRICE_UP_VOLUME_UP,
     calc_volume_ma,
     calc_volume_ratio,
+    calc_volume_ratio_60,
     classify_price_volume,
 )
 
@@ -86,6 +87,20 @@ def test_zero_volume_is_safe():
     ratio = calc_volume_ratio(volumes)
     assert all(math.isfinite(v) for v in ma.mavol1)
     assert all(math.isfinite(v) for v in ratio)
+
+
+def test_volume_ratio_60_uses_60_day_window():
+    """60 日基准量比：当日量 / 过去 60 日均量（不含当日），窗口不足用已有数据。"""
+    volumes = [100.0] * 60 + [200.0]
+    result = calc_volume_ratio_60(volumes)
+    assert result[60] == pytest.approx(2.0, abs=1e-9)
+    # 与显式 period=60 的 calc_volume_ratio 一致
+    assert result == calc_volume_ratio(volumes, period=60)
+
+
+def test_volume_ratio_60_empty_and_neutral():
+    assert calc_volume_ratio_60([]) == []
+    assert calc_volume_ratio_60([10.0]) == [1.0]  # 首根中性
 
 
 def test_classify_four_quadrants():

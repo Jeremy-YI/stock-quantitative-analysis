@@ -8,6 +8,7 @@ pythonpath = [
     "packages/strategies",
     "packages/backtest",
     "packages/scheduler",
+    "packages/research",
     "apps/api/src",
 ]
 testpaths = ["tests", "apps/api/tests"]
