@@ -105,3 +105,92 @@ async def test_macd_date_filter(client):
     )
     assert res.status_code == 200
     assert len(res.json()["body"]["series"]) < 35
+
+
+# ---------------------------------------------------------------
+# KDJ
+# ---------------------------------------------------------------
+async def test_kdj_200(client):
+    res = await client.get("/api/v1/indicators/kdj", params={"symbol": "600519"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["message"] == "ok"
+    assert body["body"]["symbol"] == "600519"
+
+    series = body["body"]["series"]
+    assert len(series) == 35
+    assert set(series[0].keys()) == {"date", "close", "k", "d", "j"}
+    # 首根：前 N-1 根填充中性值 50
+    assert series[0]["k"] == 50.0
+    assert series[0]["d"] == 50.0
+    assert series[0]["j"] == 50.0
+
+
+async def test_kdj_404_symbol_not_found(client):
+    res = await client.get("/api/v1/indicators/kdj", params={"symbol": "999999"})
+    assert res.status_code == 404
+    assert "message" in res.json()
+
+
+async def test_kdj_422_invalid_symbol(client):
+    res = await client.get("/api/v1/indicators/kdj", params={"symbol": "abc"})
+    assert res.status_code == 422
+
+
+# ---------------------------------------------------------------
+# RSI
+# ---------------------------------------------------------------
+async def test_rsi_200(client):
+    res = await client.get("/api/v1/indicators/rsi", params={"symbol": "600519"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["message"] == "ok"
+    assert body["body"]["symbol"] == "600519"
+
+    series = body["body"]["series"]
+    assert len(series) == 35
+    assert set(series[0].keys()) == {"date", "close", "rsi"}
+    # 首根：前 period 根填充中性值 50
+    assert series[0]["rsi"] == 50.0
+
+
+async def test_rsi_404_symbol_not_found(client):
+    res = await client.get("/api/v1/indicators/rsi", params={"symbol": "999999"})
+    assert res.status_code == 404
+    assert "message" in res.json()
+
+
+async def test_rsi_422_invalid_symbol(client):
+    res = await client.get("/api/v1/indicators/rsi", params={"symbol": "abc"})
+    assert res.status_code == 422
+
+
+# ---------------------------------------------------------------
+# 量能
+# ---------------------------------------------------------------
+async def test_volume_200(client):
+    res = await client.get("/api/v1/indicators/volume", params={"symbol": "600519"})
+    assert res.status_code == 200
+    body = res.json()
+    assert body["message"] == "ok"
+    assert body["body"]["symbol"] == "600519"
+
+    series = body["body"]["series"]
+    assert len(series) == 35
+    assert set(series[0].keys()) == {
+        "date", "close", "volume", "mavol1", "mavol2", "volume_ratio", "relation",
+    }
+    # 首根：量比中性 1.0，价量关系为无数据占位
+    assert series[0]["volume_ratio"] == 1.0
+    assert series[0]["relation"] == "—"
+
+
+async def test_volume_404_symbol_not_found(client):
+    res = await client.get("/api/v1/indicators/volume", params={"symbol": "999999"})
+    assert res.status_code == 404
+    assert "message" in res.json()
+
+
+async def test_volume_422_invalid_symbol(client):
+    res = await client.get("/api/v1/indicators/volume", params={"symbol": "abc"})
+    assert res.status_code == 422

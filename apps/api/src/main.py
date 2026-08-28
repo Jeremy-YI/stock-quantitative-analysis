@@ -4,9 +4,12 @@
 
     uvicorn main:app --reload
 
-阶段 1 只暴露两个端点：
+暴露端点：
     GET /api/v1/health
     GET /api/v1/indicators/macd?symbol=600519&start=&end=
+    GET /api/v1/indicators/kdj?symbol=600519&start=&end=
+    GET /api/v1/indicators/rsi?symbol=600519&start=&end=
+    GET /api/v1/indicators/volume?symbol=600519&start=&end=
 """
 
 from __future__ import annotations
