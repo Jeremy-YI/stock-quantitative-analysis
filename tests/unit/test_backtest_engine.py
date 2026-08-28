@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date
 
 import pandas as pd
+import pytest
 
 from backtest.config import BacktestConfig
 from backtest.engine import BacktestEngine, DictCandlesProvider, classify_board
@@ -108,3 +109,18 @@ def test_custom_hold_days_and_risk_free_rate():
     engine = BacktestEngine(DictCandlesProvider({}), cfg)
     report = engine.run_verification([])
     assert report.hold_days == [2, 4]
+
+
+def test_adjust_mode_default_forward_and_passthrough():
+    """复权口径：默认前复权；无复权因子时价格直通（不重复复权）。"""
+    from backtest.forward import forward_returns
+    from market.adjust import AdjustMode
+
+    cfg = BacktestConfig()
+    assert cfg.adjust_mode == AdjustMode.FORWARD
+
+    df = _rising_df(date(2026, 6, 1), n=10)
+    signal_date = df["date"].iloc[0]
+    fr = forward_returns(df, signal_date, [1])
+    # 原始收盘 10 → 10.2（1.02 倍），收益 = 2%，证明未叠加任何复权调整
+    assert fr[1] == pytest.approx(0.02, abs=1e-9)
