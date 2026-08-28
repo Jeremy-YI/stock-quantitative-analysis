@@ -20,6 +20,7 @@ import {
 import DecayChart from './decay-chart'
 import DetailTable from './detail-table'
 import EquityChart from './equity-chart'
+import ExcessChart from './excess-chart'
 import ReturnHistogram from './return-histogram'
 import StatCards from './stat-cards'
 import type { HistogramBin, StrategyResult } from './types'
@@ -174,6 +175,33 @@ export default function BacktestView() {
       {!loading && run && verification && (
         <>
           <StatCards run={run} />
+
+          <Card className={card}>
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle>策略胜率 vs 基线胜率（超额胜率）</CardTitle>
+              <div className={field}>
+                <Label htmlFor="excess-hold">持有期</Label>
+                <select
+                  id="excess-hold"
+                  value={String(effectiveHold)}
+                  onChange={(event) => setHoldDays(Number(event.target.value))}
+                  className={selectClass}
+                >
+                  {(verification.hold_days ?? []).map((d) => (
+                    <option key={d} value={d}>
+                      {d} 日
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </CardHeader>
+            <CardContent className={chartCard}>
+              <ExcessChart
+                results={verification.by_strategy}
+                holdDays={effectiveHold}
+              />
+            </CardContent>
+          </Card>
 
           {portfolio && portfolio.equity_curve.length > 0 && (
             <Card className={card}>

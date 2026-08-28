@@ -13,7 +13,7 @@ export const field = 'flex flex-col gap-1.5'
 
 export const card = 'w-full max-w-6xl'
 
-export const statGrid = 'grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6'
+export const statGrid = 'grid grid-cols-2 gap-3 md:grid-cols-4'
 
 export const statCard =
   'rounded-lg border border-border bg-card p-3 text-card-foreground'

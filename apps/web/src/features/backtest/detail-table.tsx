@@ -19,11 +19,15 @@ interface Row {
   holdDays: number
   n: number
   winRate: number
+  baselineWinRate: number | null
+  excessWinRate: number | null
   avgReturn: number
+  excessReturn: number | null
   medianReturn: number
   plRatio: number | null
   best: number
   worst: number
+  selectivity: number | null
 }
 
 function flatten(results: StrategyResult[]): Row[] {
@@ -33,11 +37,15 @@ function flatten(results: StrategyResult[]): Row[] {
       holdDays: h.hold_days,
       n: h.n,
       winRate: h.win_rate,
+      baselineWinRate: h.baseline_win_rate,
+      excessWinRate: h.excess_win_rate,
       avgReturn: h.avg_return,
+      excessReturn: h.excess_return,
       medianReturn: h.median_return,
       plRatio: h.profit_loss_ratio,
       best: h.best,
       worst: h.worst,
+      selectivity: s.selectivity,
     }))
   )
 }
@@ -46,9 +54,25 @@ function pct(value: number): string {
   return `${(value * 100).toFixed(2)}%`
 }
 
+function pp(value: number | null): string {
+  if (value === null) return '—'
+  return `${value >= 0 ? '+' : ''}${(value * 100).toFixed(1)}pp`
+}
+
 function pctCell(v: number) {
   const color = v > 0 ? 'text-up' : v < 0 ? 'text-down' : 'text-neutral'
   return <span className={color}>{pct(v)}</span>
+}
+
+function ppCell(v: number | null) {
+  if (v === null) return <span className="text-neutral">—</span>
+  const color = v > 0 ? 'text-up' : v < 0 ? 'text-down' : 'text-neutral'
+  return <span className={color}>{pp(v)}</span>
+}
+
+function selCell(v: number | null) {
+  if (v === null) return <span className="text-neutral">—</span>
+  return `${(v * 100).toFixed(1)}%`
 }
 
 export interface DetailTableProps {
@@ -70,14 +94,37 @@ export default function DetailTable({ results }: DetailTableProps) {
         cell: (info) => pct(info.getValue<number>()),
       },
       {
+        accessorKey: 'baselineWinRate',
+        header: '基线胜率',
+        cell: (info) => {
+          const v = info.getValue<number | null>()
+          return v === null ? <span className="text-neutral">—</span> : pct(v)
+        },
+      },
+      {
+        accessorKey: 'excessWinRate',
+        header: '超额胜率',
+        cell: (info) => ppCell(info.getValue<number | null>()),
+      },
+      {
         accessorKey: 'avgReturn',
         header: '平均收益',
         cell: (info) => pctCell(info.getValue<number>()),
       },
       {
+        accessorKey: 'excessReturn',
+        header: '超额收益',
+        cell: (info) => ppCell(info.getValue<number | null>()),
+      },
+      {
         accessorKey: 'medianReturn',
         header: '中位数',
         cell: (info) => pctCell(info.getValue<number>()),
+      },
+      {
+        accessorKey: 'selectivity',
+        header: '选择性',
+        cell: (info) => selCell(info.getValue<number | null>()),
       },
       {
         accessorKey: 'plRatio',
@@ -100,6 +147,8 @@ export default function DetailTable({ results }: DetailTableProps) {
     ],
     []
   )
+
+
 
   const table = useReactTable({
     data,

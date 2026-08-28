@@ -22,10 +22,32 @@ export interface HoldReturn {
   worst: number
   quantiles: Record<string, number>
   histogram: HistogramBin[]
+  baseline_win_rate: number | null
+  baseline_avg_return: number | null
+  excess_win_rate: number | null
+  excess_return: number | null
+}
+
+export interface BaselineHold {
+  hold_days: number
+  n: number
+  win_rate: number
+  avg_return: number
+  median_return: number
+}
+
+export interface BaselineResult {
+  universe: string
+  size: number
+  holds: BaselineHold[]
 }
 
 export interface StrategyResult {
   strategy: string
+  universe: string | null
+  universe_size: number | null
+  signals_per_day: number | null
+  selectivity: number | null
   holds: HoldReturn[]
 }
 
@@ -39,6 +61,8 @@ export interface DecayPoint {
   window: number
   win_rate: number
   n: number
+  baseline_win_rate: number | null
+  excess_win_rate: number | null
 }
 
 export interface DecaySeries {
@@ -54,6 +78,7 @@ export interface VerificationReport {
   by_strategy: StrategyResult[]
   by_board: BoardResult[]
   decay: DecaySeries[]
+  baselines: BaselineResult[]
 }
 
 export interface EquityPoint {
