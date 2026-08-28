@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Protocol
+from typing import Collection, Protocol
 
 import pandas as pd
 
@@ -55,13 +55,18 @@ class MarketScanner:
         self._lookback = lookback
 
     def load_candles(
-        self, as_of: date, filter_config: FilterConfig | None = None
+        self,
+        as_of: date,
+        filter_config: FilterConfig | None = None,
+        symbols: Collection[str] | None = None,
     ) -> dict[str, pd.DataFrame]:
         """遍历全量 .day 文件，返回通过过滤的 candles。
 
         filter_config 为 None 时用构造时传入的默认过滤；否则临时覆盖。
+        symbols 非空时只加载指定代码（分片扫描用，阶段 5 调度器断点续跑）。
         """
         cfg = filter_config or self._filter
+        symbol_set = set(symbols) if symbols is not None else None
         candles: dict[str, pd.DataFrame] = {}
 
         for market in _MARKETS:
@@ -74,6 +79,10 @@ class MarketScanner:
                 # 文件名形如 sh600519.day / sz000001.day
                 code = fn.name[2:8]
                 if len(code) != 6:
+                    continue
+
+                # 分片：只加载指定代码（跳过其余，省去读文件成本）
+                if symbol_set is not None and code not in symbol_set:
                     continue
 
                 # 先按代码前缀短路剔除 ETF/指数/可转债/基金，避免读文件
@@ -106,6 +115,28 @@ class MarketScanner:
                 candles[code] = df
 
         return candles
+
+    def list_symbols(self, filter_config: FilterConfig | None = None) -> list[str]:
+        """枚举候选标的代码（只按代码前缀种类过滤，不读文件）。
+
+        供分片扫描在真正读文件前切分宇宙；返回升序的 6 位代码列表。
+        """
+        cfg = filter_config or self._filter
+        codes: set[str] = set()
+        for market in _MARKETS:
+            lday_dir = self._root / market / "lday"
+            if not lday_dir.is_dir():
+                continue
+            for fn in sorted(lday_dir.iterdir()):
+                if not fn.name.endswith(".day"):
+                    continue
+                code = fn.name[2:8]
+                if len(code) != 6:
+                    continue
+                if kind_excluded(classify_symbol(market, code), cfg):
+                    continue
+                codes.add(code)
+        return sorted(codes)
 
 
 def _read_day_tail(path: Path, n_records: int) -> pd.DataFrame:

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-scheduler"
+version = "0.1.0"
+description = "任务调度器：声明式任务定义 + 执行器 + 断点续跑 + A股盘后 ETL（阶段 5）"
+requires-python = ">=3.11"
+dependencies = [
+    "croniter>=1.4",
+    "pandas>=2.0",
+    "pydantic>=2.6",
+    "stock-indicators",
+    "stock-datasource",
+    "stock-market",
+    "stock-strategies",
+    "stock-backtest",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scheduler*"]
