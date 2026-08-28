@@ -39,6 +39,7 @@ from backtest.config import BacktestConfig
 from backtest.engine import BacktestEngine, DictCandlesProvider
 from datasource.tdx import resolve_hsjday_root
 from market.calendar import trading_days
+from market.regime import compute_market_series, snapshot_at
 from strategies import REGISTRY
 from strategies.filters import SymbolKind, filter_for_kinds
 from strategies.scanner import MarketScanner
@@ -169,10 +170,34 @@ def build_snapshot(
             }
         )
 
+    # 当前市场环境（regime）：个股宇宙等权指数，末日快照
+    regime = None
+    stock_candles = {
+        sym: df for sym, df in candles.items()
+        if kind_map.get(sym) in (SymbolKind.STOCK, SymbolKind.STOCK.value)
+    }
+    series = compute_market_series(stock_candles)
+    snap = snapshot_at(series, end) if not series.empty else None
+    if snap is not None:
+        from backtest.config import RegimeFilterConfig
+
+        f = RegimeFilterConfig()
+        regime = {
+            "as_of": end.isoformat(),
+            "index_20d_return": round(snap.index_20d_return, 6),
+            "activity": round(snap.activity, 6),
+            "drawdown": round(snap.drawdown, 6),
+            "index_20d_label": snap.labels["index_20d"],
+            "activity_label": snap.labels["activity"],
+            "drawdown_label": snap.labels["drawdown"],
+            "allow_open": f.allow(snap.index_20d_return, snap.activity, snap.drawdown),
+        }
+
     return {
         "as_of": as_of.isoformat(),
         "strategies": strategies,
         "baselines": baselines,
+        "regime": regime,
         "last_scan": {
             "status": "ok",
             "as_of": as_of.isoformat(),

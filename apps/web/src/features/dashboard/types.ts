@@ -33,10 +33,22 @@ export interface DashboardLastScan {
   symbols_scanned: number | null
 }
 
+export interface DashboardRegime {
+  as_of: string | null
+  index_20d_return: number | null
+  activity: number | null
+  drawdown: number | null
+  index_20d_label: string
+  activity_label: string
+  drawdown_label: string
+  allow_open: boolean | null
+}
+
 export interface DashboardOverview {
   as_of: string | null
   strategies: DashboardStrategy[]
   baselines: DashboardBaseline[]
   last_scan: DashboardLastScan | null
+  regime: DashboardRegime | null
   recent_runs: Run[]
 }

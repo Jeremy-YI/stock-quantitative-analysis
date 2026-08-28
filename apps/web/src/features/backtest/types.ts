@@ -125,4 +125,5 @@ export interface BacktestRunRequest {
   start: string
   end: string
   mode: string
+  regime_filter: boolean
 }

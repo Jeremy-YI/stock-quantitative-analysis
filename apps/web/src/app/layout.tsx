@@ -43,6 +43,12 @@ export default function RootLayout({
             策略回测
           </Link>
           <Link
+            href="/research"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            因子研究
+          </Link>
+          <Link
             href="/scheduler"
             className="text-sm text-muted-foreground hover:text-foreground"
           >

@@ -76,6 +76,7 @@ export default function BacktestView() {
   const [start, setStart] = useState(DEFAULT_START)
   const [end, setEnd] = useState(DEFAULT_END)
   const [mode, setMode] = useState('portfolio')
+  const [regimeFilter, setRegimeFilter] = useState(false)
 
   const [holdDays, setHoldDays] = useState(1)
   const [histStrategy, setHistStrategy] = useState<string | null>(null)
@@ -83,7 +84,7 @@ export default function BacktestView() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    submit({ strategy: strategy || null, start, end, mode })
+    submit({ strategy: strategy || null, start, end, mode, regime_filter: regimeFilter })
   }
 
   const verification = run?.report.verification
@@ -164,6 +165,16 @@ export default function BacktestView() {
             <option value="portfolio">验证 + 组合</option>
             <option value="verify">仅验证</option>
           </select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            id="regime-filter"
+            type="checkbox"
+            checked={regimeFilter}
+            onChange={(event) => setRegimeFilter(event.target.checked)}
+          />
+          <Label htmlFor="regime-filter">市场环境过滤</Label>
         </div>
 
         <Button type="submit" disabled={loading}>

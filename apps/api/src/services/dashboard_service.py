@@ -21,6 +21,7 @@ from schemas.dashboard import (
     DashboardBaseline,
     DashboardLastScan,
     DashboardOverview,
+    DashboardRegime,
     DashboardStrategy,
 )
 from services.scheduler_service import SchedulerService
@@ -49,6 +50,8 @@ class DashboardService:
         last_scan = (
             DashboardLastScan(**last_scan_raw) if last_scan_raw else None
         )
+        regime_raw = snap.get("regime")
+        regime = DashboardRegime(**regime_raw) if regime_raw else None
 
         recent_runs = self._safe_recent_runs()
 
@@ -57,6 +60,7 @@ class DashboardService:
             strategies=strategies,
             baselines=baselines,
             last_scan=last_scan,
+            regime=regime,
             recent_runs=recent_runs,
         )
 

@@ -35,10 +35,11 @@ from repositories.scan_result_repository import (
     InMemoryScanResultRepository,
     ScanResultRepository,
 )
-from routers import backtest, dashboard, health, indicators, scheduler, strategies
+from routers import backtest, dashboard, health, indicators, research, scheduler, strategies
 from services.backtest_service import BacktestService
 from services.dashboard_service import DashboardService
 from services.indicator_service import IndicatorService
+from services.research_service import ResearchService
 from services.scheduler_service import SchedulerService
 from services.strategy_service import StrategyService
 from strategies.scanner import MarketScanner, Scanner
@@ -99,6 +100,7 @@ def create_app(
     app.state.dashboard_service = DashboardService(
         settings.dashboard_snapshot_path_resolved, app.state.scheduler_service
     )
+    app.state.research_service = ResearchService(settings.research_snapshot_path_resolved)
 
     _register_exception_handlers(app)
 
@@ -116,6 +118,7 @@ def create_app(
     app.include_router(strategies.router, prefix=API_PREFIX)
     app.include_router(backtest.router, prefix=API_PREFIX)
     app.include_router(scheduler.router, prefix=API_PREFIX)
+    app.include_router(research.router, prefix=API_PREFIX)
     return app
 
 

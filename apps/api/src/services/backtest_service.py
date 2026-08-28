@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 from uuid import uuid4
 
-from backtest.config import BacktestConfig
+from backtest.config import BacktestConfig, RegimeFilterConfig
 from backtest.engine import BacktestEngine, DictCandlesProvider
 from backtest.models import BacktestReport
 from config.settings import Settings
@@ -49,6 +49,8 @@ class BacktestService:
         config = BacktestConfig()
         if request.hold_days:
             config.hold_days = list(request.hold_days)
+        if request.regime_filter:
+            config.portfolio.regime_filter = RegimeFilterConfig()
 
         engine = BacktestEngine(
             DictCandlesProvider(candles), config, kind_map=kind_map

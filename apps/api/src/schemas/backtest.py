@@ -22,6 +22,9 @@ class BacktestRunRequest(BaseModel):
     hold_days: list[int] | None = Field(
         None, description="持有期列表，缺省用默认 [1,3,5,10,20]"
     )
+    regime_filter: bool = Field(
+        False, description="是否启用市场环境（regime）过滤，只在允许状态下开仓"
+    )
 
 
 class BacktestRunBody(BaseModel):

@@ -47,6 +47,19 @@ class DashboardLastScan(BaseModel):
     symbols_scanned: int | None = None
 
 
+class DashboardRegime(BaseModel):
+    """当前市场环境（regime）快照（见 market.regime 与 docs/市场环境模块说明.md）。"""
+
+    as_of: str | None = None
+    index_20d_return: float | None = None  # 大盘 20 日涨跌
+    activity: float | None = None  # 市场活跃度（总量/60日均量）
+    drawdown: float | None = None  # 距 120 日高点回撤（≤ 0）
+    index_20d_label: str = ""
+    activity_label: str = ""
+    drawdown_label: str = ""
+    allow_open: bool | None = None  # 默认 filter 下是否允许开仓
+
+
 class DashboardOverview(BaseModel):
     """概览页聚合数据。"""
 
@@ -54,4 +67,5 @@ class DashboardOverview(BaseModel):
     strategies: list[DashboardStrategy] = []
     baselines: list[DashboardBaseline] = []
     last_scan: DashboardLastScan | None = None
+    regime: DashboardRegime | None = None
     recent_runs: list[RunView] = []

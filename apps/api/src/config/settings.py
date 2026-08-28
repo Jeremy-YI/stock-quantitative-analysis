@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     # 概览页快照路径（make_dashboard_snapshot.py 离线生成，Dashboard 只读）
     # 留空 = 用仓库内默认 data/dashboard_snapshot.json（相对仓库根目录）
     dashboard_snapshot_path: str = ""
+    # 因子研究快照路径（run_research.py 离线生成，Research 只读）
+    research_snapshot_path: str = ""
 
     @property
     def hsjday_path(self) -> Path:
@@ -52,6 +54,14 @@ class Settings(BaseSettings):
         # config/settings.py 位于 apps/api/src/config/，仓库根 = 向上 4 层
         repo_root = Path(__file__).resolve().parents[4]
         return repo_root / "data" / "dashboard_snapshot.json"
+
+    @property
+    def research_snapshot_path_resolved(self) -> Path:
+        """解析因子研究快照的绝对路径（默认 ``<仓库根>/data/research_snapshot.json``）。"""
+        if self.research_snapshot_path:
+            return Path(self.research_snapshot_path).expanduser()
+        repo_root = Path(__file__).resolve().parents[4]
+        return repo_root / "data" / "research_snapshot.json"
 
 
 @lru_cache

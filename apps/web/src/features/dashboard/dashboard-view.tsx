@@ -37,6 +37,7 @@ import {
 import type {
   DashboardBaseline,
   DashboardOverview,
+  DashboardRegime,
   DashboardStrategy,
 } from './types'
 import useDashboard from './use-dashboard'
@@ -134,6 +135,55 @@ function BaselineCard({ b }: { b: DashboardBaseline }) {
   )
 }
 
+function RegimeCard({ regime }: { regime: DashboardRegime }) {
+  const allow = regime.allow_open
+  const allowText = allow === null || allow === undefined ? '—' : allow ? '允许开仓' : '不建议开仓'
+  const allowColor =
+    allow === true ? 'text-up' : allow === false ? 'text-down' : 'text-neutral'
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>当前市场环境</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-2 text-sm">
+          <div className={metricRow}>
+            <span className={metricLabel}>大盘 20 日</span>
+            <span className="font-medium">
+              {pct(regime.index_20d_return)}{' '}
+              <span className="text-xs text-muted-foreground">
+                {regime.index_20d_label}
+              </span>
+            </span>
+          </div>
+          <div className={metricRow}>
+            <span className={metricLabel}>市场活跃度</span>
+            <span className="font-medium">
+              {regime.activity?.toFixed(2) ?? '—'}{' '}
+              <span className="text-xs text-muted-foreground">
+                {regime.activity_label}
+              </span>
+            </span>
+          </div>
+          <div className={metricRow}>
+            <span className={metricLabel}>距 120 日高点</span>
+            <span className="font-medium">
+              {pct(regime.drawdown)}{' '}
+              <span className="text-xs text-muted-foreground">
+                {regime.drawdown_label}
+              </span>
+            </span>
+          </div>
+          <div className={metricRow}>
+            <span className={metricLabel}>默认 filter 判定</span>
+            <span className={`font-semibold ${allowColor}`}>{allowText}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 /** 概览页：策略信号/超额胜率 + 市场基线 + 最近扫描/调度状态 + 子页导航。 */
 export default function DashboardView() {
   const { data, loading, error } = useDashboard()
@@ -200,6 +250,15 @@ export default function DashboardView() {
               <BaselineCard key={b.universe} b={b} />
             ))}
           </div>
+
+          {/* 当前市场环境（regime） */}
+          {data.regime && (
+            <Card className={card}>
+              <CardContent className="pt-6">
+                <RegimeCard regime={data.regime} />
+              </CardContent>
+            </Card>
+          )}
 
           {/* 最近调度任务执行状态 */}
           <Card className={card}>

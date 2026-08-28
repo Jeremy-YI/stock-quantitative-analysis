@@ -41,6 +41,16 @@ function makeOverview(): DashboardOverview {
       },
     ],
     last_scan: { status: 'ok', as_of: '2026-08-27', duration_seconds: 45.2, symbols_scanned: 6968 },
+    regime: {
+      as_of: '2026-08-27',
+      index_20d_return: -0.03,
+      activity: 0.9,
+      drawdown: -0.05,
+      index_20d_label: '微跌-4~0',
+      activity_label: '偏淡0.8-1.0',
+      drawdown_label: '近高-8~-3%',
+      allow_open: true,
+    },
     recent_runs: [],
   }
 }
@@ -81,6 +91,13 @@ describe('DashboardView', () => {
     expect(screen.getByText('选股策略')).toBeTruthy()
     expect(screen.getByText('策略回测')).toBeTruthy()
     expect(screen.getByText('任务调度')).toBeTruthy()
+  })
+
+  it('should render market regime card', () => {
+    render(<DashboardView />)
+    expect(screen.getByText('当前市场环境')).toBeTruthy()
+    expect(screen.getByText('微跌-4~0')).toBeTruthy()
+    expect(screen.getByText('允许开仓')).toBeTruthy()
   })
 
   it('should show error when loading fails', () => {
