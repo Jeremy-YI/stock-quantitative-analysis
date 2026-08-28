@@ -13,13 +13,14 @@
 | --- | --- | --- |
 | 概览看板 | `/` | 各策略当日信号数 / 选择性 / 超额胜率 + 市场基线 + 最近扫描与调度状态 |
 | 技术指标 | `/indicators` | MACD / KDJ / RSI / 量能，输入代码即出图（ECharts） |
-| 选股策略 | `/strategies` | 五策略扫描结果表（排序 / 列切换 / 点击看该股指标图） |
-| 策略回测 | `/backtest` | 净值曲线 / 超额胜率对比 / 收益分布 / 衰减 / 明细 |
+| 选股策略 | `/strategies` | 六策略扫描结果表（排序 / 列切换 / 点击看该股指标图） |
+| 策略回测 | `/backtest` | 净值曲线 / 超额胜率对比 / 收益分布 / 衰减 / 信号叠加矩阵 / 明细 |
 | 任务调度 | `/scheduler` | 每日扫描 / 报告 / ETL 任务列表 + 执行历史 + 手动触发 |
 
-内置五套 A股选股策略（`packages/strategies/`）：`b1b2b3`（KDJ+量价）、`macd_resonance`
+内置六套 A股选股策略（`packages/strategies/`）：`b1b2b3`（KDJ+量价）、`macd_resonance`
 （月线水上 + 周线金叉）、`pin30`（单针下30）、`stealth_rally`（水下二次金叉偷涨）、
-`etf_accumulation`（ETF 跌幅 25%-40% + 底背离）。
+`double_bottom`（双底齐平 + 底背离 + 缩量二次探底）、`etf_accumulation`（ETF 跌幅
+25%-40% + 底背离）。
 
 ## 目录结构
 
@@ -41,7 +42,7 @@ stock-platform/
 │   ├── indicators/               # MACD / KDJ / RSI / 量能（纯函数）
 │   ├── datasource/               # 通达信 hsjday 只读解析
 │   ├── market/                   # 交易日历 / 涨跌停 / 复权
-│   ├── strategies/               # 五策略 + 全市场扫描器
+│   ├── strategies/               # 六策略 + 全市场扫描器
 │   ├── backtest/                 # 回测引擎 + 基线（超额胜率口径）
 │   └── scheduler/                # 调度器（任务注册 / 执行 / 分片断点）
 ├── data/                         # 演示数据 + 概览页快照（.gitignore 忽略，由 seed_demo_data.py 现场生成）
@@ -146,7 +147,7 @@ cd apps/web && npx playwright test
 覆盖要点：
 
 - **指标黄金值**：MACD/KDJ/RSI/量能 逐点比对真实 600519 切片（精确到 4 位小数），锁死公式。
-- **策略一致性**：五策略快照 + 一致性测试（新旧实现同结果）。
+- **策略一致性**：六策略快照 + 一致性测试（新旧实现同结果）。
 - **回测口径**：超额胜率 = 策略胜率 − 同期同宇宙基线胜率（详见 `docs/回测迁移说明.md`），
   单测锁死「不用 50% 当基准」的方法论修正。
 - **调度器**：cron 解析 / 执行器 / 分片断点 / 通知器单测。

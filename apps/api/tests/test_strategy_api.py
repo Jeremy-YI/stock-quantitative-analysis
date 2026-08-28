@@ -49,7 +49,7 @@ async def test_strategies_list_200(client):
     body = res.json()
     assert body["message"] == "ok"
     names = [s["name"] for s in body["body"]["strategies"]]
-    assert {"b1b2b3", "macd_resonance", "pin30", "stealth_rally", "etf_accumulation"} <= set(names)
+    assert {"b1b2b3", "double_bottom", "macd_resonance", "pin30", "stealth_rally", "etf_accumulation"} <= set(names)
     # 每个策略都有描述与配置
     for s in body["body"]["strategies"]:
         assert s["description"]

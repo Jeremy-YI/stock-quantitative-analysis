@@ -10,6 +10,7 @@ import DetailTable from '@/features/backtest/detail-table'
 import EquityChart from '@/features/backtest/equity-chart'
 import DecayChart from '@/features/backtest/decay-chart'
 import ExcessChart from '@/features/backtest/excess-chart'
+import OverlayHeatmap from '@/features/backtest/overlay-heatmap'
 import ReturnHistogram from '@/features/backtest/return-histogram'
 
 describe('backtest charts', () => {
@@ -81,6 +82,28 @@ describe('backtest charts', () => {
       />
     )
     expect(screen.getByTestId('echarts')).toBeTruthy()
+  })
+
+  it('should render overlay heatmap container', () => {
+    render(
+      <OverlayHeatmap
+        cells={[
+          {
+            strategy_a: 'stealth_rally',
+            strategy_b: 'double_bottom',
+            n: 120,
+            win_rate: 0.5,
+            excess_win_rate: 0.07,
+          },
+        ]}
+      />
+    )
+    expect(screen.getByTestId('echarts')).toBeTruthy()
+  })
+
+  it('should render overlay heatmap empty hint when no cells', () => {
+    render(<OverlayHeatmap cells={[]} />)
+    expect(screen.getByText(/暂无叠加分析数据/)).toBeTruthy()
   })
 })
 

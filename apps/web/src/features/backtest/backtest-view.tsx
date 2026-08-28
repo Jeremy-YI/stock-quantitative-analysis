@@ -21,6 +21,7 @@ import DecayChart from './decay-chart'
 import DetailTable from './detail-table'
 import EquityChart from './equity-chart'
 import ExcessChart from './excess-chart'
+import OverlayHeatmap from './overlay-heatmap'
 import ReturnHistogram from './return-histogram'
 import StatCards from './stat-cards'
 import type { HistogramBin, StrategyResult } from './types'
@@ -28,6 +29,7 @@ import useBacktest from './use-backtest'
 
 const STRATEGIES = [
   'b1b2b3',
+  'double_bottom',
   'macd_resonance',
   'pin30',
   'stealth_rally',
@@ -210,6 +212,19 @@ export default function BacktestView() {
               </CardHeader>
               <CardContent className={chartCard}>
                 <EquityChart series={portfolio.equity_curve} />
+              </CardContent>
+            </Card>
+          )}
+
+          {verification.overlay.length > 0 && (
+            <Card className={card}>
+              <CardHeader>
+                <CardTitle>信号叠加矩阵（两两策略同标的同日触发的超额胜率）</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={chartCard}>
+                  <OverlayHeatmap cells={verification.overlay} />
+                </div>
               </CardContent>
             </Card>
           )}

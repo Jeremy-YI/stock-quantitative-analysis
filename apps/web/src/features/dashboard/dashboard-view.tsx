@@ -243,7 +243,7 @@ export default function DashboardView() {
             </Link>
             <Link href="/strategies" className={navCard}>
               <span className={navTitle}>选股策略</span>
-              <span className={navDesc}>五策略扫描结果</span>
+              <span className={navDesc}>六策略扫描结果</span>
             </Link>
             <Link href="/backtest" className={navCard}>
               <span className={navTitle}>策略回测</span>

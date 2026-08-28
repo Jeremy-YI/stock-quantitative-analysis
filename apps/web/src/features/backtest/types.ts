@@ -51,6 +51,14 @@ export interface StrategyResult {
   holds: HoldReturn[]
 }
 
+export interface OverlayCell {
+  strategy_a: string
+  strategy_b: string
+  n: number
+  win_rate: number
+  excess_win_rate: number | null
+}
+
 export interface BoardResult {
   board: string
   holds: HoldReturn[]
@@ -79,6 +87,7 @@ export interface VerificationReport {
   by_board: BoardResult[]
   decay: DecaySeries[]
   baselines: BaselineResult[]
+  overlay: OverlayCell[]
 }
 
 export interface EquityPoint {
