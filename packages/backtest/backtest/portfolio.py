@@ -7,10 +7,21 @@ A股约束全部落实：
     - 交易成本：佣金 / 印花税 / 过户费 / 滑点（见 ``CostConfig``）。
     - 仓位：单只 ≤ position_weight，最多动用 (1 - reserve_ratio) 资金，保留预备队。
 
+仓位分配（阶段 8 修复 FIFO 缺陷）：
+
+    - **按策略分资金池**：当日可用资金按策略份额（share，归一化到 sum=1）切分，
+      各策略只能在自己的池子里建仓，互不抢占——避免旧版按信号到达顺序（FIFO）
+      让信号量大的策略（如 b1b2b3 每日 3186 条）先占满仓位槽。
+    - **策略内按 score 排序取前 N**：同一策略内信号按 ``Signal.score`` 降序，
+      依次建仓直到该策略资金池耗尽，而非按遍历顺序。
+    - 个股单只 ≤ position_weight；同日同标的只建一笔（跨策略去重，权重高者优先，
+      再按 score）。
+    - 市场环境过滤（可选）：``PortfolioConfig.regime_filter`` 给定后，只允许在
+      ``market.regime`` 判定的允许市场状态下开仓（卖出不受限制）。
+
 简化说明（文档记录在 docs/回测迁移说明.md）：
     - 3-2-2-2 分步建仓未实现，当前按一次性建仓近似（PortfolioConfig TODO）。
     - 止盈止损按收盘价判断（不用盘中高低点），属于保守近似。
-    - 同一天同一标的只建一笔；已持仓的标的当日新信号不重复加仓。
 """
 
 from __future__ import annotations
@@ -20,6 +31,7 @@ from datetime import date
 import pandas as pd
 
 from market.calendar import trading_days
+from market.regime import snapshot_at
 
 from .config import BacktestConfig, default_config
 from .execution import apply_slippage, buy_cost, can_buy_at_open, can_sell_at_close, sell_cost
@@ -29,26 +41,78 @@ from .stats import max_drawdown, sharpe_ratio, total_return
 _T1_DAYS = 1
 
 
-def strategy_weight_multiplier(strategy: str, weights: dict[str, float] | None) -> float:
-    """把策略权重归一化成仓位乘数（0~1）。
-
-    - weights 为空 → 等权，返回 1.0（旧行为：每信号都按 position_weight 全额建仓）。
-    - weights 非空 → 乘数 = w / max(w)，其中 w = weights.get(strategy, 0.0)。
-      未列入的策略权重为 0（不建仓），权重最高的策略乘数 = 1.0（拿满单只仓位上限）。
-    """
+def _eligible_strategies(signals: list, weights: dict[str, float] | None) -> set[str]:
+    """返回参与建仓的策略集合（有信号且权重 > 0；等权时 = 所有出现过的策略）。"""
+    present = {s.strategy for s in signals}
     if not weights:
-        return 1.0
-    max_w = max(weights.values()) if weights else 0.0
-    if max_w <= 0:
-        return 0.0
-    return weights.get(strategy, 0.0) / max_w
+        return present
+    return {n for n in present if weights.get(n, 0.0) > 0}
 
 
-def _strategy_rank(strategy: str, weights: dict[str, float] | None) -> float:
-    """同日同标的多个策略信号时，取权重更高的策略（等权时权重相等，保留先见者）。"""
+def _strategy_shares(
+    weights: dict[str, float] | None, eligible: set[str]
+) -> dict[str, float]:
+    """返回归一化到 sum=1 的策略资金份额。
+
+    - weights 为 None 或空 → 等权（每个策略 1/N）。
+    - weights 非空 → share = max(0, w) / sum(max(0, w))。
+    """
+    if not eligible:
+        return {}
+    if not weights:
+        return {n: 1.0 / len(eligible) for n in eligible}
+    raw = {n: max(0.0, float(weights.get(n, 0.0))) for n in eligible}
+    total = sum(raw.values())
+    if total <= 0:
+        return {}
+    return {n: raw[n] / total for n in raw}
+
+
+def _strategy_priority(strategy: str, weights: dict[str, float] | None) -> float:
+    """跨策略去重时的优先级：权重高者优先；等权时所有策略同优先级（再按 score）。"""
     if not weights:
         return 0.0
     return weights.get(strategy, 0.0)
+
+
+def _better_signal(a, b, weights: dict[str, float] | None) -> bool:
+    """跨策略去重：a 是否优于 b（先比权重，再比 score）。"""
+    pa = _strategy_priority(a.strategy, weights)
+    pb = _strategy_priority(b.strategy, weights)
+    if pa != pb:
+        return pa > pb
+    return a.score > b.score
+
+
+def _build_buy_groups(
+    signals: list, weights: dict[str, float] | None, ord_map: dict[date, int]
+) -> dict[date, dict[str, list]]:
+    """把信号归组成 {entry_day: {strategy: [Signal 按 score 降序]}}。
+
+    跨策略同日同标的去重（保留权重高/score 高者），策略内按 score 降序。
+    """
+    eligible = _eligible_strategies(signals, weights)
+    day_candidates: dict[date, dict[str, object]] = {}
+    for s in signals:
+        if s.strategy not in eligible:
+            continue
+        entry_day = _next_trading_day(s.triggered_at)
+        if entry_day not in ord_map:
+            continue
+        cand = day_candidates.setdefault(entry_day, {})
+        existing = cand.get(s.symbol)
+        if existing is None or _better_signal(s, existing, weights):
+            cand[s.symbol] = s
+
+    buys_by_day: dict[date, dict[str, list]] = {}
+    for entry_day, cand in day_candidates.items():
+        by_strat: dict[str, list] = {}
+        for sig in cand.values():
+            by_strat.setdefault(sig.strategy, []).append(sig)
+        for lst in by_strat.values():
+            lst.sort(key=lambda s: s.score, reverse=True)
+        buys_by_day[entry_day] = by_strat
+    return buys_by_day
 
 
 class Position:
@@ -67,13 +131,17 @@ def simulate_portfolio(
     signals: list,
     candles: dict[str, pd.DataFrame],
     config: BacktestConfig | None = None,
+    regime_series: pd.DataFrame | None = None,
 ) -> dict:
     """按信号模拟组合，返回净值曲线与汇总指标。
 
     Args:
-        signals: Signal 列表（含 symbol / triggered_at / strategy）。
+        signals: Signal 列表（含 symbol / triggered_at / strategy / score）。
         candles: {symbol: 全量日线 DataFrame}（含 date/open/high/low/close）。
         config: 回测配置。
+        regime_series: 市场环境序列（market.regime.compute_market_series 的输出，
+            以 date 为索引）。仅在 ``config.portfolio.regime_filter`` 给定且本参数
+            非空时生效；生效后只允许在允许的市场状态下开仓（卖出不受限）。
 
     Returns:
         dict，含：
@@ -81,10 +149,11 @@ def simulate_portfolio(
             total_return / max_drawdown / sharpe
             trade_count: 实际成交的买卖对数
             filled_buys: 成功买入次数
-            skipped_buys: 因涨停/资金不足跳过的买入次数
+            skipped_buys: 因涨停/资金不足/regime 过滤跳过的买入次数
     """
     cfg = config or default_config()
     pcfg = cfg.portfolio
+    rfilter = pcfg.regime_filter
 
     # 预取每日开盘/收盘价（按日期字典，供 O(1) 取用 + 停牌前向填充）
     open_map: dict[str, dict[date, float]] = {}
@@ -106,7 +175,6 @@ def simulate_portfolio(
             prev = c
         prev_close_map[symbol] = pc
 
-    # 信号按交易日索引，方便「T 日收盘触发 → T+1 开盘买入」
     if not signals:
         return _empty_report(cfg)
 
@@ -115,10 +183,8 @@ def simulate_portfolio(
     max_date = signal_dates[-1]
 
     # 交易日序列 + 序数映射（持有期按交易日计）
-    # 窗口：从信号首日开始，末端扩展 max_holding_days 个交易日
     start = min_date
-    end = max_date
-    end_ext = end
+    end_ext = max_date
     for _ in range(pcfg.max_holding_days + 2):
         nxt = _next_trading_day(end_ext)
         if nxt == end_ext:
@@ -128,21 +194,10 @@ def simulate_portfolio(
 
     ord_map: dict[date, int] = {d: i for i, d in enumerate(days)}
 
-    # 按「触发日 + 1」归组待买入信号（去重：同日同标的只建一笔，保留权重最高的策略）
-    # 权重为 0 的策略（未列入 strategy_weights 或权重 ≤ 0）直接不建仓，不进候选。
-    buys_by_day: dict[date, dict[str, str]] = {}
-    for s in signals:
-        if strategy_weight_multiplier(s.strategy, pcfg.strategy_weights) <= 0:
-            continue
-        entry_day = _next_trading_day(s.triggered_at)
-        if entry_day not in ord_map:
-            continue
-        day_map = buys_by_day.setdefault(entry_day, {})
-        existing = day_map.get(s.symbol)
-        if existing is None or _strategy_rank(s.strategy, pcfg.strategy_weights) > _strategy_rank(
-            existing, pcfg.strategy_weights
-        ):
-            day_map[s.symbol] = s.strategy
+    # 策略份额 + 按日归组买入信号（策略内按 score 降序）
+    eligible = _eligible_strategies(signals, pcfg.strategy_weights)
+    shares = _strategy_shares(pcfg.strategy_weights, eligible)
+    buys_by_day = _build_buy_groups(signals, pcfg.strategy_weights, ord_map)
 
     cash = pcfg.initial_cash
     positions: dict[str, Position] = {}
@@ -154,48 +209,70 @@ def simulate_portfolio(
     for day in days:
         ord_i = ord_map[day]
 
+        # 0) 市场环境过滤：不在允许状态时当日不开仓（卖出不受限）
+        regime_ok = True
+        if rfilter is not None:
+            snap = snapshot_at(regime_series, day) if regime_series is not None else None
+            if snap is None or not rfilter.allow(
+                snap.index_20d_return, snap.activity, snap.drawdown
+            ):
+                regime_ok = False
+
         # 1) 买入（当日开盘，处理「昨日触发」的信号）
-        for symbol, strategy in buys_by_day.get(day, {}).items():
-            if symbol in positions:
-                continue
-            o = open_map.get(symbol, {}).get(day)
-            pc = prev_close_map.get(symbol, {}).get(day)
-            if o is None or pc is None or o <= 0:
-                skipped_buys += 1
-                continue
-            if not can_buy_at_open(o, pc, symbol):
-                skipped_buys += 1
-                continue
+        if regime_ok:
+            day_buys = buys_by_day.get(day, {})
+            if day_buys:
+                equity_now = _mark_to_market(cash, positions, close_map, day)
+                deployable_cap = equity_now * (1.0 - pcfg.reserve_ratio)
+                deployed_mv = _deployed(positions, close_map, day)
+                headroom = max(deployable_cap - deployed_mv, 0.0)
 
-            equity_now = _mark_to_market(cash, positions, close_map, day)
-            deployable_cap = equity_now * (1.0 - pcfg.reserve_ratio)
-            deployed_mv = _deployed(positions, close_map, day)
-            # 单只仓位上限、可用现金、总部署上限（保留预备队）三者取最小
-            base_budget = min(
-                equity_now * pcfg.position_weight,
-                cash,
-                max(deployable_cap - deployed_mv, 0.0),
+                for strategy in sorted(day_buys.keys()):
+                    share = shares.get(strategy, 0.0)
+                    if share <= 0:
+                        continue
+                    pool = headroom * share
+                    remaining_pool = pool
+                    for sig in day_buys[strategy]:
+                        symbol = sig.symbol
+                        if symbol in positions:
+                            continue
+                        if remaining_pool <= 0:
+                            break
+                        o = open_map.get(symbol, {}).get(day)
+                        pc = prev_close_map.get(symbol, {}).get(day)
+                        if o is None or pc is None or o <= 0:
+                            skipped_buys += 1
+                            continue
+                        if not can_buy_at_open(o, pc, symbol):
+                            skipped_buys += 1
+                            continue
+
+                        # 单只仓位上限 / 该策略剩余资金池 / 可用现金 三者取最小
+                        budget = min(equity_now * pcfg.position_weight, remaining_pool, cash)
+                        if budget <= 0:
+                            break
+
+                        buy_px = apply_slippage(o, "buy", cfg.cost)
+                        if buy_px <= 0:
+                            skipped_buys += 1
+                            continue
+                        qty = budget / buy_px
+                        turnover = buy_px * qty
+                        fee = buy_cost(turnover, symbol, cfg.cost)
+                        total_cost = turnover + fee
+                        if total_cost > cash + 1e-9 or qty <= 0:
+                            skipped_buys += 1
+                            continue
+
+                        cash -= total_cost
+                        positions[symbol] = Position(symbol, qty, buy_px, ord_i)
+                        remaining_pool -= turnover
+                        filled_buys += 1
+        else:
+            skipped_buys += sum(
+                len(lst) for lst in buys_by_day.get(day, {}).values()
             )
-            # 策略权重：base_budget × w / max(w)，权重高的策略拿满、低的等比例缩小
-            budget = base_budget * strategy_weight_multiplier(
-                strategy, pcfg.strategy_weights
-            )
-
-            buy_px = apply_slippage(o, "buy", cfg.cost)
-            if buy_px <= 0:
-                skipped_buys += 1
-                continue
-            qty = budget / buy_px
-            turnover = buy_px * qty
-            fee = buy_cost(turnover, symbol, cfg.cost)
-            total_cost = turnover + fee
-            if total_cost > cash + 1e-9 or qty <= 0:
-                skipped_buys += 1
-                continue
-
-            cash -= total_cost
-            positions[symbol] = Position(symbol, qty, buy_px, ord_i)
-            filled_buys += 1
 
         # 2) 卖出（当日收盘，判断固定持有期 / 止盈止损，T+1 约束）
         for symbol in list(positions.keys()):
@@ -284,7 +361,6 @@ def _close_as_of(close_by_date: dict[date, float], day: date) -> float | None:
         return None
     if day in close_by_date:
         return close_by_date[day]
-    # 找 <= day 的最大日期
     best = None
     for d, c in close_by_date.items():
         if d <= day and (best is None or d > best):

@@ -15,25 +15,26 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from market.adjust import DEFAULT_ADJUST_MODE, AdjustMode
+from market.regime import should_allow as _regime_should_allow
 
 # 默认持有期（交易日）：对应 Jeremy 现用 top5_verify 的「持有 N 日」验证
 DEFAULT_HOLD_DAYS = (1, 3, 5, 10, 20)
 
-# 默认策略仓位权重（阶段 7，按 20 日超额胜率推导，见 docs/信号叠加分析.md）。
-# 推导公式：weight = max(0, 20 日超额胜率)，单位 pp（百分点）。
-#   实测（2026-03-01 ~ 08-27）：etf_accumulation +31.4pp、stealth_rally +7.2pp，
-#   其余（b1b2b3 / double_bottom / macd_resonance / pin30）超额 ≤ 0 → 权重 0。
-# 重要警示（数据结论，非拍脑袋）：按此「超额胜率」权重加权后，组合回测反而跑输
-# 等权（-14.13% vs +4.00%），因为超额胜率 ≠ 绝对收益——stealth_rally 超额胜率为正
-# 但绝对 20 日收益为负（-16.82% solo），把仓位分给它拖累组合；唯一绝对收益为正的
-# 是 etf_accumulation（+9.41% solo）。是否采用由 Jeremy 决定。
+# 默认策略仓位权重（阶段 7 按「20 日超额胜率」推导，阶段 8 改用「超额收益」，
+# 见 docs/信号叠加分析.md）。推导公式：weight = max(0, 20 日超额收益)，单位百分点。
+#   实测（2026-03-01 ~ 08-27，修复仓位分配缺陷后）：
+#   etf_accumulation +6.25%、stealth_rally +1.65% 为正超额收益；其余 ≤ 0 → 权重 0。
+# 阶段 8 修复了组合回测 FIFO 建仓缺陷（按策略分资金池 + 策略内按 score 排序），
+# 权重从「超额胜率」改为「超额收益」后，结论变为「etf 主配 + 偷涨次配」——
+# 详见 docs/信号叠加分析.md §3。
 DEFAULT_STRATEGY_WEIGHTS: dict[str, float] = {
-    "etf_accumulation": 31.4,
-    "stealth_rally": 7.2,
+    "etf_accumulation": 6.25,
+    "stealth_rally": 1.65,
     "double_bottom": 0.0,
     "b1b2b3": 0.0,
     "macd_resonance": 0.0,
     "pin30": 0.0,
+    "macd_volume_washout": 0.0,
 }
 
 
@@ -60,6 +61,36 @@ class CostConfig(BaseModel):
     )
 
 
+class RegimeFilterConfig(BaseModel):
+    """组合回测的市场环境（regime）过滤条件——只在允许的市场状态下开仓。
+
+    默认值依据实测（docs/市场环境模块说明.md）：
+        - 大盘 20 日涨幅 < +4%（上涨市中均值回归组合超额转负）
+        - 活跃度 < 1.2（火爆市超额最差）
+        - 回撤在 -15%~0（中跌区间均值回归组合超额转负）
+    任一指标缺失 / NaN 时视为不允许（数据不足保守）。
+    """
+
+    max_index_20d_return: float = Field(0.04, description="大盘 20 日涨幅上限")
+    max_activity: float = Field(1.2, description="市场活跃度上限（总成交量/60日均量）")
+    min_drawdown: float = Field(-0.15, description="距 120 日高点回撤下限")
+    max_drawdown: float = Field(0.0, description="距 120 日高点回撤上限")
+
+    def allow(
+        self, index_20d_return: float | None, activity: float | None, drawdown: float | None
+    ) -> bool:
+        """判断是否允许开仓（委托 market.regime.should_allow）。"""
+        return _regime_should_allow(
+            index_20d_return,
+            activity,
+            drawdown,
+            max_index_20d_return=self.max_index_20d_return,
+            max_activity=self.max_activity,
+            min_drawdown=self.min_drawdown,
+            max_drawdown=self.max_drawdown,
+        )
+
+
 class PortfolioConfig(BaseModel):
     """组合回测仓位规则（参考 TOOLS.md）。"""
 
@@ -78,10 +109,14 @@ class PortfolioConfig(BaseModel):
     strategy_weights: dict[str, float] | None = Field(
         None,
         description=(
-            "各策略仓位权重（按实测超额胜率推导，见 docs/信号叠加分析.md）。"
-            "None = 等权（每信号均按 position_weight 全额建仓，旧行为）；"
-            "给定后，每个信号预算 = base_budget × w / max(w)，未列出的策略权重为 0（不建仓）。"
+            "各策略仓位权重（阶段 8 改为按 20 日超额收益推导，见 docs/信号叠加分析.md）。"
+            "None = 等权（各策略均分资金池，每策略按 score 取前 N）；"
+            "给定后，资金池按 w/sum(w) 切分，未列出的策略权重为 0（不建仓）。"
         ),
+    )
+    # 市场环境过滤：None = 不过滤（旧行为）；给定后只在允许的市场状态下开仓。
+    regime_filter: RegimeFilterConfig | None = Field(
+        None, description="市场环境过滤条件（见 market.regime 与 docs/市场环境模块说明.md）"
     )
 
 

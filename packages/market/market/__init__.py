@@ -9,6 +9,13 @@ from market.calendar import (
 )
 from market.holidays import HOLIDAYS
 from market.price_limit import PriceLimit, get_price_limit
+from market.regime import (
+    RegimeSnapshot,
+    classify_regime,
+    compute_market_series,
+    should_allow,
+    snapshot_at,
+)
 from market.resample import (
     RULE_MONTHLY,
     RULE_WEEKLY,
@@ -25,9 +32,14 @@ __all__ = [
     "RULE_MONTHLY",
     "RULE_WEEKLY",
     "PriceLimit",
+    "RegimeSnapshot",
+    "classify_regime",
+    "compute_market_series",
     "get_price_limit",
     "is_trading_day",
+    "should_allow",
     "shift_trading_day",
+    "snapshot_at",
     "trading_days",
     "resample_monthly",
     "resample_ohlc",

@@ -28,6 +28,7 @@ from typing import Protocol
 import pandas as pd
 
 from market.calendar import trading_days
+from market.regime import compute_market_series
 
 from .baseline import daily_baseline_win_rates, compute_baseline
 from .config import BacktestConfig, default_config
@@ -90,6 +91,10 @@ class DictCandlesProvider:
 
     def get(self, symbol: str) -> pd.DataFrame | None:
         return self._candles.get(symbol)
+
+    def all(self) -> dict[str, pd.DataFrame]:
+        """返回全部标的日线（供 regime 计算取全市场数据）。"""
+        return self._candles
 
 
 class BacktestEngine:
@@ -340,10 +345,17 @@ class BacktestEngine:
     # 组合回测模式
     # ------------------------------------------------------------------
     def run_portfolio(self, signals: list) -> PortfolioReport:
-        """按信号模拟组合，输出净值曲线。"""
+        """按信号模拟组合，输出净值曲线。
+
+        若 ``config.portfolio.regime_filter`` 给定，则从全市场 candles 计算
+        市场环境序列并传入组合回测，只在允许的市场状态下开仓。
+        """
         candles_map = {s.symbol: self._candles.get(s.symbol) for s in signals}
         candles_map = {k: v for k, v in candles_map.items() if v is not None}
-        raw = simulate_portfolio(signals, candles_map, self._config)
+        regime_series = None
+        if self._config.portfolio.regime_filter is not None:
+            regime_series = self._compute_regime_series()
+        raw = simulate_portfolio(signals, candles_map, self._config, regime_series=regime_series)
         return PortfolioReport(
             equity_curve=[{"date": p["date"], "equity": p["equity"]} for p in raw["equity_curve"]],
             total_return=round(raw["total_return"], 4),
@@ -354,6 +366,22 @@ class BacktestEngine:
             skipped_buys=raw["skipped_buys"],
             open_positions=raw["open_positions"],
         )
+
+    def _compute_regime_series(self) -> pd.DataFrame | None:
+        """从全市场 candles 算等权市场序列（仅个股宇宙，排除 ETF）。"""
+        provider = self._candles
+        if not hasattr(provider, "all"):
+            return None
+        candles = provider.all()
+        # 只取个股宇宙（ETF 波动小、会稀释等权指数的择时信号）
+        stock_candles = {
+            sym: df
+            for sym, df in candles.items()
+            if self._kind_map.get(sym) is None
+            or _kind_value(self._kind_map.get(sym)) == "stock"
+        }
+        series = compute_market_series(stock_candles)
+        return series if not series.empty else None
 
     # ------------------------------------------------------------------
     # 一次跑完整报告（验证 + 组合）

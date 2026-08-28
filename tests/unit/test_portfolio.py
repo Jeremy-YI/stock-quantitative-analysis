@@ -8,7 +8,12 @@ import pandas as pd
 import pytest
 
 from backtest.config import BacktestConfig
-from backtest.portfolio import simulate_portfolio, strategy_weight_multiplier
+from backtest.portfolio import (
+    _build_buy_groups,
+    _eligible_strategies,
+    _strategy_shares,
+    simulate_portfolio,
+)
 from strategies.signal import Signal
 
 D0 = date(2026, 8, 24)  # 周一
@@ -114,17 +119,29 @@ def test_portfolio_empty_signals():
     assert report["filled_buys"] == 0
 
 
-def test_strategy_weight_multiplier_equal_when_none():
-    assert strategy_weight_multiplier("b1b2b3", None) == 1.0
-    assert strategy_weight_multiplier("anything", {}) == 1.0
+def test_strategy_shares_equal_when_none():
+    assert _strategy_shares(None, {"a", "b"}) == {"a": 0.5, "b": 0.5}
+    assert _strategy_shares({}, {"a", "b"}) == {"a": 0.5, "b": 0.5}
+    assert _strategy_shares(None, set()) == {}
 
 
-def test_strategy_weight_multiplier_normalizes_and_excludes():
-    weights = {"stealth_rally": 6.8, "double_bottom": 4.0, "pin30": 0.0}
-    assert strategy_weight_multiplier("stealth_rally", weights) == 1.0
-    assert strategy_weight_multiplier("double_bottom", weights) == pytest.approx(4.0 / 6.8)
-    assert strategy_weight_multiplier("pin30", weights) == 0.0
-    assert strategy_weight_multiplier("macd_resonance", weights) == 0.0  # 未列入 = 不建仓
+def test_strategy_shares_normalizes_and_excludes():
+    weights = {"stealth_rally": 6.8, "double_bottom": 3.2, "pin30": 0.0}
+    shares = _strategy_shares(weights, {"stealth_rally", "double_bottom", "pin30"})
+    assert shares["stealth_rally"] == pytest.approx(6.8 / 10.0)
+    assert shares["double_bottom"] == pytest.approx(3.2 / 10.0)
+    assert shares["pin30"] == 0.0
+
+
+def test_eligible_strategies_filters_zero_weight():
+    signals = [
+        Signal(symbol="600000", strategy="b1b2b3", signal_type="b1", score=1.0, triggered_at=D0),
+        Signal(symbol="600001", strategy="stealth_rally", signal_type="x", score=1.0, triggered_at=D0),
+    ]
+    assert _eligible_strategies(signals, None) == {"b1b2b3", "stealth_rally"}
+    assert _eligible_strategies(signals, {"b1b2b3": 0.0, "stealth_rally": 1.0}) == {
+        "stealth_rally"
+    }
 
 
 def test_portfolio_weight_zero_strategy_not_bought():
@@ -139,3 +156,38 @@ def test_portfolio_weight_zero_strategy_not_bought():
     )
     assert report["filled_buys"] == 0  # b1b2b3 权重 0，不建仓
     assert report["trade_count"] == 0
+
+
+def test_portfolio_equal_weight_strategy_pools_not_fifo():
+    """等权时各策略分池：信号多的策略不能占满所有仓位槽（阶段 8 FIFO 修复）。"""
+    symbols_a = ["600001", "600002", "600003"]
+    symbol_b = "600004"
+    candles = {
+        sym: _df([D0, D1, D2, D3], [100, 101, 102, 103], [100, 101, 102, 103])
+        for sym in symbols_a + [symbol_b]
+    }
+    signals = [
+        Signal(symbol=sym, strategy="strat_a", signal_type="x", score=float(i), triggered_at=D0)
+        for i, sym in enumerate(symbols_a)
+    ] + [
+        Signal(symbol=symbol_b, strategy="strat_b", signal_type="x", score=9.0, triggered_at=D0)
+    ]
+    report = simulate_portfolio(signals, candles, _config())
+    # 等权两策略各拿 50% 资金池：strat_a 建 2 笔（2×20%）、strat_b 建 1 笔
+    # 旧 FIFO 下 strat_a 会占满 4 个仓位槽，strat_b 0 笔
+    assert report["filled_buys"] == 3
+
+
+def test_build_buy_groups_sorts_by_score_and_dedupes():
+    """策略内按 score 降序；同标的多信号去重保留 score 高者。"""
+    signals = [
+        Signal(symbol="600000", strategy="s", signal_type="x", score=1.0, triggered_at=D0),
+        Signal(symbol="600001", strategy="s", signal_type="x", score=9.0, triggered_at=D0),
+        Signal(symbol="600000", strategy="s", signal_type="x", score=5.0, triggered_at=D0),
+    ]
+    ord_map = {D1: 0, D2: 1, D3: 2}
+    groups = _build_buy_groups(signals, None, ord_map)
+    lst = groups[D1]["s"]
+    # 600001 score 9 优先；600000 两条信号去重保留 score 5
+    assert [s.symbol for s in lst] == ["600001", "600000"]
+    assert [s.score for s in lst] == [9.0, 5.0]

@@ -168,14 +168,16 @@ def overlay_matrix(signals, candles, kind_map, start, end, hold_days):
 
 
 def derive_weights(verification, hold_days: int = HEADLINE_HOLD) -> dict[str, float]:
-    """按实测超额胜率推导策略权重：weight = max(0, excess_win_rate_20d)，单位 pp。
+    """按实测超额收益推导策略权重：weight = max(0, excess_return_20d)。
 
-    负超额 → 权重 0（不建仓）；正超额按比例分配，最高者拿满单只仓位上限。
+    阶段 8 从「超额胜率」改为「超额收益」：超额收益才和组合净值直接挂钩
+    （超额胜率是「输得少」的假象）。负超额收益 → 权重 0（不建仓）；
+    正超额收益按比例分配，最高者拿满单只仓位上限。
     """
     weights = {}
     for sr in verification.by_strategy:
         hold = next((h for h in sr.holds if h.hold_days == hold_days), None)
-        excess = hold.excess_win_rate if hold else None
+        excess = hold.excess_return if hold else None
         weights[sr.strategy] = max(0.0, excess) if excess is not None else 0.0
     return weights
 
@@ -278,7 +280,7 @@ def main() -> None:
     # 权重推导 + 组合对比
     weights = derive_weights(verification, HEADLINE_HOLD)
     print(f"\n{'='*100}")
-    print(f"【3】权重推导：weight = max(0, {HEADLINE_HOLD}日超额胜率)，单位 pp")
+    print(f"【3】权重推导：weight = max(0, {HEADLINE_HOLD}日超额收益)")
     print(f"{'='*100}")
     for name, w in weights.items():
         print(f"    {name:<16s} {w*100:+.1f}pp → 权重 {w:.3f}")
