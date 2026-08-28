@@ -36,6 +36,12 @@ export default function RootLayout({
           >
             策略回测
           </Link>
+          <Link
+            href="/scheduler"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            任务调度
+          </Link>
         </nav>
         {children}
       </body>
