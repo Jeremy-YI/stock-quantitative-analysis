@@ -32,12 +32,14 @@ sys.path.insert(0, str(ROOT))
 
 from backtest.config import BacktestConfig
 from backtest.engine import BacktestEngine, DictCandlesProvider
+from datasource.tdx import resolve_hsjday_root
 from market.calendar import trading_days
 from strategies import REGISTRY
 from strategies.filters import SymbolKind, filter_for_kinds
 from strategies.scanner import MarketScanner
 
-HSJDAY = Path.home() / "Desktop" / "每日复盘" / "hsjday"
+# 数据根目录：优先读环境变量 STOCK_HSJDAY_ROOT，缺省用本地默认路径
+HSJDAY = resolve_hsjday_root()
 
 
 def load_universe(end: date) -> tuple[dict, dict[str, SymbolKind]]:

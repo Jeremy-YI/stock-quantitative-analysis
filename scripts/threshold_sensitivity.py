@@ -38,11 +38,13 @@ sys.path.insert(0, str(ROOT))
 from indicators.kdj import calc_kdj
 from indicators.macd import calc_ema
 from indicators.volume import calc_volume_ratio
+from datasource.tdx import resolve_hsjday_root
 from strategies.filters import SymbolKind, filter_for_kinds
 from strategies.scanner import MarketScanner
 from market.calendar import trading_days
 
-HSJDAY = Path.home() / "Desktop" / "每日复盘" / "hsjday"
+# 数据根目录：优先读环境变量 STOCK_HSJDAY_ROOT，缺省用本地默认路径
+HSJDAY = resolve_hsjday_root()
 HOLD_DAYS = (1, 3, 5, 10, 20)
 
 # 各策略默认阈值（与 config.py 一致，仅用于标注 baseline 与扫描基准）

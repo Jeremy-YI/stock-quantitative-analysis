@@ -21,7 +21,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from datasource.tdx import parse_day_file, resolve_symbol_path
+from datasource.tdx import parse_day_file, resolve_hsjday_root, resolve_symbol_path
 from indicators.kdj import calc_kdj
 from indicators.macd import calc_macd
 from indicators.rsi import calc_rsi
@@ -32,7 +32,8 @@ from indicators.volume import (
 )
 
 ROOT = Path(__file__).resolve().parent.parent
-HSJDAY = Path.home() / "Desktop" / "每日复盘" / "hsjday"
+# 数据根目录：优先读环境变量 STOCK_HSJDAY_ROOT，缺省用本地默认路径
+HSJDAY = resolve_hsjday_root()
 FIXTURES_DIR = ROOT / "tests" / "fixtures"
 
 SYMBOL = "600519"

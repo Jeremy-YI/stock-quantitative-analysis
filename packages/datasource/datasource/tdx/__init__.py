@@ -2,18 +2,22 @@
 
 from datasource.tdx.reader import (
     COLUMNS,
+    DEFAULT_HSJDAY_ROOT,
     RECORD_SIZE,
     parse_day_file,
     parse_records,
+    resolve_hsjday_root,
     resolve_market,
     resolve_symbol_path,
 )
 
 __all__ = [
     "COLUMNS",
+    "DEFAULT_HSJDAY_ROOT",
     "RECORD_SIZE",
     "parse_day_file",
     "parse_records",
+    "resolve_hsjday_root",
     "resolve_market",
     "resolve_symbol_path",
 ]

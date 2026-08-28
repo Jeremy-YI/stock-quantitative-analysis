@@ -25,6 +25,7 @@
 
 from __future__ import annotations
 
+import os
 import struct
 from datetime import date, datetime
 from pathlib import Path
@@ -32,6 +33,10 @@ from pathlib import Path
 import pandas as pd
 
 RECORD_SIZE = 32
+
+# 默认 hsjday 根目录（本地通达信导出的日线数据）。
+# 通过环境变量 STOCK_HSJDAY_ROOT 可覆盖（与 config/settings.py 命名一致）。
+DEFAULT_HSJDAY_ROOT = Path.home() / "Desktop" / "每日复盘" / "hsjday"
 _STRUCT = struct.Struct("<IIIIIfII")
 
 # DataFrame 列顺序（对外统一契约，字段全小写）
@@ -40,6 +45,16 @@ COLUMNS = ["date", "open", "high", "low", "close", "volume", "amount"]
 # 板块前缀（阶段 1 覆盖 A 股个股，ETF/债券/北交所扩展见 TODO）
 _SH_PREFIXES = ("60", "68")
 _BJ_PREFIXES = ("43", "83", "87", "88", "92")
+
+
+def resolve_hsjday_root() -> Path:
+    """从环境变量 ``STOCK_HSJDAY_ROOT`` 读 hsjday 根目录，缺省用本地默认路径。
+
+    脚本 / 测试统一走这里取值，避免散落硬编码路径；缺失时给默认值而非报错，
+    让「没有真实数据」的环境也能先启动（后续读文件时再明确报错）。
+    """
+    raw = os.environ.get("STOCK_HSJDAY_ROOT")
+    return Path(raw).expanduser() if raw else DEFAULT_HSJDAY_ROOT
 
 
 def resolve_market(symbol: str) -> str:

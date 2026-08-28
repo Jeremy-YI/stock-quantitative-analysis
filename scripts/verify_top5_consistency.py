@@ -19,6 +19,7 @@ top5_verify 的 hit/flat/miss 三分类只是在正收益之外多切了一刀�
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -26,12 +27,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from datasource.tdx import parse_day_file, resolve_symbol_path
+from datasource.tdx import parse_day_file, resolve_hsjday_root, resolve_symbol_path
 from market.calendar import trading_days
 
 TOOLS = Path.home() / ".openclaw" / "workspace" / "tools"
-HISTORY = TOOLS / "stock_pick_history.json"
-HSJDAY = Path.home() / "Desktop" / "每日复盘" / "hsjday"
+# 选股历史：优先读环境变量 STOCK_PICK_HISTORY，缺省用本地旧脚本产物（只读）
+HISTORY = Path(os.environ.get("STOCK_PICK_HISTORY", TOOLS / "stock_pick_history.json"))
+# 数据根目录：优先读环境变量 STOCK_HSJDAY_ROOT，缺省用本地默认路径
+HSJDAY = resolve_hsjday_root()
 
 
 def next_day_return(code: str, signal_date: date) -> float | None:

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
+from datasource.tdx import resolve_hsjday_root
 from errors import SymbolNotFoundError
 from repositories.daily_bar_repository import TdxDailyBarRepository
 from tests.helpers import build_day_bytes, make_daily_records
@@ -33,7 +32,7 @@ def test_symbol_not_found_raises(tmp_path):
 
 def test_real_hsjday_600519_if_present():
     """本地有真实 hsjday 数据时的端到端冒烟测试（没有则跳过）。"""
-    root = Path.home() / "Desktop" / "每日复盘" / "hsjday"
+    root = resolve_hsjday_root()
     if not (root / "sh" / "lday" / "sh600519.day").exists():
         pytest.skip("本地 hsjday 数据不存在，跳过")
 
