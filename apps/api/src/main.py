@@ -35,8 +35,9 @@ from repositories.scan_result_repository import (
     InMemoryScanResultRepository,
     ScanResultRepository,
 )
-from routers import backtest, health, indicators, scheduler, strategies
+from routers import backtest, dashboard, health, indicators, scheduler, strategies
 from services.backtest_service import BacktestService
+from services.dashboard_service import DashboardService
 from services.indicator_service import IndicatorService
 from services.scheduler_service import SchedulerService
 from services.strategy_service import StrategyService
@@ -95,6 +96,9 @@ def create_app(
 
     sched = scheduler_instance or _build_default_scheduler(settings)
     app.state.scheduler_service = SchedulerService(sched)
+    app.state.dashboard_service = DashboardService(
+        settings.dashboard_snapshot_path_resolved, app.state.scheduler_service
+    )
 
     _register_exception_handlers(app)
 
@@ -107,6 +111,7 @@ def create_app(
     )
 
     app.include_router(health.router, prefix=API_PREFIX)
+    app.include_router(dashboard.router, prefix=API_PREFIX)
     app.include_router(indicators.router, prefix=API_PREFIX)
     app.include_router(strategies.router, prefix=API_PREFIX)
     app.include_router(backtest.router, prefix=API_PREFIX)
