@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from backtest.config import (
     DEFAULT_HOLD_DAYS,
+    DEFAULT_STRATEGY_WEIGHTS,
     BacktestConfig,
     CostConfig,
     PortfolioConfig,
     default_config,
+    default_strategy_weights,
 )
 from backtest.engine import (
     BacktestEngine,
@@ -28,6 +30,7 @@ from backtest.models import (
     DecaySeries,
     EquityPoint,
     HoldReturn,
+    OverlayCell,
     PortfolioReport,
     StrategyResult,
     VerificationReport,
@@ -43,15 +46,18 @@ __all__ = [
     "CandlesProvider",
     "CostConfig",
     "DEFAULT_HOLD_DAYS",
+    "DEFAULT_STRATEGY_WEIGHTS",
     "DecayPoint",
     "DecaySeries",
     "DictCandlesProvider",
     "EquityPoint",
     "HoldReturn",
+    "OverlayCell",
     "PortfolioConfig",
     "PortfolioReport",
     "StrategyResult",
     "VerificationReport",
     "classify_board",
     "default_config",
+    "default_strategy_weights",
 ]

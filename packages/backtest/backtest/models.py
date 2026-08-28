@@ -74,6 +74,20 @@ class BoardResult(BaseModel):
     holds: list[HoldReturn] = Field(default_factory=list)
 
 
+class OverlayCell(BaseModel):
+    """两个策略同时触发标的的叠加超额（阶段 7 信号叠加分析）。
+
+    n = 两策略「同标的同日触发」的去重样本数（标的-日）；
+    excess_win_rate = 叠加标的 win_rate - 同期同宇宙基线胜率（相对 headline_hold）。
+    """
+
+    strategy_a: str
+    strategy_b: str
+    n: int = 0
+    win_rate: float = 0.0
+    excess_win_rate: float | None = None
+
+
 class DecayPoint(BaseModel):
     """衰减曲线上的一个点（某日滚动窗口胜率）。
 
@@ -108,6 +122,7 @@ class VerificationReport(BaseModel):
     by_board: list[BoardResult] = Field(default_factory=list)
     decay: list[DecaySeries] = Field(default_factory=list)
     baselines: list[BaselineResult] = Field(default_factory=list)
+    overlay: list[OverlayCell] = Field(default_factory=list)
 
 
 class EquityPoint(BaseModel):

@@ -29,6 +29,28 @@ from .stats import max_drawdown, sharpe_ratio, total_return
 _T1_DAYS = 1
 
 
+def strategy_weight_multiplier(strategy: str, weights: dict[str, float] | None) -> float:
+    """把策略权重归一化成仓位乘数（0~1）。
+
+    - weights 为空 → 等权，返回 1.0（旧行为：每信号都按 position_weight 全额建仓）。
+    - weights 非空 → 乘数 = w / max(w)，其中 w = weights.get(strategy, 0.0)。
+      未列入的策略权重为 0（不建仓），权重最高的策略乘数 = 1.0（拿满单只仓位上限）。
+    """
+    if not weights:
+        return 1.0
+    max_w = max(weights.values()) if weights else 0.0
+    if max_w <= 0:
+        return 0.0
+    return weights.get(strategy, 0.0) / max_w
+
+
+def _strategy_rank(strategy: str, weights: dict[str, float] | None) -> float:
+    """同日同标的多个策略信号时，取权重更高的策略（等权时权重相等，保留先见者）。"""
+    if not weights:
+        return 0.0
+    return weights.get(strategy, 0.0)
+
+
 class Position:
     """一笔持仓。"""
 
@@ -106,15 +128,21 @@ def simulate_portfolio(
 
     ord_map: dict[date, int] = {d: i for i, d in enumerate(days)}
 
-    # 按「触发日 + 1」归组待买入信号（去重：同日同标的只建一笔）
-    buys_by_day: dict[date, list[str]] = {}
+    # 按「触发日 + 1」归组待买入信号（去重：同日同标的只建一笔，保留权重最高的策略）
+    # 权重为 0 的策略（未列入 strategy_weights 或权重 ≤ 0）直接不建仓，不进候选。
+    buys_by_day: dict[date, dict[str, str]] = {}
     for s in signals:
+        if strategy_weight_multiplier(s.strategy, pcfg.strategy_weights) <= 0:
+            continue
         entry_day = _next_trading_day(s.triggered_at)
         if entry_day not in ord_map:
             continue
-        buys_by_day.setdefault(entry_day, [])
-        if s.symbol not in buys_by_day[entry_day]:
-            buys_by_day[entry_day].append(s.symbol)
+        day_map = buys_by_day.setdefault(entry_day, {})
+        existing = day_map.get(s.symbol)
+        if existing is None or _strategy_rank(s.strategy, pcfg.strategy_weights) > _strategy_rank(
+            existing, pcfg.strategy_weights
+        ):
+            day_map[s.symbol] = s.strategy
 
     cash = pcfg.initial_cash
     positions: dict[str, Position] = {}
@@ -127,7 +155,7 @@ def simulate_portfolio(
         ord_i = ord_map[day]
 
         # 1) 买入（当日开盘，处理「昨日触发」的信号）
-        for symbol in buys_by_day.get(day, []):
+        for symbol, strategy in buys_by_day.get(day, {}).items():
             if symbol in positions:
                 continue
             o = open_map.get(symbol, {}).get(day)
@@ -143,10 +171,14 @@ def simulate_portfolio(
             deployable_cap = equity_now * (1.0 - pcfg.reserve_ratio)
             deployed_mv = _deployed(positions, close_map, day)
             # 单只仓位上限、可用现金、总部署上限（保留预备队）三者取最小
-            budget = min(
+            base_budget = min(
                 equity_now * pcfg.position_weight,
                 cash,
                 max(deployable_cap - deployed_mv, 0.0),
+            )
+            # 策略权重：base_budget × w / max(w)，权重高的策略拿满、低的等比例缩小
+            budget = base_budget * strategy_weight_multiplier(
+                strategy, pcfg.strategy_weights
             )
 
             buy_px = apply_slippage(o, "buy", cfg.cost)

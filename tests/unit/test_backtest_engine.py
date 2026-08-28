@@ -163,3 +163,34 @@ def test_run_verification_excess_win_rate_and_selectivity():
     assert h1.baseline_win_rate == pytest.approx(0.5)
     assert h1.excess_win_rate == pytest.approx(0.5)
     assert h1.excess_return == pytest.approx(0.01, abs=1e-9)
+
+
+def test_overlay_matrix_marks_co_triggered():
+    """叠加矩阵：同标的同日被两个策略同时触发 → 产生一条 (a,b) 叠加样本。"""
+    base = date(2026, 6, 1)
+    rising = make_candle_df([10.0 * (1.01**i) for i in range(40)], start=base)
+    falling = make_candle_df([10.0 * (0.99**i) for i in range(40)], start=base)
+    candles = {"600000": rising, "300001": falling}
+    kind_map = {"600000": "stock", "300001": "stock"}
+
+    d = date(2026, 6, 18)
+    signals = [
+        _signal("600000", "b1b2b3", d),
+        _signal("600000", "pin30", d),
+        _signal("600000", "stealth_rally", d),
+    ]
+    engine = BacktestEngine(DictCandlesProvider(candles), kind_map=kind_map)
+    report = engine.run_verification(signals, start=d, end=d)
+
+    assert report.overlay, "应产生叠加矩阵"
+    by_pair = {(c.strategy_a, c.strategy_b): c for c in report.overlay}
+
+    # 对角 = 单策略自身，各 1 条信号
+    assert by_pair[("b1b2b3", "b1b2b3")].n == 1
+    # b1b2b3 × pin30 同标的同日触发 → n=1
+    assert by_pair[("b1b2b3", "pin30")].n == 1
+    assert by_pair[("pin30", "stealth_rally")].n == 1
+    # 叠加信号打在上涨标的上（20 日 +22%），同期基线约 50%（一涨一跌）→ 超额 > 0
+    co = by_pair[("b1b2b3", "pin30")]
+    assert co.win_rate == pytest.approx(1.0)
+    assert co.excess_win_rate is not None and co.excess_win_rate > 0

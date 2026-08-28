@@ -40,10 +40,12 @@ from .models import (
     DecayPoint,
     DecaySeries,
     HoldReturn,
+    OverlayCell,
     PortfolioReport,
     StrategyResult,
     VerificationReport,
 )
+from .overlay import compute_overlay
 from .portfolio import simulate_portfolio
 from .stats import histogram, summarize_returns
 
@@ -168,6 +170,8 @@ class BacktestEngine:
             signals, rows, baseline_by_kind=baseline_by_kind, strategy_kind=strategy_kind
         )
 
+        overlay = self._compute_overlay(signals, baseline_by_kind)
+
         return VerificationReport(
             total_signals=len(signals),
             hold_days=list(cfg.hold_days),
@@ -175,6 +179,7 @@ class BacktestEngine:
             by_board=by_board,
             decay=decay,
             baselines=baselines,
+            overlay=overlay,
         )
 
     def _compute_baselines(
@@ -315,6 +320,21 @@ class BacktestEngine:
             else:
                 out.append(BoardResult(board=name, holds=holds))
         return out
+
+    def _compute_overlay(
+        self, signals: list, baseline_by_kind: dict[str, dict[int, BaselineHold]]
+    ) -> list[OverlayCell]:
+        """算两两策略叠加矩阵（阶段 7）。基线胜率已由 _compute_baselines 算出。"""
+        if not signals:
+            return []
+        kind_str = {sym: _kind_value(k) for sym, k in self._kind_map.items()}
+        base_win = {
+            universe: {hd: bh.win_rate for hd, bh in holds.items()}
+            for universe, holds in baseline_by_kind.items()
+        }
+        headline = self._config.hold_days[-1] if self._config.hold_days else 20
+        cells = compute_overlay(signals, self._candles, kind_str, base_win, headline_hold=headline)
+        return [OverlayCell(**c) for c in cells]
 
     # ------------------------------------------------------------------
     # 组合回测模式

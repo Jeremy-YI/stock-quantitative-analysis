@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from backtest.config import BacktestConfig
-from backtest.portfolio import simulate_portfolio
+from backtest.portfolio import simulate_portfolio, strategy_weight_multiplier
 from strategies.signal import Signal
 
 D0 = date(2026, 8, 24)  # 周一
@@ -112,3 +112,30 @@ def test_portfolio_empty_signals():
     assert report["equity_curve"] == []
     assert report["total_return"] == 0.0
     assert report["filled_buys"] == 0
+
+
+def test_strategy_weight_multiplier_equal_when_none():
+    assert strategy_weight_multiplier("b1b2b3", None) == 1.0
+    assert strategy_weight_multiplier("anything", {}) == 1.0
+
+
+def test_strategy_weight_multiplier_normalizes_and_excludes():
+    weights = {"stealth_rally": 6.8, "double_bottom": 4.0, "pin30": 0.0}
+    assert strategy_weight_multiplier("stealth_rally", weights) == 1.0
+    assert strategy_weight_multiplier("double_bottom", weights) == pytest.approx(4.0 / 6.8)
+    assert strategy_weight_multiplier("pin30", weights) == 0.0
+    assert strategy_weight_multiplier("macd_resonance", weights) == 0.0  # 未列入 = 不建仓
+
+
+def test_portfolio_weight_zero_strategy_not_bought():
+    """权重为 0 的策略信号不建仓。"""
+    candles = {"600000": _df([D0, D1, D2, D3], [100, 101, 102, 103], [100, 101, 102, 103])}
+    cfg = _config()
+    cfg.portfolio.strategy_weights = {"b1b2b3": 0.0, "stealth_rally": 1.0}
+    report = simulate_portfolio(
+        [Signal(symbol="600000", strategy="b1b2b3", signal_type="b1", score=1.0, triggered_at=D0)],
+        candles,
+        cfg,
+    )
+    assert report["filled_buys"] == 0  # b1b2b3 权重 0，不建仓
+    assert report["trade_count"] == 0

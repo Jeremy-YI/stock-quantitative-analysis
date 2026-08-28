@@ -4011,7 +4011,51 @@
         ]
       }
     ],
-    "baselines": []
+    "baselines": [],
+    "overlay": [
+      {
+        "strategy_a": "b1b2b3",
+        "strategy_b": "b1b2b3",
+        "n": 3,
+        "win_rate": 1.0,
+        "excess_win_rate": null
+      },
+      {
+        "strategy_a": "b1b2b3",
+        "strategy_b": "pin30",
+        "n": 0,
+        "win_rate": 0.0,
+        "excess_win_rate": null
+      },
+      {
+        "strategy_a": "b1b2b3",
+        "strategy_b": "stealth_rally",
+        "n": 0,
+        "win_rate": 0.0,
+        "excess_win_rate": null
+      },
+      {
+        "strategy_a": "pin30",
+        "strategy_b": "pin30",
+        "n": 3,
+        "win_rate": 0.0,
+        "excess_win_rate": null
+      },
+      {
+        "strategy_a": "pin30",
+        "strategy_b": "stealth_rally",
+        "n": 0,
+        "win_rate": 0.0,
+        "excess_win_rate": null
+      },
+      {
+        "strategy_a": "stealth_rally",
+        "strategy_b": "stealth_rally",
+        "n": 3,
+        "win_rate": 0.0,
+        "excess_win_rate": null
+      }
+    ]
   },
   "portfolio": {
     "equity_curve": [
