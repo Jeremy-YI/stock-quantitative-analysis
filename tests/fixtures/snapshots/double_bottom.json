@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-08-27",
+  "strategy": "double_bottom",
+  "signals": [
+    {
+      "symbol": "600519",
+      "strategy": "double_bottom",
+      "signal_type": "double_bottom",
+      "score": 87.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "stage": "右底爬升",
+        "l1": 71.64,
+        "l2": 73.132,
+        "neck": 86.43,
+        "diff_pct": 2.083,
+        "gap": 80,
+        "bars_since_l2": 9,
+        "rally_pct": 18.183,
+        "to_neck_pct": -12.646,
+        "from_l2_pct": 3.237,
+        "drawdown_pct": -24.876,
+        "div_cnt": 2,
+        "dif_up": true,
+        "hist_up": false,
+        "rsi_up": true,
+        "vol_shrink": 0.4,
+        "dif_now": -0.836,
+        "macd_water": false,
+        "rsi_now": 45.468,
+        "close": 75.5,
+        "dd_sweet": false
+      }
+    }
+  ]
+}

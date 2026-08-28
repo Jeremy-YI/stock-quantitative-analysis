@@ -13,7 +13,7 @@ from datetime import date
 from pathlib import Path
 
 from strategies import REGISTRY
-from tests.helpers import load_market_fixture, make_candle_df, signals_to_json
+from tests.helpers import load_market_fixture, make_candle_df, make_double_bottom_candles, signals_to_json
 
 SNAPSHOTS_DIR = Path(__file__).resolve().parent.parent / "fixtures" / "snapshots"
 AS_OF = date(2026, 8, 27)
@@ -36,7 +36,12 @@ def _snapshot(name: str) -> dict:
 
 def _run(name: str) -> dict:
     mod = REGISTRY[name]
-    candles = _etf_candles() if name == "etf_accumulation" else load_market_fixture()
+    if name == "etf_accumulation":
+        candles = _etf_candles()
+    elif name == "double_bottom":
+        candles = make_double_bottom_candles()
+    else:
+        candles = load_market_fixture()
     signals = mod.scan(candles, AS_OF)
     return {
         "as_of": AS_OF.isoformat(),
@@ -65,7 +70,11 @@ def test_etf_accumulation_snapshot():
     assert _run("etf_accumulation") == _snapshot("etf_accumulation")
 
 
+def test_double_bottom_snapshot():
+    assert _run("double_bottom") == _snapshot("double_bottom")
+
+
 def test_snapshots_are_non_empty():
     """除极端情况外，快照应包含信号（保证快照有防回归价值）。"""
-    for name in ("b1b2b3", "macd_resonance", "pin30", "stealth_rally", "etf_accumulation"):
+    for name in ("b1b2b3", "macd_resonance", "pin30", "stealth_rally", "etf_accumulation", "double_bottom"):
         assert len(_snapshot(name)["signals"]) > 0, f"{name} 快照为空"

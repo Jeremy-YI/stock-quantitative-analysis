@@ -106,6 +106,36 @@ def make_candle_df(
     )
 
 
+def make_double_bottom_candles() -> dict[str, pd.DataFrame]:
+    """合成一段能触发双底反弹信号的 K 线（W 底 + 底背离 + 缩量二次探底）。
+
+    形态：高位平台 100 → 第一段主跌到左底 72 → 反弹到颈线 86 → 第二段
+    缓跌到右底 73.5（略高于左底，形成底背离）→ 尾盘反弹。左右底间隔 80 根、
+    右底距末根 9 根，满足 swing_k / recent / min_gap~max_gap 约束。
+
+    供快照测试与单测构造固定回归基准（与 make_strategy_snapshots.py 一致）。
+    """
+    n = 240
+    closes: list[float] = [0.0] * n
+
+    def _fill(i0: int, i1: int, v0: float, v1: float) -> None:
+        for i in range(i0, i1 + 1):
+            if i < n:
+                closes[i] = v0 + (i - i0) * (v1 - v0) / max(1, i1 - i0)
+
+    _fill(0, 40, 100.0, 100.0)  # 高位平台（近 250 日高点）
+    _fill(40, 150, 100.0, 72.0)  # 第一段主跌 → 左底 72
+    _fill(150, 185, 72.0, 86.0)  # 反弹 → 颈线 86
+    _fill(185, 230, 86.0, 73.5)  # 第二段缓跌 → 右底 73.5（略高，底背离）
+    _fill(230, n - 1, 73.5, 75.5)  # 尾盘反弹
+
+    # 量能：右底附近缩量（左底 3 根均量高、右底 3 根均量低 → vol_shrink < 1）
+    vols = [1_000_000.0] * n
+    for i in range(228, 233):
+        vols[i] = 400_000.0
+    return {"600519": make_candle_df(closes, volume=vols, high_pad=0.005, low_pad=0.005)}
+
+
 def load_market_fixture() -> dict[str, pd.DataFrame]:
     """加载全市场抽样 fixture（scripts/make_fixtures.py 生成的 market_daily.csv）。
 

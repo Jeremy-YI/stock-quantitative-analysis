@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from strategies import (
     b1b2b3,
+    double_bottom,
     etf_accumulation,
     macd_resonance,
     pin30,
@@ -20,6 +21,7 @@ from strategies.signal import MetricValue, Signal
 # 策略注册表：name → 策略模块（含 NAME/DESCRIPTION/scan/default_config）
 REGISTRY = {
     b1b2b3.NAME: b1b2b3,
+    double_bottom.NAME: double_bottom,
     macd_resonance.NAME: macd_resonance,
     pin30.NAME: pin30,
     stealth_rally.NAME: stealth_rally,
@@ -36,6 +38,7 @@ __all__ = [
     "SymbolKind",
     "b1b2b3",
     "classify_symbol",
+    "double_bottom",
     "etf_accumulation",
     "macd_resonance",
     "pin30",

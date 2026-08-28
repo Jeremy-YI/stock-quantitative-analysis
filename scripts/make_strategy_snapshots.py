@@ -22,7 +22,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from strategies import REGISTRY
-from tests.helpers import load_market_fixture, make_candle_df, signals_to_json
+from tests.helpers import (
+    load_market_fixture,
+    make_candle_df,
+    make_double_bottom_candles,
+    signals_to_json,
+)
 
 SNAPSHOTS_DIR = ROOT / "tests" / "fixtures" / "snapshots"
 
@@ -48,6 +53,8 @@ def main() -> None:
     for name, mod in REGISTRY.items():
         if name == "etf_accumulation":
             candles = _etf_candles()
+        elif name == "double_bottom":
+            candles = make_double_bottom_candles()
         else:
             candles = market
         signals = mod.scan(candles, AS_OF)

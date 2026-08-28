@@ -21,7 +21,10 @@ import pytest
 from strategies.macd_resonance import scan as macd_resonance_scan
 from strategies.stealth_rally import detect_underwater_double_golden
 from strategies.stealth_rally.strategy import _score as stealth_score
-from tests.helpers import load_market_fixture
+from strategies.double_bottom.config import DoubleBottomConfig
+from strategies.double_bottom.strategy import _detect as double_bottom_detect
+from tests.helpers import load_market_fixture, make_double_bottom_candles
+from tests.reference.legacy_double_bottom import legacy_detect_double_bottom
 from tests.reference.legacy_macd_resonance import legacy_analyze
 from tests.reference.legacy_stealth_rally import (
     legacy_detect_underwater_double_golden,
@@ -122,3 +125,80 @@ def test_stealth_score_matches_legacy_formula():
         score = stealth_score(closes, volumes, dif, dea, bar, cross_idx, cross_days, bonus)
         assert score >= bonus  # 基础分至少是 bonus
         assert abs(score) < 100.0
+
+
+# --------------------------------------------------------------------------
+# 双底反弹一致性测试
+# --------------------------------------------------------------------------
+# 旧脚本 us_double_bottom.py 是美股口径（流动性用 closes×volume 当「美元成交额」），
+# 新实现用 A股 hsjday 的 amount（成交额，元）列。一致性比对把两边流动性门槛都关掉
+# （min_amount=0 / min_dollar_vol=0）后，比对新旧「是否选出信号」的集合——
+# 二者形态判定逻辑（摆动低点/配对/颈线/底背离/量能）应逐行一致。
+# 其余差异（流动性口径、回撤基准 max(highs) vs 近 250 日）只影响 score 不影响选择，
+# 详见 docs/双底反弹迁移说明.md。
+
+
+def _double_bottom_synthetic_corpus() -> dict[str, dict]:
+    """构造一组触发/不触发的 W 底序列，供新旧选择集合比对（非空、有意义）。"""
+    base = make_double_bottom_candles()["600519"]
+    closes = base["close"].astype(float).tolist()
+    highs = base["high"].astype(float).tolist()
+    lows = base["low"].astype(float).tolist()
+    vols = base["volume"].astype(float).tolist()
+    amounts = base["amount"].astype(float).tolist()
+    n = len(closes)
+
+    # 变体 1：右底相对左底抬高 10%（超出容差 → 不触发）
+    v1 = list(closes)
+    for i in range(185, n):
+        v1[i] = closes[i] + 6.0
+
+    # 变体 2：颈线反弹不足（中间最高点砍低 → 不触发）
+    v2 = list(closes)
+    for i in range(150, 185):
+        v2[i] = closes[i] - 6.0
+
+    # 变体 3：单边下跌（无第二个低点 → 不触发）
+    v3 = [100.0 - i * 0.5 for i in range(n)]
+
+    def to_df(cc):
+        return {
+            "closes": cc,
+            "highs": [x * 1.005 for x in cc],
+            "lows": [x * 0.995 for x in cc],
+            "vols": [1_000_000.0] * len(cc),
+            "amounts": [x * 1_000_000.0 for x in cc],
+        }
+
+    return {
+        "base": {"closes": closes, "highs": highs, "lows": lows, "vols": vols, "amounts": amounts},
+        "l2_too_high": to_df(v1),
+        "weak_rally": to_df(v2),
+        "single_low": to_df(v3),
+    }
+
+
+def test_double_bottom_selection_matches_legacy():
+    """新旧在合成 W 底语料上的「是否触发」集合一致（流动性门槛关掉）。"""
+    cfg = DoubleBottomConfig(min_amount=0.0)
+    for case, d in _double_bottom_synthetic_corpus().items():
+        new = double_bottom_detect(d["closes"], d["highs"], d["lows"], d["vols"], d["amounts"], cfg)
+        old = legacy_detect_double_bottom(
+            d["closes"], d["highs"], d["lows"], d["vols"], min_dollar_vol=0.0
+        )
+        assert (new is None) == (old is None), f"{case}: new={new is not None}, old={old is not None}"
+
+
+def test_double_bottom_selection_matches_legacy_on_market_fixture():
+    """新旧在真实抽样 fixture（80 只）上的选择集合一致（流动性门槛关掉）。"""
+    candles = load_market_fixture()
+    cfg = DoubleBottomConfig(min_amount=0.0)
+    for symbol, df in candles.items():
+        c = df["close"].astype(float).tolist()
+        h = df["high"].astype(float).tolist()
+        l = df["low"].astype(float).tolist()
+        v = df["volume"].astype(float).tolist()
+        a = df["amount"].astype(float).tolist()
+        new = double_bottom_detect(c, h, l, v, a, cfg)
+        old = legacy_detect_double_bottom(c, h, l, v, min_dollar_vol=0.0)
+        assert (new is None) == (old is None), f"{symbol}: new={new is not None}, old={old is not None}"
