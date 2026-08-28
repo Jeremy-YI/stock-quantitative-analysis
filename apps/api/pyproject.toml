@@ -17,6 +17,8 @@ dependencies = [
     "stock-datasource",
     "stock-market",
     "stock-strategies",
+    "stock-backtest",
+    "stock-scheduler",
 ]
 
 [project.optional-dependencies]

@@ -21,3 +21,7 @@ class InsufficientDataError(DomainError):
 
 class UnknownStrategyError(DomainError):
     """策略名不存在（映射 HTTP 404）。"""
+
+
+class UnknownJobError(DomainError):
+    """调度任务名不存在（映射 HTTP 404）。"""

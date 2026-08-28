@@ -20,6 +20,9 @@ coverage/
 .env
 .env.local
 
+# 调度器报告输出（FileNotifier 写的 Markdown，运行时生成，不入库）
+reports/
+
 # 系统 / 编辑器
 .DS_Store
 .idea/

@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     hsjday_root: str = "~/Desktop/每日复盘/hsjday"
     # 允许跨域的前端来源
     cors_origins: list[str] = ["http://localhost:3000"]
+    # 调度器：报告输出目录（FileNotifier 写 Markdown 到这里）
+    scheduler_report_dir: str = "~/Desktop/stock-platform/reports"
+    # 调度器：飞书 webhook URL（WebhookNotifier，从 .env 读，绝不硬编码）
+    feishu_webhook_url: str = ""
 
     @property
     def hsjday_path(self) -> Path:

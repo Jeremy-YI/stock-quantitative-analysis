@@ -4,6 +4,7 @@ from errors.domain import (
     DomainError,
     InsufficientDataError,
     SymbolNotFoundError,
+    UnknownJobError,
     UnknownStrategyError,
 )
 
@@ -11,5 +12,6 @@ __all__ = [
     "DomainError",
     "InsufficientDataError",
     "SymbolNotFoundError",
+    "UnknownJobError",
     "UnknownStrategyError",
 ]
