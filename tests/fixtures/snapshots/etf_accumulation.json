@@ -1,0 +1,22 @@
+{
+  "as_of": "2026-08-27",
+  "strategy": "etf_accumulation",
+  "signals": [
+    {
+      "symbol": "588710",
+      "strategy": "etf_accumulation",
+      "signal_type": "etf_accumulation",
+      "score": 80.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "drawdown_pct": -34.95,
+        "macd_divergence": true,
+        "rsi_divergence": false,
+        "dif_now": -3.0657,
+        "rsi_now": 0.0,
+        "high60": 100.0,
+        "close": 65.05
+      }
+    }
+  ]
+}

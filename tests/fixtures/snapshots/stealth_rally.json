@@ -1,0 +1,244 @@
+{
+  "as_of": "2026-08-27",
+  "strategy": "stealth_rally",
+  "signals": [
+    {
+      "symbol": "000060",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 26.9,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 23,
+        "stealth_gain": 9.09,
+        "dif_now": 0.0139,
+        "dif_cross": -0.3435,
+        "bar_now": 0.0701,
+        "vol_ratio": 1.11,
+        "close": 6.84,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "000506",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 23.5,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 25,
+        "stealth_gain": 67.91,
+        "dif_now": 1.8621,
+        "dif_cross": -0.3592,
+        "bar_now": 0.4916,
+        "vol_ratio": 1.51,
+        "close": 22.08,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "000715",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 25.2,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 21,
+        "stealth_gain": 20.08,
+        "dif_now": 0.1768,
+        "dif_cross": -0.0861,
+        "bar_now": 0.106,
+        "vol_ratio": 1.48,
+        "close": 5.68,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "002751",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 20.9,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 2,
+        "stealth_gain": -14.0,
+        "dif_now": -1.3982,
+        "dif_cross": -1.5084,
+        "bar_now": 0.1646,
+        "vol_ratio": 1.57,
+        "close": 0.86,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "003816",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 28.7,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 2,
+        "stealth_gain": 5.56,
+        "dif_now": 0.0002,
+        "dif_cross": -0.0408,
+        "bar_now": 0.0598,
+        "vol_ratio": 1.65,
+        "close": 4.18,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "300092",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 30.4,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 31,
+        "stealth_gain": 9.36,
+        "dif_now": 0.104,
+        "dif_cross": -0.7273,
+        "bar_now": 0.0779,
+        "vol_ratio": 0.53,
+        "close": 12.03,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "300211",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 29.1,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 20,
+        "stealth_gain": 18.55,
+        "dif_now": 0.1255,
+        "dif_cross": -0.3912,
+        "bar_now": 0.0133,
+        "vol_ratio": 0.43,
+        "close": 7.67,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "300450",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 22.8,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 25,
+        "stealth_gain": 2.06,
+        "dif_now": -0.5982,
+        "dif_cross": -3.3506,
+        "bar_now": 0.1688,
+        "vol_ratio": 0.82,
+        "close": 33.77,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "300820",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 28.6,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 15,
+        "stealth_gain": 0.32,
+        "dif_now": -1.1194,
+        "dif_cross": -5.1452,
+        "bar_now": 0.9209,
+        "vol_ratio": 0.77,
+        "close": 53.78,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "600036",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 25.5,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 38,
+        "stealth_gain": 4.9,
+        "dif_now": 0.2522,
+        "dif_cross": -0.4128,
+        "bar_now": 0.1084,
+        "vol_ratio": 0.74,
+        "close": 39.58,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "601225",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 30.2,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 37,
+        "stealth_gain": 18.06,
+        "dif_now": 0.5864,
+        "dif_cross": -0.8847,
+        "bar_now": 0.239,
+        "vol_ratio": 1.01,
+        "close": 27.0,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "601318",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 32.3,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 38,
+        "stealth_gain": 11.52,
+        "dif_now": 0.6316,
+        "dif_cross": -1.4986,
+        "bar_now": 0.6517,
+        "vol_ratio": 0.85,
+        "close": 55.87,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "688352",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 29.4,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 16,
+        "stealth_gain": 20.81,
+        "dif_now": 0.3903,
+        "dif_cross": -1.3358,
+        "bar_now": 0.0845,
+        "vol_ratio": 1.08,
+        "close": 18.46,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    },
+    {
+      "symbol": "688697",
+      "strategy": "stealth_rally",
+      "signal_type": "stealth_rally",
+      "score": 22.8,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "cross_days": 24,
+        "stealth_gain": 35.52,
+        "dif_now": 0.3163,
+        "dif_cross": -1.4555,
+        "bar_now": 0.1687,
+        "vol_ratio": 1.42,
+        "close": 15.49,
+        "detail": "水下二次金叉+红柱确认(偷涨型)"
+      }
+    }
+  ]
+}

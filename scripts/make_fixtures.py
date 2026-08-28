@@ -38,6 +38,19 @@ FIXTURES_DIR = ROOT / "tests" / "fixtures"
 SYMBOL = "600519"
 WINDOW_BARS = 40  # 切多少根 K 线做黄金值基准
 
+# 全市场抽样 fixture：覆盖不同板块/前缀的代表标的（确保一致性测试有真实形态）
+MARKET_CURATED = [
+    "600519", "600036", "600028", "601318", "603288", "605499",  # 沪主板
+    "688981", "688111",  # 科创板
+    "000001", "000002", "000858", "002415", "002594", "003816",  # 深主板/中小
+    "300750", "300059", "301236",  # 创业板
+    # 下面这批是 2026-08-27 真实触发 macd_resonance 的代表，保证快照非空
+    "000008", "000017", "000045", "000407", "000426", "000428",
+    "000506", "000520", "001225", "002004", "003003", "300012",
+]
+MARKET_TARGET = 80  # 抽样总只数（含 curated）
+MARKET_WINDOW_BARS = 900  # 每只切最近多少根日线（macd 月线需 30 月 ≈ 660 日，留余量）
+
 
 def main() -> None:
     path = resolve_symbol_path(HSJDAY, SYMBOL)
@@ -126,6 +139,73 @@ def main() -> None:
     print(f"✅ 已生成 {rsi_path}")
     print(f"✅ 已生成 {volume_path}")
     print(f"   日期区间：{df['date'].iloc[0].isoformat()} ~ {df['date'].iloc[-1].isoformat()}")
+
+    make_market_fixture()
+
+
+def make_market_fixture() -> None:
+    """生成全市场抽样 fixture：tests/fixtures/market_daily.csv。
+
+    从本地 hsjday 按确定性规则抽样 ``MARKET_TARGET`` 只 A股个股（覆盖沪/深/
+    主板/科创/创业板），每只切最近 ``MARKET_WINDOW_BARS`` 根日线，合并写入
+    单个 CSV（含 symbol 列）。供策略层一致性测试使用。
+    """
+    from strategies.filters import SymbolKind, classify_symbol
+
+    market_csv = FIXTURES_DIR / "market_daily.csv"
+
+    # 收集全部个股代码（按市场 + 前缀去重、排序，确定性）
+    codes: list[tuple[str, str]] = []
+    for market in ("sh", "sz", "bj"):
+        lday = HSJDAY / market / "lday"
+        if not lday.is_dir():
+            continue
+        for fn in sorted(lday.iterdir()):
+            if not fn.name.endswith(".day"):
+                continue
+            code = fn.name[2:8]
+            if len(code) != 6:
+                continue
+            if classify_symbol(market, code) is SymbolKind.STOCK:
+                codes.append((market, code))
+
+    # curated 优先，再等间隔抽到 MARKET_TARGET 只
+    curated = [(resolve_market(c), c) for c in MARKET_CURATED]
+    selected: list[tuple[str, str]] = list(curated)
+    rest = [mc for mc in codes if mc not in selected]
+    if rest:
+        step = max(1, len(rest) // max(1, MARKET_TARGET - len(selected)))
+        for i in range(0, len(rest), step):
+            selected.append(rest[i])
+            if len(selected) >= MARKET_TARGET:
+                break
+
+    rows: list[dict] = []
+    for market, code in selected:
+        path = HSJDAY / market / "lday" / f"{market}{code}.day"
+        if not path.exists():
+            continue
+        df = parse_day_file(path).tail(MARKET_WINDOW_BARS).reset_index(drop=True)
+        for row in df.to_dict("records"):
+            rows.append({"symbol": code, **row})
+
+    with market_csv.open("w", newline="") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["symbol", "date", "open", "high", "low", "close", "volume", "amount"]
+        )
+        writer.writeheader()
+        for r in rows:
+            writer.writerow({**r, "date": r["date"].isoformat()})
+
+    n_symbols = len({r["symbol"] for r in rows})
+    print(f"✅ 已生成 {market_csv}（{n_symbols} 只 / {len(rows)} 行）")
+
+
+def resolve_market(code: str) -> str:
+    """按代码前缀判定市场（与 datasource.resolve_market 一致）。"""
+    from datasource.tdx import resolve_market as _resolve_market
+
+    return _resolve_market(code)
 
 
 if __name__ == "__main__":

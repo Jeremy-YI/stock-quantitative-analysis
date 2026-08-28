@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-strategies"
+version = "0.1.0"
+description = "A股选股策略层（B1B2B3 / MACD月周共振 / 单针下30 / 偷涨 / ETF吸筹）"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.0",
+    "pydantic>=2.6",
+    "stock-indicators",
+    "stock-market",
+    "stock-datasource",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["strategies*"]

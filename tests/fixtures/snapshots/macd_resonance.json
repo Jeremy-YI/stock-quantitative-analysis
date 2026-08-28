@@ -1,0 +1,294 @@
+{
+  "as_of": "2026-08-27",
+  "strategy": "macd_resonance",
+  "signals": [
+    {
+      "symbol": "000008",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.014,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0145,
+        "m_dea": 0.0926,
+        "w_dif_now": -0.1079,
+        "w_dea_now": -0.1251,
+        "cross_dif": -0.1214,
+        "cross_week": "2026-08-21",
+        "close": 2.49
+      }
+    },
+    {
+      "symbol": "000017",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.36,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.3602,
+        "m_dea": 0.2461,
+        "w_dif_now": 0.1973,
+        "w_dea_now": -0.2215,
+        "cross_dif": -0.4134,
+        "cross_week": "2026-07-24",
+        "close": 10.41
+      }
+    },
+    {
+      "symbol": "000045",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.065,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0655,
+        "m_dea": 0.3202,
+        "w_dif_now": -0.5896,
+        "w_dea_now": -0.6373,
+        "cross_dif": -0.5896,
+        "cross_week": "2026-08-28",
+        "close": 10.75
+      }
+    },
+    {
+      "symbol": "000407",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.199,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.1989,
+        "m_dea": 0.2324,
+        "w_dif_now": -0.1454,
+        "w_dea_now": -0.1585,
+        "cross_dif": -0.1454,
+        "cross_week": "2026-08-28",
+        "close": 4.17
+      }
+    },
+    {
+      "symbol": "000426",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 7.079,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 7.0786,
+        "m_dea": 7.3816,
+        "w_dif_now": -0.5575,
+        "w_dea_now": -0.8507,
+        "cross_dif": -0.5575,
+        "cross_week": "2026-08-28",
+        "close": 40.69
+      }
+    },
+    {
+      "symbol": "000428",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.035,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0346,
+        "m_dea": -0.12,
+        "w_dif_now": 0.132,
+        "w_dea_now": 0.0122,
+        "cross_dif": -0.065,
+        "cross_week": "2026-07-31",
+        "close": 4.61
+      }
+    },
+    {
+      "symbol": "000506",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 3.322,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 3.3224,
+        "m_dea": 3.0372,
+        "w_dif_now": 0.9661,
+        "w_dea_now": 0.1544,
+        "cross_dif": -0.2162,
+        "cross_week": "2026-08-07",
+        "close": 22.08
+      }
+    },
+    {
+      "symbol": "000520",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.052,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0518,
+        "m_dea": 0.185,
+        "w_dif_now": -0.0884,
+        "w_dea_now": -0.1208,
+        "cross_dif": -0.1116,
+        "cross_week": "2026-08-21",
+        "close": 4.22
+      }
+    },
+    {
+      "symbol": "000885",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.136,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.1355,
+        "m_dea": 0.4406,
+        "w_dif_now": -0.3705,
+        "w_dea_now": -0.3563,
+        "cross_dif": -0.3485,
+        "cross_week": "2026-08-14",
+        "close": 12.3
+      }
+    },
+    {
+      "symbol": "001225",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 2.088,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 2.0877,
+        "m_dea": 2.9676,
+        "w_dif_now": -2.5236,
+        "w_dea_now": -3.1971,
+        "cross_dif": -2.9703,
+        "cross_week": "2026-08-21",
+        "close": 47.1
+      }
+    },
+    {
+      "symbol": "002004",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.002,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0024,
+        "m_dea": 0.0392,
+        "w_dif_now": -0.1369,
+        "w_dea_now": -0.1683,
+        "cross_dif": -0.1749,
+        "cross_week": "2026-08-14",
+        "close": 4.56
+      }
+    },
+    {
+      "symbol": "002029",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.753,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.7527,
+        "m_dea": 0.9474,
+        "w_dif_now": -0.4174,
+        "w_dea_now": -0.4613,
+        "cross_dif": -0.4621,
+        "cross_week": "2026-08-21",
+        "close": 8.74
+      }
+    },
+    {
+      "symbol": "002148",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.087,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0871,
+        "m_dea": 0.4538,
+        "w_dif_now": -0.4879,
+        "w_dea_now": -0.5359,
+        "cross_dif": -0.5282,
+        "cross_week": "2026-08-14",
+        "close": 6.28
+      }
+    },
+    {
+      "symbol": "003003",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.225,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.2249,
+        "m_dea": 0.5224,
+        "w_dif_now": -0.6156,
+        "w_dea_now": -0.6642,
+        "cross_dif": -0.6156,
+        "cross_week": "2026-08-28",
+        "close": 11.26
+      }
+    },
+    {
+      "symbol": "300012",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.039,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.0393,
+        "m_dea": -0.2715,
+        "w_dif_now": -0.0648,
+        "w_dea_now": -0.1163,
+        "cross_dif": -0.0648,
+        "cross_week": "2026-08-28",
+        "close": 15.05
+      }
+    },
+    {
+      "symbol": "301209",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 5.802,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 5.8019,
+        "m_dea": 13.1457,
+        "w_dif_now": -10.4245,
+        "w_dea_now": -10.7852,
+        "cross_dif": -10.4245,
+        "cross_week": "2026-08-28",
+        "close": 59.78
+      }
+    },
+    {
+      "symbol": "600805",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 0.028,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 0.028,
+        "m_dea": 0.1647,
+        "w_dif_now": -0.2349,
+        "w_dea_now": -0.27,
+        "cross_dif": -0.2711,
+        "cross_week": "2026-08-21",
+        "close": 4.64
+      }
+    },
+    {
+      "symbol": "601318",
+      "strategy": "macd_resonance",
+      "signal_type": "macd_resonance",
+      "score": 1.469,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "m_dif": 1.469,
+        "m_dea": 2.5122,
+        "w_dif_now": -1.5303,
+        "w_dea_now": -2.0767,
+        "cross_dif": -2.3415,
+        "cross_week": "2026-07-31",
+        "close": 55.87
+      }
+    }
+  ]
+}

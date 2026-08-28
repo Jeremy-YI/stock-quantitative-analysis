@@ -1,0 +1,156 @@
+{
+  "as_of": "2026-08-27",
+  "strategy": "pin30",
+  "signals": [
+    {
+      "symbol": "000568",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 8.1507,
+        "k": 16.2564,
+        "d": 20.3093,
+        "short": 27.272,
+        "long": 9.6329,
+        "close": 81.93
+      }
+    },
+    {
+      "symbol": "002751",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 8.9819,
+        "k": 8.1462,
+        "d": 7.7284,
+        "short": 17.6367,
+        "long": 0.5736,
+        "close": 0.86
+      }
+    },
+    {
+      "symbol": "300571",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 13.0612,
+        "k": 19.769,
+        "d": 23.1229,
+        "short": 49.7488,
+        "long": 15.1973,
+        "close": 29.55
+      }
+    },
+    {
+      "symbol": "300692",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 11.2272,
+        "k": 24.6709,
+        "d": 31.3928,
+        "short": 32.2529,
+        "long": 44.5815,
+        "close": 9.01
+      }
+    },
+    {
+      "symbol": "300750",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 3.2224,
+        "k": 17.4423,
+        "d": 24.5523,
+        "short": 32.9605,
+        "long": 8.3926,
+        "close": 373.0
+      }
+    },
+    {
+      "symbol": "600270",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 12.8753,
+        "k": 23.9981,
+        "d": 29.5594,
+        "short": 99.9875,
+        "long": 34.933,
+        "close": 20.99
+      }
+    },
+    {
+      "symbol": "688212",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 5.0681,
+        "k": 20.5384,
+        "d": 28.2735,
+        "short": 99.9926,
+        "long": 34.3794,
+        "close": 28.19
+      }
+    },
+    {
+      "symbol": "688545",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 9.7849,
+        "k": 24.0143,
+        "d": 31.129,
+        "short": 99.9984,
+        "long": 57.7717,
+        "close": 80.36
+      }
+    },
+    {
+      "symbol": "833030",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 13.1224,
+        "k": 17.9506,
+        "d": 20.3647,
+        "short": 89.955,
+        "long": 9.6152,
+        "close": 27.25
+      }
+    },
+    {
+      "symbol": "870204",
+      "strategy": "pin30",
+      "signal_type": "b1_w",
+      "score": 70.0,
+      "triggered_at": "2026-08-27",
+      "metrics": {
+        "j": 0.4043,
+        "k": 5.0135,
+        "d": 7.3181,
+        "short": 99.9412,
+        "long": 3.3333,
+        "close": 19.97
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@ pythonpath = [
     "packages/indicators",
     "packages/datasource",
     "packages/market",
+    "packages/strategies",
     "apps/api/src",
 ]
 testpaths = ["tests", "apps/api/tests"]
