@@ -20,6 +20,7 @@ from backtest.engine import (
     classify_board,
 )
 from backtest.models import (
+    BacktestReport,
     BoardResult,
     DecayPoint,
     DecaySeries,
@@ -33,6 +34,7 @@ from backtest.models import (
 __all__ = [
     "BacktestConfig",
     "BacktestEngine",
+    "BacktestReport",
     "BoardResult",
     "CandlesProvider",
     "CostConfig",

@@ -25,12 +25,17 @@ from errors import (
     SymbolNotFoundError,
     UnknownStrategyError,
 )
+from repositories.backtest_repository import (
+    BacktestRunRepository,
+    InMemoryBacktestRunRepository,
+)
 from repositories.daily_bar_repository import DailyBarRepository, TdxDailyBarRepository
 from repositories.scan_result_repository import (
     InMemoryScanResultRepository,
     ScanResultRepository,
 )
-from routers import health, indicators, strategies
+from routers import backtest, health, indicators, strategies
+from services.backtest_service import BacktestService
 from services.indicator_service import IndicatorService
 from services.strategy_service import StrategyService
 from strategies.scanner import MarketScanner, Scanner
@@ -63,6 +68,7 @@ def create_app(
     repository: DailyBarRepository | None = None,
     strategy_scanner: Scanner | None = None,
     scan_repository: ScanResultRepository | None = None,
+    backtest_repository: BacktestRunRepository | None = None,
 ) -> FastAPI:
     """应用工厂：测试可传入自定义 settings / fake 仓储 / fake 扫描器。"""
     settings = settings or get_settings()
@@ -77,6 +83,9 @@ def create_app(
     scan_repo = scan_repository or InMemoryScanResultRepository()
     app.state.strategy_service = StrategyService(scanner, scan_repo)
 
+    backtest_repo = backtest_repository or InMemoryBacktestRunRepository()
+    app.state.backtest_service = BacktestService(scanner, backtest_repo, settings)
+
     _register_exception_handlers(app)
 
     app.add_middleware(
@@ -90,6 +99,7 @@ def create_app(
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(indicators.router, prefix=API_PREFIX)
     app.include_router(strategies.router, prefix=API_PREFIX)
+    app.include_router(backtest.router, prefix=API_PREFIX)
     return app
 
 

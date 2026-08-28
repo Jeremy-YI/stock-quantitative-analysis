@@ -1,0 +1,150 @@
+"""回测服务。
+
+职责：按日期区间逐日扫描策略收集信号 → 组装回测引擎 → 出报告 → 落库。
+不碰 HTTP，不直接读文件（通过扫描器），保持可单测。
+
+性能说明：逐日全市场扫描成本较高（单日约 1 分钟，见 docs/策略迁移说明.md），
+阶段 4 按任务书要求「同步执行即可」，不引入队列。大批量历史回测建议用
+scripts/run_backtest.py 离线跑批，API 面向小范围演示与查询。
+"""
+
+from __future__ import annotations
+
+from datetime import date, timedelta
+from uuid import uuid4
+
+from backtest.config import BacktestConfig
+from backtest.engine import BacktestEngine, DictCandlesProvider
+from backtest.models import BacktestReport
+from config.settings import Settings
+from errors import DomainError, UnknownStrategyError
+from market.calendar import trading_days
+from repositories.backtest_repository import BacktestRunRepository
+from schemas.backtest import BacktestRunBody, BacktestRunRequest, DecayBody
+from strategies import REGISTRY
+from strategies.filters import filter_for_kinds
+from strategies.scanner import Scanner
+
+
+class BacktestService:
+    """回测发起 / 查询 / 衰减服务。"""
+
+    def __init__(
+        self,
+        scanner: Scanner,
+        repository: BacktestRunRepository,
+        settings: Settings,
+    ) -> None:
+        self._scanner = scanner
+        self._repository = repository
+        self._settings = settings
+
+    def create_run(self, request: BacktestRunRequest) -> BacktestRunBody:
+        """同步执行一次回测并落库。"""
+        strategies = self._resolve_strategies(request.strategy)
+        if request.start > request.end:
+            raise DomainError("回测起始日不能晚于结束日")
+
+        signals, candles = self._collect_signals(strategies, request.start, request.end)
+        config = BacktestConfig()
+        if request.hold_days:
+            config.hold_days = list(request.hold_days)
+
+        engine = BacktestEngine(DictCandlesProvider(candles), config)
+        verification = engine.run_verification(signals)
+        portfolio = engine.run_portfolio(signals) if request.mode == "portfolio" else None
+        report = BacktestReport(verification=verification, portfolio=portfolio)
+
+        run = BacktestRunBody(
+            run_id=uuid4().hex,
+            strategy=request.strategy,
+            start=request.start,
+            end=request.end,
+            mode=request.mode,
+            report=report,
+        )
+        self._repository.save(run)
+        return run
+
+    def get_run(self, run_id: str) -> BacktestRunBody:
+        """查询已落库的回测任务。"""
+        run = self._repository.get(run_id)
+        if run is None:
+            raise UnknownStrategyError(f"回测任务 {run_id} 不存在")
+        return run
+
+    def get_decay(
+        self,
+        strategy: str,
+        window: int,
+        hold_days: int = 1,
+        start: date | None = None,
+        end: date | None = None,
+    ) -> DecayBody:
+        """计算某策略的滚动胜率衰减曲线。"""
+        self._resolve_strategies(strategy)  # 校验策略存在
+        end = end or date.today()
+        start = start or (end - timedelta(days=180))
+
+        signals, candles = self._collect_signals([strategy], start, end)
+        config = BacktestConfig()
+        config.decay_hold_days = hold_days
+        config.decay_windows = [window]
+
+        engine = BacktestEngine(DictCandlesProvider(candles), config)
+        series_list = engine.compute_decay(signals)
+        points = []
+        for s in series_list:
+            if s.strategy == strategy and s.window == window:
+                points = s.points
+                break
+
+        return DecayBody(
+            strategy=strategy,
+            window=window,
+            hold_days=hold_days,
+            points=points,
+        )
+
+    # ------------------------------------------------------------------
+    # 内部
+    # ------------------------------------------------------------------
+    def _resolve_strategies(self, strategy: str | None) -> list[str]:
+        """strategy 为 None 时返回全部策略；否则校验存在并返回单元素列表。"""
+        if strategy is None:
+            return list(REGISTRY)
+        if strategy not in REGISTRY:
+            raise UnknownStrategyError(f"策略 {strategy} 不存在")
+        return [strategy]
+
+    def _collect_signals(
+        self, strategies: list[str], start: date, end: date
+    ) -> tuple[list, dict]:
+        """逐日扫描策略，返回 (signals, {symbol: 全量日线})。
+
+        candles 按各策略目标宇宙加载（个股策略 vs ETF 策略分开），
+        扫描时按日切片（只留 <= 当日），前向收益在引擎里用全量 candles 算。
+        """
+        symbols_by_strategy: dict[str, set[str]] = {}
+        candles: dict = {}
+        for strategy in strategies:
+            mod = REGISTRY[strategy]
+            loaded = self._scanner.load_candles(
+                end, filter_config=filter_for_kinds(mod.TARGET_KINDS)
+            )
+            symbols_by_strategy[strategy] = set(loaded.keys())
+            for symbol, df in loaded.items():
+                candles.setdefault(symbol, df)
+
+        signals: list = []
+        for day in trading_days(start, end):
+            for strategy in strategies:
+                mod = REGISTRY[strategy]
+                sliced = {
+                    symbol: candles[symbol][candles[symbol]["date"] <= day]
+                    for symbol in symbols_by_strategy[strategy]
+                    if symbol in candles
+                }
+                signals.extend(mod.scan(sliced, day))
+
+        return signals, candles

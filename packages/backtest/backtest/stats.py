@@ -147,3 +147,39 @@ def total_return(equity: list[float]) -> float:
     if not equity or equity[0] == 0:
         return 0.0
     return equity[-1] / equity[0] - 1.0
+
+
+def histogram(
+    returns: list[float],
+    width: float = 0.02,
+    lower: float = -0.20,
+    upper: float = 0.20,
+) -> list[dict]:
+    """把收益样本切成固定等宽直方图（稳定、可跨数据比对）。
+
+    区间 [lower, upper] 按 width 等分；落在区间外的样本并进首 / 末桶。
+    返回 [{"lower": 左界, "upper": 右界, "count": 数量}]（右界取开区间）。
+    """
+    if not returns:
+        return []
+    n_bins = int(round((upper - lower) / width))
+    if n_bins <= 0:
+        return []
+    counts = [0] * n_bins
+    for r in returns:
+        idx = int((r - lower) / width)
+        if idx < 0:
+            idx = 0
+        elif idx >= n_bins:
+            idx = n_bins - 1
+        counts[idx] += 1
+    bins: list[dict] = []
+    for i in range(n_bins):
+        bins.append(
+            {
+                "lower": round(lower + i * width, 4),
+                "upper": round(lower + (i + 1) * width, 4),
+                "count": counts[i],
+            }
+        )
+    return bins

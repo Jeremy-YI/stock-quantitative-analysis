@@ -29,7 +29,109 @@
               "p50": 0.03,
               "p75": 0.03,
               "p95": 0.03
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 4
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -47,7 +149,109 @@
               "p50": 0.092727,
               "p75": 0.092727,
               "p95": 0.092727
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 4
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -65,7 +269,109 @@
               "p50": 0.159274,
               "p75": 0.159274,
               "p95": 0.159274
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 4
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -83,7 +389,109 @@
               "p50": 0.343916,
               "p75": 0.343916,
               "p95": 0.343916
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 4
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -101,7 +509,109 @@
               "p50": 0.806111,
               "p75": 0.806111,
               "p95": 0.806111
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 3
+              }
+            ]
           }
         ]
       },
@@ -124,7 +634,109 @@
               "p50": -0.03,
               "p75": -0.03,
               "p95": -0.03
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 4
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -142,7 +754,109 @@
               "p50": -0.087327,
               "p75": -0.087327,
               "p95": -0.087327
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 4
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -160,7 +874,109 @@
               "p50": -0.141266,
               "p75": -0.141266,
               "p95": -0.141266
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 4
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -178,7 +994,109 @@
               "p50": -0.262576,
               "p75": -0.262576,
               "p95": -0.262576
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 4
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -196,7 +1114,109 @@
               "p50": -0.456206,
               "p75": -0.456206,
               "p95": -0.456206
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 3
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           }
         ]
       },
@@ -219,7 +1239,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -237,7 +1359,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -255,7 +1479,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -273,7 +1599,109 @@
               "p50": 0.0,
               "p75": 0.0,
               "p95": 0.0
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 4
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -291,7 +1719,109 @@
               "p50": 0.0,
               "p75": 0.0,
               "p95": 0.0
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 3
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           }
         ]
       }
@@ -316,7 +1846,109 @@
               "p50": -0.03,
               "p75": -0.03,
               "p95": -0.03
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 4
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -334,7 +1966,109 @@
               "p50": -0.087327,
               "p75": -0.087327,
               "p95": -0.087327
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 4
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -352,7 +2086,109 @@
               "p50": -0.141266,
               "p75": -0.141266,
               "p95": -0.141266
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 4
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -370,7 +2206,109 @@
               "p50": -0.262576,
               "p75": -0.262576,
               "p95": -0.262576
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 4
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -388,7 +2326,109 @@
               "p50": -0.456206,
               "p75": -0.456206,
               "p95": -0.456206
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 3
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           }
         ]
       },
@@ -411,7 +2451,109 @@
               "p50": 0.03,
               "p75": 0.03,
               "p95": 0.03
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 4
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -429,7 +2571,109 @@
               "p50": 0.092727,
               "p75": 0.092727,
               "p95": 0.092727
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 4
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -447,7 +2691,109 @@
               "p50": 0.159274,
               "p75": 0.159274,
               "p95": 0.159274
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 4
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -465,7 +2811,109 @@
               "p50": 0.343916,
               "p75": 0.343916,
               "p95": 0.343916
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 4
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -483,7 +2931,109 @@
               "p50": 0.806111,
               "p75": 0.806111,
               "p95": 0.806111
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 3
+              }
+            ]
           }
         ]
       },
@@ -506,7 +3056,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 3,
@@ -524,7 +3176,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 5,
@@ -542,7 +3296,109 @@
               "p50": 0.005013,
               "p75": 0.105263,
               "p95": 0.105263
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 2
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 0
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 2
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 10,
@@ -560,7 +3416,109 @@
               "p50": 0.0,
               "p75": 0.0,
               "p95": 0.0
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 4
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           },
           {
             "hold_days": 20,
@@ -578,7 +3536,109 @@
               "p50": 0.0,
               "p75": 0.0,
               "p95": 0.0
-            }
+            },
+            "histogram": [
+              {
+                "lower": -0.2,
+                "upper": -0.18,
+                "count": 0
+              },
+              {
+                "lower": -0.18,
+                "upper": -0.16,
+                "count": 0
+              },
+              {
+                "lower": -0.16,
+                "upper": -0.14,
+                "count": 0
+              },
+              {
+                "lower": -0.14,
+                "upper": -0.12,
+                "count": 0
+              },
+              {
+                "lower": -0.12,
+                "upper": -0.1,
+                "count": 0
+              },
+              {
+                "lower": -0.1,
+                "upper": -0.08,
+                "count": 0
+              },
+              {
+                "lower": -0.08,
+                "upper": -0.06,
+                "count": 0
+              },
+              {
+                "lower": -0.06,
+                "upper": -0.04,
+                "count": 0
+              },
+              {
+                "lower": -0.04,
+                "upper": -0.02,
+                "count": 0
+              },
+              {
+                "lower": -0.02,
+                "upper": 0.0,
+                "count": 0
+              },
+              {
+                "lower": 0.0,
+                "upper": 0.02,
+                "count": 3
+              },
+              {
+                "lower": 0.02,
+                "upper": 0.04,
+                "count": 0
+              },
+              {
+                "lower": 0.04,
+                "upper": 0.06,
+                "count": 0
+              },
+              {
+                "lower": 0.06,
+                "upper": 0.08,
+                "count": 0
+              },
+              {
+                "lower": 0.08,
+                "upper": 0.1,
+                "count": 0
+              },
+              {
+                "lower": 0.1,
+                "upper": 0.12,
+                "count": 0
+              },
+              {
+                "lower": 0.12,
+                "upper": 0.14,
+                "count": 0
+              },
+              {
+                "lower": 0.14,
+                "upper": 0.16,
+                "count": 0
+              },
+              {
+                "lower": 0.16,
+                "upper": 0.18,
+                "count": 0
+              },
+              {
+                "lower": 0.18,
+                "upper": 0.2,
+                "count": 0
+              }
+            ]
           }
         ]
       }

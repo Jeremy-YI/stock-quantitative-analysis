@@ -20,6 +20,7 @@ class HoldReturn(BaseModel):
     best: float = 0.0
     worst: float = 0.0
     quantiles: dict[str, float] = Field(default_factory=dict)
+    histogram: list[dict] = Field(default_factory=list)
 
 
 class StrategyResult(BaseModel):
@@ -83,3 +84,10 @@ class PortfolioReport(BaseModel):
     filled_buys: int = 0
     skipped_buys: int = 0
     open_positions: int = 0
+
+
+class BacktestReport(BaseModel):
+    """一次回测的完整报告（信号验证 + 可选组合净值）。"""
+
+    verification: VerificationReport
+    portfolio: PortfolioReport | None = None

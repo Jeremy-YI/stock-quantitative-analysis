@@ -23,6 +23,7 @@ from market.calendar import trading_days
 from .config import BacktestConfig, default_config
 from .forward import forward_returns
 from .models import (
+    BacktestReport,
     BoardResult,
     DecayPoint,
     DecaySeries,
@@ -32,7 +33,7 @@ from .models import (
     VerificationReport,
 )
 from .portfolio import simulate_portfolio
-from .stats import summarize_returns
+from .stats import histogram, summarize_returns
 
 # 简化板块映射（代码前缀 → 市场板块）。TODO: 接真实行业板块数据。
 _BOARD_PREFIXES = (
@@ -152,6 +153,7 @@ class BacktestEngine:
                         best=round(stats.best, 4),
                         worst=round(stats.worst, 4),
                         quantiles=stats.quantiles,
+                        histogram=histogram(returns),
                     )
                 )
             if as_strategy:
@@ -178,6 +180,15 @@ class BacktestEngine:
             skipped_buys=raw["skipped_buys"],
             open_positions=raw["open_positions"],
         )
+
+    # ------------------------------------------------------------------
+    # 一次跑完整报告（验证 + 组合）
+    # ------------------------------------------------------------------
+    def run(self, signals: list, with_portfolio: bool = True) -> BacktestReport:
+        """一次算出验证报告（含衰减），可选叠加组合净值。"""
+        verification = self.run_verification(signals)
+        portfolio = self.run_portfolio(signals) if with_portfolio else None
+        return BacktestReport(verification=verification, portfolio=portfolio)
 
     # ------------------------------------------------------------------
     # 策略衰减监测
