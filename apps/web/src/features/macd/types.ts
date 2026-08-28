@@ -1,4 +1,4 @@
-/** 与后端 apps/api/src/schemas/indicator.py 对齐的契约类型。 */
+/** 与后端 apps/api/src/schemas/indicator.py 对齐的 MACD 契约类型。 */
 
 export interface MacdPoint {
   date: string
@@ -11,9 +11,4 @@ export interface MacdPoint {
 export interface MacdBody {
   symbol: string
   series: MacdPoint[]
-}
-
-export interface ApiResponse<T> {
-  message: string
-  body: T | null
 }

@@ -9,4 +9,11 @@ export const colors = {
   neutral: '#64748b', // 灰：平/中性
   dif: '#2563eb', // DIF 线（快慢线差）
   dea: '#f59e0b', // DEA 线（信号线）
+  kdjK: '#eab308', // KDJ 的 K 线
+  kdjD: '#22d3ee', // KDJ 的 D 线
+  kdjJ: '#a855f7', // KDJ 的 J 线
+  rsi: '#6366f1', // RSI 线
+  rsiRef: '#94a3b8', // RSI 30/70 参考线
+  mavol1: '#f59e0b', // MAVOL1（5 日量均线）
+  mavol2: '#2563eb', // MAVOL2（10 日量均线）
 } as const

@@ -1,5 +1,5 @@
-import MacdView from '@/features/macd/macd-view'
+import IndicatorView from '@/features/indicators/indicator-view'
 
 export default function Page() {
-  return <MacdView />
+  return <IndicatorView />
 }
