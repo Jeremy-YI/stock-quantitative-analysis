@@ -16,6 +16,7 @@ dependencies = [
     "stock-indicators",
     "stock-datasource",
     "stock-market",
+    "stock-strategies",
 ]
 
 [project.optional-dependencies]
@@ -36,3 +37,4 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -6,10 +6,10 @@
 
 暴露端点：
     GET /api/v1/health
-    GET /api/v1/indicators/macd?symbol=600519&start=&end=
-    GET /api/v1/indicators/kdj?symbol=600519&start=&end=
-    GET /api/v1/indicators/rsi?symbol=600519&start=&end=
-    GET /api/v1/indicators/volume?symbol=600519&start=&end=
+    GET /api/v1/indicators/{macd,kdj,rsi,volume}?symbol=...&start=&end=
+    GET /api/v1/strategies
+    GET /api/v1/strategies/{name}/scan?date=YYYY-MM-DD
+    GET /api/v1/strategies/{name}/signals?from=&to=
 """
 
 from __future__ import annotations
@@ -19,19 +19,34 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config.settings import Settings, get_settings
-from errors import DomainError, InsufficientDataError, SymbolNotFoundError
+from errors import (
+    DomainError,
+    InsufficientDataError,
+    SymbolNotFoundError,
+    UnknownStrategyError,
+)
 from repositories.daily_bar_repository import DailyBarRepository, TdxDailyBarRepository
-from routers import health, indicators
+from repositories.scan_result_repository import (
+    InMemoryScanResultRepository,
+    ScanResultRepository,
+)
+from routers import health, indicators, strategies
 from services.indicator_service import IndicatorService
+from services.strategy_service import StrategyService
+from strategies.scanner import MarketScanner, Scanner
 
 API_PREFIX = "/api/v1"
 
 
 def _register_exception_handlers(app: FastAPI) -> None:
-    """领域异常 → HTTP 状态码（404 / 422），响应统一用 { message }。"""
+    """领域异常 → HTTP 状态码（400/404/422），响应统一用 { message }。"""
 
     @app.exception_handler(SymbolNotFoundError)
     async def _symbol_not_found(_request: Request, exc: SymbolNotFoundError):
+        return JSONResponse(status_code=404, content={"message": str(exc)})
+
+    @app.exception_handler(UnknownStrategyError)
+    async def _unknown_strategy(_request: Request, exc: UnknownStrategyError):
         return JSONResponse(status_code=404, content={"message": str(exc)})
 
     @app.exception_handler(InsufficientDataError)
@@ -46,8 +61,10 @@ def _register_exception_handlers(app: FastAPI) -> None:
 def create_app(
     settings: Settings | None = None,
     repository: DailyBarRepository | None = None,
+    strategy_scanner: Scanner | None = None,
+    scan_repository: ScanResultRepository | None = None,
 ) -> FastAPI:
-    """应用工厂：测试可传入自定义 settings 或 fake repository。"""
+    """应用工厂：测试可传入自定义 settings / fake 仓储 / fake 扫描器。"""
     settings = settings or get_settings()
 
     app = FastAPI(title="stock-api", version="0.1.0")
@@ -55,6 +72,10 @@ def create_app(
     # 依赖注入：service 挂到 app.state，路由里通过 Depends 取用
     repo = repository or TdxDailyBarRepository(settings.hsjday_path)
     app.state.service = IndicatorService(repo)
+
+    scanner = strategy_scanner or MarketScanner(settings.hsjday_path)
+    scan_repo = scan_repository or InMemoryScanResultRepository()
+    app.state.strategy_service = StrategyService(scanner, scan_repo)
 
     _register_exception_handlers(app)
 
@@ -68,6 +89,7 @@ def create_app(
 
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(indicators.router, prefix=API_PREFIX)
+    app.include_router(strategies.router, prefix=API_PREFIX)
     return app
 
 

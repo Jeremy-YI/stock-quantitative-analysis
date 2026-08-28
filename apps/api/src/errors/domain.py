@@ -17,3 +17,7 @@ class SymbolNotFoundError(DomainError):
 
 class InsufficientDataError(DomainError):
     """标的存在但日线数据不足（映射 HTTP 422）。"""
+
+
+class UnknownStrategyError(DomainError):
+    """策略名不存在（映射 HTTP 404）。"""
