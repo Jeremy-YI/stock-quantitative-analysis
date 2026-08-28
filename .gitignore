@@ -16,12 +16,20 @@ out/
 coverage/
 *.tsbuildinfo
 
+# Playwright 运行产物
+apps/web/test-results/
+apps/web/playwright-report/
+blob-report/
+
 # 环境变量（含密钥，不入库）
 .env
 .env.local
 
 # 调度器报告输出（FileNotifier 写的 Markdown，运行时生成，不入库）
 reports/
+
+# 数据产物（演示数据 / 概览页快照 / 回测结果 JSON，全部由脚本现场生成，不入库）
+data/
 
 # 系统 / 编辑器
 .DS_Store

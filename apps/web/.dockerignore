@@ -1,0 +1,27 @@
+# web 镜像构建上下文忽略清单（构建上下文是 apps/web 目录）。
+# 这些目录在构建时不需要，不忽略会把几百 MB 的本地产物塞进上下文。
+
+.git
+.gitignore
+.dockerignore
+node_modules
+.next
+out
+coverage
+*.tsbuildinfo
+
+# 测试与运行产物（Playwright / vitest）
+test-results
+playwright-report
+blob-report
+e2e
+tests
+playwright.config.ts
+vitest.config.ts
+vitest.setup.ts
+
+# 环境变量（含密钥，绝不打进镜像）
+.env
+.env.local
+
+.DS_Store

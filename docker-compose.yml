@@ -45,8 +45,10 @@ services:
   # ----------------------------------------------------------
   api:
     build:
-      context: ./apps/api
-      dockerfile: Dockerfile
+      # 构建上下文是仓库根目录（Dockerfile 需要 COPY packages/* 与 apps/api/*，
+      # 这些都在 apps/api 目录之外，所以上下文必须是仓库根）
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: stock-api
     restart: unless-stopped
     environment:
@@ -56,9 +58,24 @@ services:
     volumes:
       # 把宿主机（你 Mac）的 hsjday 数据只读挂进容器，后端能直接读
       - ~/Desktop/每日复盘/hsjday:/data/hsjday:ro
+      # 概览页快照（seed_demo_data.py / make_dashboard_snapshot.py 生成在仓库 data/ 下），
+      # 挂进容器让 Dashboard 有数据；没生成则首页降级为空、不报错
+      - ./data:/app/data
     expose:
       # 只对内部网络暴露 8000 端口（不直接对外），统一由 nginx 收口
       - "8000"
+    healthcheck:
+      # 健康检查：探活接口能返回 200 才视为就绪（python slim 用 urllib 探活）
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     depends_on:
       mysql:
         condition: service_healthy
@@ -75,6 +92,12 @@ services:
     # 把 Next.js 默认端口 3000 只暴露给内部网络，对外由 nginx 收口
     expose:
       - "3000"
+    healthcheck:
+      # 健康检查：Next.js 起好后能响应首页才视为就绪（node:alpine 自带 wget）
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     depends_on:
       - api
 
@@ -96,8 +119,10 @@ services:
       # 把我们写的 nginx.conf 挂进去，覆盖 nginx 默认配置
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - api
-      - web
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
 
 # 顶层 volumes：声明上面用到的命名数据卷
 volumes:

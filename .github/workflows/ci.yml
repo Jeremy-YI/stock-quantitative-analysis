@@ -21,7 +21,8 @@ jobs:
         run: |
           python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
           python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
-            -e packages/indicators -e packages/datasource -e packages/market
+            -e packages/indicators -e packages/datasource -e packages/market \
+            -e packages/strategies -e packages/backtest -e packages/scheduler
           python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -e "apps/api[dev]"
 
       - name: Run pytest
