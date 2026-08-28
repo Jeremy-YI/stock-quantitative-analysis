@@ -30,6 +30,12 @@ export default function RootLayout({
           >
             选股策略
           </Link>
+          <Link
+            href="/backtest"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            策略回测
+          </Link>
         </nav>
         {children}
       </body>
