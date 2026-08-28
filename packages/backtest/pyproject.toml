@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-backtest"
+version = "0.1.0"
+description = "A股回测引擎（信号验证 / 组合回测 / 统计 / 策略衰减）"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.0",
+    "pydantic>=2.6",
+    "stock-strategies",
+    "stock-market",
+    "stock-datasource",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backtest*"]

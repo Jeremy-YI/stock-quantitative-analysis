@@ -21,7 +21,7 @@ venv:
 # 因为 api 的 pyproject 依赖前三个库，必须先存在才能被 pip 解析到。
 install: venv
 	.venv/bin/python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-	.venv/bin/python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -e packages/indicators -e packages/datasource -e packages/market -e packages/strategies
+	.venv/bin/python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -e packages/indicators -e packages/datasource -e packages/market -e packages/strategies -e packages/backtest
 	.venv/bin/python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -e "apps/api[dev]"
 
 # 跑后端单元 + 集成测试（必须在 install 之后执行）
