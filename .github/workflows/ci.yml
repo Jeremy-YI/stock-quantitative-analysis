@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # ---------- 后端：安装依赖 + 跑 pytest ----------
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 用清华源加速（国内 CI 网络环境下更快）
+      - name: Install dependencies
+        run: |
+          python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+          python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
+            -e packages/indicators -e packages/datasource -e packages/market
+          python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -e "apps/api[dev]"
+
+      - name: Run pytest
+        run: python -m pytest
+
+  # ---------- 前端：npm ci + 测试 + 构建 ----------
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      # npm ci：严格按 lock 文件安装，CI 里比 npm install 快且可复现
+      - name: Install dependencies
+        run: npm ci
+        working-directory: apps/web
+
+      - name: Run tests
+        run: npm test
+        working-directory: apps/web
+
+      - name: Build
+        run: npm run build
+        working-directory: apps/web

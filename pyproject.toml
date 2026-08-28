@@ -1,0 +1,12 @@
+# 仅作为 monorepo 根目录的「工具配置」，不参与打包（各子包有自己的 pyproject.toml）。
+# 让 `pytest` 在仓库根目录直接跑通，无需先安装各子包。
+[tool.pytest.ini_options]
+pythonpath = [
+    "packages/indicators",
+    "packages/datasource",
+    "packages/market",
+    "apps/api/src",
+]
+testpaths = ["tests", "apps/api/tests"]
+addopts = "-q"
+asyncio_mode = "auto"
