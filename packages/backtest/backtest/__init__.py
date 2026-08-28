@@ -21,6 +21,8 @@ from backtest.engine import (
 )
 from backtest.models import (
     BacktestReport,
+    BaselineHold,
+    BaselineResult,
     BoardResult,
     DecayPoint,
     DecaySeries,
@@ -35,6 +37,8 @@ __all__ = [
     "BacktestConfig",
     "BacktestEngine",
     "BacktestReport",
+    "BaselineHold",
+    "BaselineResult",
     "BoardResult",
     "CandlesProvider",
     "CostConfig",

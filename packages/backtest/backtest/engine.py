@@ -3,16 +3,25 @@
 三种能力：
 
     1. ``run_verification``  信号验证模式（对应 top5_verify.py）：
-       每个信号算持有 N 日的收益，按策略 / 板块聚合截面统计。
+       每个信号算持有 N 日的收益，按策略 / 板块聚合截面统计，并附上
+       「同期同宇宙基线」对比（超额胜率 / 超额收益，见 backtest.baseline）。
     2. ``run_portfolio``     组合回测模式：按信号建仓 → 净值曲线。
-    3. ``compute_decay``     策略衰减监测：滚动窗口（交易日）胜率曲线。
+    3. ``compute_decay``     策略衰减监测：滚动窗口（交易日）胜率曲线，
+       同时给出「超额胜率」滚动曲线（原始胜率下降可能只是市场变差）。
 
 板块归属：先按市场板块（主板 / 创业板 / 科创板 / 北交所）做简化映射，
 真实行业板块（申万 / 东方财富）需名称快照，列为后续 TODO（见 docs）。
+
+选择性 / 超额口径（阶段 4.5 引入，见 docs/回测迁移说明.md）：
+
+    - 基线按「宇宙种类」分开算（个股 / ETF），策略对各自目标宇宙的基线。
+    - selectivity = 日均信号数 / 宇宙标的数（每天触发了该宇宙的百分之几）。
+    - excess_win_rate = 策略胜率 - 同期同宇宙基线胜率（真正衡量「有没有超额」）。
 """
 
 from __future__ import annotations
 
+from collections import Counter, defaultdict
 from datetime import date
 from typing import Protocol
 
@@ -20,10 +29,13 @@ import pandas as pd
 
 from market.calendar import trading_days
 
+from .baseline import daily_baseline_win_rates, compute_baseline
 from .config import BacktestConfig, default_config
 from .forward import forward_returns
 from .models import (
     BacktestReport,
+    BaselineHold,
+    BaselineResult,
     BoardResult,
     DecayPoint,
     DecaySeries,
@@ -57,6 +69,11 @@ def classify_board(symbol: str) -> str:
     return "其他"
 
 
+def _kind_value(kind) -> str:
+    """把 SymbolKind 枚举或普通字符串归一化成 'stock'/'etf' 字符串。"""
+    return getattr(kind, "value", kind)
+
+
 class CandlesProvider(Protocol):
     """回测取数接口：按代码返回全量日线（含 date/open/high/low/close）。"""
 
@@ -80,37 +97,76 @@ class BacktestEngine:
         self,
         candles: CandlesProvider | None = None,
         config: BacktestConfig | None = None,
+        kind_map: dict[str, str] | None = None,
     ) -> None:
         self._candles = candles or DictCandlesProvider({})
         self._config = config or default_config()
+        # 标的 → 宇宙种类（"stock"/"etf" 或 SymbolKind 枚举）。用于基线分宇宙计算。
+        self._kind_map = kind_map or {}
 
     # ------------------------------------------------------------------
     # 信号验证模式
     # ------------------------------------------------------------------
-    def run_verification(self, signals: list) -> VerificationReport:
-        """对一批信号算持有 N 日收益并聚合。"""
+    def run_verification(
+        self,
+        signals: list,
+        start: date | None = None,
+        end: date | None = None,
+    ) -> VerificationReport:
+        """对一批信号算持有 N 日收益并聚合（含基线 / 选择性 / 超额）。"""
         cfg = self._config
+
+        # 区间：未显式给定时从信号日期推导（基线要与信号同期）
+        if start is None or end is None:
+            ds = [s.triggered_at for s in signals]
+            if ds:
+                start = start or min(ds)
+                end = end or max(ds)
+
+        # 基线：按宇宙种类（个股 / ETF）分开算
+        baselines = self._compute_baselines(start, end)
+        baseline_by_kind = {
+            b.universe: {h.hold_days: h for h in b.holds} for b in baselines
+        }
+
+        # 宇宙规模 + 策略 → 宇宙种类 + 日均信号数（选择性指标用）
+        kind_counts: dict[str, int] = Counter(_kind_value(k) for k in self._kind_map.values())
+        strategy_kind: dict[str, str] = {}
+        for s in signals:
+            kind = self._kind_map.get(s.symbol)
+            if kind is not None:
+                strategy_kind.setdefault(s.strategy, _kind_value(kind))
+        signal_counts: dict[str, int] = Counter(s.strategy for s in signals)
+        n_days = len(trading_days(start, end)) if start and end else 0
 
         # 每信号算 forward returns（缓存 DataFrame 避免重复读）
         df_cache: dict[str, pd.DataFrame] = {}
         rows: list[tuple] = []  # (strategy, board, signal_date, hold_returns)
         for s in signals:
-            df = df_cache.get(s.symbol)
             if s.symbol not in df_cache:
-                df = self._candles.get(s.symbol)
-                df_cache[s.symbol] = df
+                df_cache[s.symbol] = self._candles.get(s.symbol)
+            df = df_cache[s.symbol]
             if df is None or df.empty:
                 continue
             fr = forward_returns(df, s.triggered_at, cfg.hold_days)
             rows.append((s.strategy, classify_board(s.symbol), s.triggered_at, fr))
 
+        agg_kwargs = dict(
+            baseline_by_kind=baseline_by_kind,
+            strategy_kind=strategy_kind,
+            kind_counts=kind_counts,
+            n_days=n_days,
+            signal_counts=signal_counts,
+        )
         by_strategy = self._aggregate_by_group(
-            rows, key_idx=0, name_field="strategy", as_strategy=True
+            rows, key_idx=0, name_field="strategy", as_strategy=True, **agg_kwargs
         )
         by_board = self._aggregate_by_group(
             rows, key_idx=1, name_field="board", as_strategy=False
         )
-        decay = self.compute_decay(signals, rows)
+        decay = self.compute_decay(
+            signals, rows, baseline_by_kind=baseline_by_kind, strategy_kind=strategy_kind
+        )
 
         return VerificationReport(
             total_signals=len(signals),
@@ -118,17 +174,69 @@ class BacktestEngine:
             by_strategy=by_strategy,
             by_board=by_board,
             decay=decay,
+            baselines=baselines,
         )
 
-    def _aggregate_by_group(
-        self, rows: list[tuple], key_idx: int, name_field: str, as_strategy: bool
-    ):
-        """按策略 / 板块聚合截面统计。"""
-        from collections import defaultdict
+    def _compute_baselines(
+        self, start: date | None, end: date | None
+    ) -> list[BaselineResult]:
+        """按宇宙种类（个股 / ETF）分别计算同期基线。无宇宙信息时返回空。"""
+        if start is None or end is None or not self._kind_map:
+            return []
 
+        groups: dict[str, set[str]] = defaultdict(set)
+        for symbol, kind in self._kind_map.items():
+            groups[_kind_value(kind)].add(symbol)
+
+        out: list[BaselineResult] = []
+        for universe in sorted(groups):
+            stats = compute_baseline(
+                self._candles,
+                groups[universe],
+                universe,
+                start,
+                end,
+                self._config.hold_days,
+            )
+            out.append(
+                BaselineResult(
+                    universe=universe,
+                    size=stats.size,
+                    holds=[
+                        BaselineHold(
+                            hold_days=h.hold_days,
+                            n=h.n,
+                            win_rate=round(h.win_rate, 6),
+                            avg_return=round(h.avg_return, 6),
+                            median_return=round(h.median_return, 6),
+                        )
+                        for h in stats.holds
+                    ],
+                )
+            )
+        return out
+
+    def _aggregate_by_group(
+        self,
+        rows: list[tuple],
+        key_idx: int,
+        name_field: str,
+        as_strategy: bool,
+        baseline_by_kind: dict[str, dict[int, BaselineHold]] | None = None,
+        strategy_kind: dict[str, str] | None = None,
+        kind_counts: dict[str, int] | None = None,
+        n_days: int = 0,
+        signal_counts: dict[str, int] | None = None,
+    ):
+        """按策略 / 板块聚合截面统计（策略层附带基线超额 + 选择性）。"""
         groups: dict[str, list[tuple]] = defaultdict(list)
         for r in rows:
             groups[r[key_idx]].append(r)
+
+        baseline_by_kind = baseline_by_kind or {}
+        strategy_kind = strategy_kind or {}
+        kind_counts = kind_counts or {}
+        signal_counts = signal_counts or {}
 
         out: list = []
         for name in sorted(groups):
@@ -137,6 +245,28 @@ class BacktestEngine:
             for n in self._config.hold_days:
                 returns = [r[3][n] for r in group_rows if r[3].get(n) is not None]
                 stats = summarize_returns(returns)
+
+                # 超额：只有策略层有宇宙种类时才对比基线
+                baseline_hold = None
+                if as_strategy:
+                    universe = strategy_kind.get(name)
+                    if universe and universe in baseline_by_kind:
+                        baseline_hold = baseline_by_kind[universe].get(n)
+
+                excess_win_rate = None
+                excess_return = None
+                baseline_win_rate = None
+                baseline_avg_return = None
+                if baseline_hold is not None:
+                    baseline_win_rate = baseline_hold.win_rate
+                    baseline_avg_return = baseline_hold.avg_return
+                    excess_win_rate = round(
+                        stats.win_rate - baseline_hold.win_rate, 4
+                    )
+                    excess_return = round(
+                        stats.avg_return - baseline_hold.avg_return, 4
+                    )
+
                 holds.append(
                     HoldReturn(
                         hold_days=n,
@@ -154,10 +284,34 @@ class BacktestEngine:
                         worst=round(stats.worst, 4),
                         quantiles=stats.quantiles,
                         histogram=histogram(returns),
+                        baseline_win_rate=baseline_win_rate,
+                        baseline_avg_return=baseline_avg_return,
+                        excess_win_rate=excess_win_rate,
+                        excess_return=excess_return,
                     )
                 )
             if as_strategy:
-                out.append(StrategyResult(strategy=name, holds=holds))
+                universe = strategy_kind.get(name)
+                universe_size = kind_counts.get(universe) if universe else None
+                sig_count = signal_counts.get(name, 0)
+                signals_per_day = sig_count / n_days if n_days else None
+                selectivity = None
+                if signals_per_day is not None and universe_size:
+                    selectivity = round(signals_per_day / universe_size, 6)
+                out.append(
+                    StrategyResult(
+                        strategy=name,
+                        universe=universe,
+                        universe_size=universe_size,
+                        signals_per_day=(
+                            round(signals_per_day, 3)
+                            if signals_per_day is not None
+                            else None
+                        ),
+                        selectivity=selectivity,
+                        holds=holds,
+                    )
+                )
             else:
                 out.append(BoardResult(board=name, holds=holds))
         return out
@@ -184,9 +338,15 @@ class BacktestEngine:
     # ------------------------------------------------------------------
     # 一次跑完整报告（验证 + 组合）
     # ------------------------------------------------------------------
-    def run(self, signals: list, with_portfolio: bool = True) -> BacktestReport:
+    def run(
+        self,
+        signals: list,
+        with_portfolio: bool = True,
+        start: date | None = None,
+        end: date | None = None,
+    ) -> BacktestReport:
         """一次算出验证报告（含衰减），可选叠加组合净值。"""
-        verification = self.run_verification(signals)
+        verification = self.run_verification(signals, start=start, end=end)
         portfolio = self.run_portfolio(signals) if with_portfolio else None
         return BacktestReport(verification=verification, portfolio=portfolio)
 
@@ -194,12 +354,17 @@ class BacktestEngine:
     # 策略衰减监测
     # ------------------------------------------------------------------
     def compute_decay(
-        self, signals: list, rows: list[tuple] | None = None
+        self,
+        signals: list,
+        rows: list[tuple] | None = None,
+        baseline_by_kind: dict[str, dict[int, BaselineHold]] | None = None,
+        strategy_kind: dict[str, str] | None = None,
     ) -> list[DecaySeries]:
-        """滚动窗口（交易日）胜率曲线。
+        """滚动窗口（交易日）胜率曲线（含超额胜率）。
 
         用「汇总持有期 decay_hold_days」的正收益占比，按交易日滑动窗口
-        （decay_windows 里每个长度各出一条曲线）。
+        （decay_windows 里每个长度各出一条曲线）。同时给出超额胜率：
+        策略滚动胜率 − 同期同宇宙基线滚动胜率（每日基线胜率的窗口均值）。
         """
         cfg = self._config
         if rows is None:
@@ -215,14 +380,31 @@ class BacktestEngine:
                 rows.append((s.strategy, classify_board(s.symbol), s.triggered_at, fr))
 
         # 只保留有有效 decay 收益的信号，按策略分组
-        from collections import defaultdict
-
         by_strategy: dict[str, list[tuple[date, int]]] = defaultdict(list)
         for strategy, _board, d, fr in rows:
             ret = fr.get(cfg.decay_hold_days)
             if ret is None:
                 continue
             by_strategy[strategy].append((d, 1 if ret > 0 else 0))
+
+        # 全局区间（用于算每日基线胜率）
+        all_dates = [d for strategy, _b, d, _fr in rows]
+        gmin = min(all_dates) if all_dates else None
+        gmax = max(all_dates) if all_dates else None
+
+        # 每个宇宙种类的「当日基线胜率」序列（供超额对比）
+        daily_base_by_kind: dict[str, dict[date, float]] = {}
+        if gmin and gmax and self._kind_map:
+            groups: dict[str, set[str]] = defaultdict(set)
+            for symbol, kind in self._kind_map.items():
+                groups[_kind_value(kind)].add(symbol)
+            for kind, syms in groups.items():
+                daily = daily_baseline_win_rates(
+                    self._candles, syms, gmin, gmax, [cfg.decay_hold_days]
+                )
+                daily_base_by_kind[kind] = daily.get(cfg.decay_hold_days, {})
+
+        strategy_kind = strategy_kind or {}
 
         out: list[DecaySeries] = []
         for strategy in sorted(by_strategy):
@@ -241,27 +423,51 @@ class BacktestEngine:
                 ww, nn = per_day.get(d, (0, 0))
                 per_day[d] = (ww + w, nn + 1)
 
+            base_daily = daily_base_by_kind.get(strategy_kind.get(strategy), {})
+
             for window in cfg.decay_windows:
                 points: list[DecayPoint] = []
-
                 for d in day_list:
                     if d not in per_day:
                         continue
-                    # 窗口起点：d 往前 window-1 个交易日
                     start_ord = ord_map[d] - (window - 1)
                     if start_ord < 0:
                         start_ord = 0
                     wins = 0
                     n = 0
+                    base_wins_sum = 0.0
+                    base_n = 0
                     for dd, (w, nn) in per_day.items():
                         if dd in ord_map and start_ord <= ord_map[dd] <= ord_map[d]:
                             wins += w
                             n += nn
-                    if n == 0:
-                        continue
+                    # 基线：窗口内每日基线胜率的均值（市场广度口径）
+                    if base_daily:
+                        for dd, bw in base_daily.items():
+                            if dd in ord_map and start_ord <= ord_map[dd] <= ord_map[d]:
+                                base_wins_sum += bw
+                                base_n += 1
+                    win_rate = wins / n if n else 0.0
+                    baseline_win_rate = (
+                        base_wins_sum / base_n if base_n else None
+                    )
+                    excess_win_rate = (
+                        round(win_rate - baseline_win_rate, 4)
+                        if baseline_win_rate is not None
+                        else None
+                    )
                     points.append(
                         DecayPoint(
-                            date=d, window=window, win_rate=round(wins / n, 4), n=n
+                            date=d,
+                            window=window,
+                            win_rate=round(win_rate, 4),
+                            n=n,
+                            baseline_win_rate=(
+                                round(baseline_win_rate, 4)
+                                if baseline_win_rate is not None
+                                else None
+                            ),
+                            excess_win_rate=excess_win_rate,
                         )
                     )
                 out.append(

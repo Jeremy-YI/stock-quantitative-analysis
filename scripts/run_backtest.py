@@ -134,10 +134,10 @@ def main() -> None:
         all_signals.extend(signals)
     print(f"\n扫描完成，总信号 {len(all_signals)}，累计耗时 {time.time()-t0:.1f}s", flush=True)
 
-    # 回测引擎
+    # 回测引擎（传入 kind_map 供基线分宇宙计算，start/end 对齐基线区间）
     config = BacktestConfig()
-    engine = BacktestEngine(DictCandlesProvider(candles), config)
-    verification = engine.run_verification(all_signals)
+    engine = BacktestEngine(DictCandlesProvider(candles), config, kind_map=kind_map)
+    verification = engine.run_verification(all_signals, start=start, end=end)
     portfolio = engine.run_portfolio(all_signals)
 
     _print_report(verification, portfolio, start, end, all_signals)
@@ -162,16 +162,39 @@ def _print_report(verification, portfolio, start, end, signals) -> None:
     print(f"【📊 回测报告】{start} ~ {end}")
     print(f"  总信号 {len(signals)} 条，持有期 {verification.hold_days}")
 
-    print(f"\n--- 按策略 · 胜率 / 平均收益（%） ---")
-    print(f"  {'策略':<16s}{'持有':>6s}{'样本':>7s}{'胜率':>8s}{'平均':>9s}{'中位':>9s}{'盈亏比':>8s}")
+    # 基线（按宇宙种类）
+    if verification.baselines:
+        print(f"\n--- 同期市场基线（正收益比例 / 平均收益） ---")
+        for b in verification.baselines:
+            row = f"  {b.universe:<8s}（标的 {b.size}）"
+            for h in b.holds:
+                row += f"  {h.hold_days}日 {h.win_rate*100:.1f}%/{h.avg_return*100:+.2f}%"
+            print(row)
+
+    print(f"\n--- 按策略 · 胜率 / 平均收益 / 超额（%） ---")
+    print(
+        f"  {'策略':<16s}{'持有':>4s}{'样本':>8s}{'胜率':>7s}{'基线':>7s}"
+        f"{'超额胜':>7s}{'平均':>8s}{'超额收益':>9s}"
+    )
     for sr in verification.by_strategy:
         for h in sr.holds:
-            plr = f"{h.profit_loss_ratio:.2f}" if h.profit_loss_ratio is not None else "—"
+            base = f"{h.baseline_win_rate*100:.1f}%" if h.baseline_win_rate is not None else "—"
+            exw = f"{h.excess_win_rate*100:+.1f}pp" if h.excess_win_rate is not None else "—"
+            exr = f"{h.excess_return*100:+.2f}%" if h.excess_return is not None else "—"
             print(
-                f"  {sr.strategy:<16s}{h.hold_days:>6d}{h.n:>7d}"
-                f"{h.win_rate*100:>7.1f}%{h.avg_return*100:>8.2f}%"
-                f"{h.median_return*100:>8.2f}%{plr:>8s}"
+                f"  {sr.strategy:<16s}{h.hold_days:>4d}{h.n:>8d}"
+                f"{h.win_rate*100:>6.1f}%{base:>7s}{exw:>7s}"
+                f"{h.avg_return*100:>7.2f}%{exr:>9s}"
             )
+
+    print(f"\n--- 选择性（日均信号数 / 宇宙标的数） ---")
+    for sr in verification.by_strategy:
+        sel = f"{sr.selectivity*100:.1f}%" if sr.selectivity is not None else "—"
+        spd = f"{sr.signals_per_day:.1f}" if sr.signals_per_day is not None else "—"
+        print(
+            f"  {sr.strategy:<16s} 日均 {spd} 条 / 宇宙 {sr.universe_size or '—'} 只"
+            f" = 选择性 {sel}"
+        )
 
     print(f"\n--- 组合回测 ---")
     print(f"  总收益 {portfolio.total_return*100:+.2f}%  最大回撤 {portfolio.max_drawdown*100:.2f}%  "
@@ -182,7 +205,11 @@ def _print_report(verification, portfolio, start, end, signals) -> None:
     for s in verification.decay:
         if s.window == 20 and s.points:
             last = s.points[-1]
-            print(f"  {s.strategy:<16s} 末点胜率 {last.win_rate*100:.1f}%  (n={last.n}, {last.date})")
+            exw = f"{last.excess_win_rate*100:+.1f}pp" if last.excess_win_rate is not None else "—"
+            print(
+                f"  {s.strategy:<16s} 末点胜率 {last.win_rate*100:.1f}%"
+                f"  (n={last.n}, {last.date})  超额 {exw}"
+            )
 
 
 if __name__ == "__main__":

@@ -45,13 +45,17 @@ class BacktestService:
         if request.start > request.end:
             raise DomainError("回测起始日不能晚于结束日")
 
-        signals, candles = self._collect_signals(strategies, request.start, request.end)
+        signals, candles, kind_map = self._collect_signals(strategies, request.start, request.end)
         config = BacktestConfig()
         if request.hold_days:
             config.hold_days = list(request.hold_days)
 
-        engine = BacktestEngine(DictCandlesProvider(candles), config)
-        verification = engine.run_verification(signals)
+        engine = BacktestEngine(
+            DictCandlesProvider(candles), config, kind_map=kind_map
+        )
+        verification = engine.run_verification(
+            signals, start=request.start, end=request.end
+        )
         portfolio = engine.run_portfolio(signals) if request.mode == "portfolio" else None
         report = BacktestReport(verification=verification, portfolio=portfolio)
 
@@ -86,12 +90,14 @@ class BacktestService:
         end = end or date.today()
         start = start or (end - timedelta(days=180))
 
-        signals, candles = self._collect_signals([strategy], start, end)
+        signals, candles, kind_map = self._collect_signals([strategy], start, end)
         config = BacktestConfig()
         config.decay_hold_days = hold_days
         config.decay_windows = [window]
 
-        engine = BacktestEngine(DictCandlesProvider(candles), config)
+        engine = BacktestEngine(
+            DictCandlesProvider(candles), config, kind_map=kind_map
+        )
         series_list = engine.compute_decay(signals)
         points = []
         for s in series_list:
@@ -119,22 +125,28 @@ class BacktestService:
 
     def _collect_signals(
         self, strategies: list[str], start: date, end: date
-    ) -> tuple[list, dict]:
-        """逐日扫描策略，返回 (signals, {symbol: 全量日线})。
+    ) -> tuple[list, dict, dict]:
+        """逐日扫描策略，返回 (signals, candles, kind_map)。
 
         candles 按各策略目标宇宙加载（个股策略 vs ETF 策略分开），
         扫描时按日切片（只留 <= 当日），前向收益在引擎里用全量 candles 算。
+        kind_map = {代码: 宇宙种类字符串}，供引擎分宇宙算基线。
         """
         symbols_by_strategy: dict[str, set[str]] = {}
         candles: dict = {}
+        kind_map: dict[str, str] = {}
         for strategy in strategies:
             mod = REGISTRY[strategy]
             loaded = self._scanner.load_candles(
                 end, filter_config=filter_for_kinds(mod.TARGET_KINDS)
             )
             symbols_by_strategy[strategy] = set(loaded.keys())
+            # 目标宇宙种类：策略均针对单一宇宙（个股或 ETF）
+            kind = mod.TARGET_KINDS[0].value if mod.TARGET_KINDS else None
             for symbol, df in loaded.items():
                 candles.setdefault(symbol, df)
+                if kind:
+                    kind_map.setdefault(symbol, kind)
 
         signals: list = []
         for day in trading_days(start, end):
@@ -147,4 +159,4 @@ class BacktestService:
                 }
                 signals.extend(mod.scan(sliced, day))
 
-        return signals, candles
+        return signals, candles, kind_map

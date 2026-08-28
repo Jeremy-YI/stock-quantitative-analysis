@@ -124,3 +124,42 @@ def test_adjust_mode_default_forward_and_passthrough():
     fr = forward_returns(df, signal_date, [1])
     # 原始收盘 10 → 10.2（1.02 倍），收益 = 2%，证明未叠加任何复权调整
     assert fr[1] == pytest.approx(0.02, abs=1e-9)
+
+
+def test_run_verification_excess_win_rate_and_selectivity():
+    """超额胜率与选择性：一只上涨 + 一只下跌的股票宇宙，基线 1 日胜率 50%。
+
+    策略信号只打在上涨标的上 → 策略胜率 100%，超额 = +50pp；
+    选择性 = 日均 1 条信号 / 宇宙 2 只 = 0.5。
+    """
+    base = date(2026, 6, 1)
+    rising = make_candle_df([10.0 * (1.01**i) for i in range(40)], start=base)
+    falling = make_candle_df([10.0 * (0.99**i) for i in range(40)], start=base)
+    candles = {"600000": rising, "300001": falling}
+    kind_map = {"600000": "stock", "300001": "stock"}
+
+    # 2026-06-18 为周四（交易日），单日区间让基线/选择性可精确断言
+    d = date(2026, 6, 18)
+    signals = [_signal("600000", "b1b2b3", d)]
+    engine = BacktestEngine(DictCandlesProvider(candles), kind_map=kind_map)
+    report = engine.run_verification(signals, start=d, end=d)
+
+    # 基线：上涨 +0.01、下跌 -0.01 → 1 日胜率 50%
+    assert len(report.baselines) == 1
+    baseline = report.baselines[0]
+    assert baseline.universe == "stock"
+    assert baseline.size == 2
+    b1 = next(h for h in baseline.holds if h.hold_days == 1)
+    assert b1.win_rate == pytest.approx(0.5)
+
+    sr = report.by_strategy[0]
+    assert sr.strategy == "b1b2b3"
+    assert sr.universe == "stock"
+    assert sr.universe_size == 2
+    assert sr.selectivity == pytest.approx(0.5)
+
+    h1 = next(h for h in sr.holds if h.hold_days == 1)
+    assert h1.win_rate == pytest.approx(1.0)
+    assert h1.baseline_win_rate == pytest.approx(0.5)
+    assert h1.excess_win_rate == pytest.approx(0.5)
+    assert h1.excess_return == pytest.approx(0.01, abs=1e-9)

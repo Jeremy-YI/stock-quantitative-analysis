@@ -12,6 +12,10 @@
     "by_strategy": [
       {
         "strategy": "b1b2b3",
+        "universe": null,
+        "universe_size": null,
+        "signals_per_day": 0.25,
+        "selectivity": null,
         "holds": [
           {
             "hold_days": 1,
@@ -131,7 +135,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -251,7 +259,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -371,7 +383,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -491,7 +507,11 @@
                 "upper": 0.2,
                 "count": 4
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -611,12 +631,20 @@
                 "upper": 0.2,
                 "count": 3
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       },
       {
         "strategy": "pin30",
+        "universe": null,
+        "universe_size": null,
+        "signals_per_day": 0.25,
+        "selectivity": null,
         "holds": [
           {
             "hold_days": 1,
@@ -736,7 +764,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -856,7 +888,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -976,7 +1012,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -1096,7 +1136,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -1216,12 +1260,20 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       },
       {
         "strategy": "stealth_rally",
+        "universe": null,
+        "universe_size": null,
+        "signals_per_day": 0.25,
+        "selectivity": null,
         "holds": [
           {
             "hold_days": 1,
@@ -1341,7 +1393,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -1461,7 +1517,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -1581,7 +1641,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -1701,7 +1765,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -1821,7 +1889,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       }
@@ -1948,7 +2020,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -2068,7 +2144,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -2188,7 +2268,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -2308,7 +2392,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -2428,7 +2516,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       },
@@ -2553,7 +2645,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -2673,7 +2769,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -2793,7 +2893,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -2913,7 +3017,11 @@
                 "upper": 0.2,
                 "count": 4
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -3033,7 +3141,11 @@
                 "upper": 0.2,
                 "count": 3
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       },
@@ -3158,7 +3270,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 3,
@@ -3278,7 +3394,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 5,
@@ -3398,7 +3518,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 10,
@@ -3518,7 +3642,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           },
           {
             "hold_days": 20,
@@ -3638,7 +3766,11 @@
                 "upper": 0.2,
                 "count": 0
               }
-            ]
+            ],
+            "baseline_win_rate": null,
+            "baseline_avg_return": null,
+            "excess_win_rate": null,
+            "excess_return": null
           }
         ]
       }
@@ -3653,25 +3785,33 @@
             "date": "2026-07-06",
             "window": 20,
             "win_rate": 1.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 20,
             "win_rate": 1.0,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 20,
             "win_rate": 1.0,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 20,
             "win_rate": 1.0,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       },
@@ -3684,25 +3824,33 @@
             "date": "2026-07-06",
             "window": 60,
             "win_rate": 1.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 60,
             "win_rate": 1.0,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 60,
             "win_rate": 1.0,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 60,
             "win_rate": 1.0,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       },
@@ -3715,25 +3863,33 @@
             "date": "2026-07-06",
             "window": 20,
             "win_rate": 0.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 20,
             "win_rate": 0.0,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 20,
             "win_rate": 0.0,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 20,
             "win_rate": 0.0,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       },
@@ -3746,25 +3902,33 @@
             "date": "2026-07-06",
             "window": 60,
             "win_rate": 0.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 60,
             "win_rate": 0.0,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 60,
             "win_rate": 0.0,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 60,
             "win_rate": 0.0,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       },
@@ -3777,25 +3941,33 @@
             "date": "2026-07-06",
             "window": 20,
             "win_rate": 1.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 20,
             "win_rate": 0.5,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 20,
             "win_rate": 0.6667,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 20,
             "win_rate": 0.5,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       },
@@ -3808,29 +3980,38 @@
             "date": "2026-07-06",
             "window": 60,
             "win_rate": 1.0,
-            "n": 1
+            "n": 1,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-13",
             "window": 60,
             "win_rate": 0.5,
-            "n": 2
+            "n": 2,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-20",
             "window": 60,
             "win_rate": 0.6667,
-            "n": 3
+            "n": 3,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           },
           {
             "date": "2026-07-27",
             "window": 60,
             "win_rate": 0.5,
-            "n": 4
+            "n": 4,
+            "baseline_win_rate": null,
+            "excess_win_rate": null
           }
         ]
       }
-    ]
+    ],
+    "baselines": []
   },
   "portfolio": {
     "equity_curve": [
