@@ -30,6 +30,10 @@ class MacdVolumeWashoutConfig(BaseModel):
     min_amount: float = Field(
         50_000_000.0, description="20 日均成交额下限（元，5000 万），剔除流动性不足"
     )
+    # 市场环境档（阶段 9）：均值回归类 = 避开强涨/火爆/深跌，要清淡市。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> MacdVolumeWashoutConfig:

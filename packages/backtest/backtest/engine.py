@@ -353,7 +353,10 @@ class BacktestEngine:
         candles_map = {s.symbol: self._candles.get(s.symbol) for s in signals}
         candles_map = {k: v for k, v in candles_map.items() if v is not None}
         regime_series = None
-        if self._config.portfolio.regime_filter is not None:
+        if (
+            self._config.portfolio.regime_filter is not None
+            or self._config.portfolio.regime_by_strategy
+        ):
             regime_series = self._compute_regime_series()
         raw = simulate_portfolio(signals, candles_map, self._config, regime_series=regime_series)
         return PortfolioReport(

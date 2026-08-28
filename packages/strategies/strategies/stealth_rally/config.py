@@ -21,6 +21,10 @@ class StealthRallyConfig(BaseModel):
     )
     limit_up_lookback: int = Field(10, description="检查最近 N 日是否有涨停")
     limit_up_pct: float = Field(9.5, description="涨跌幅（%）达到此阈值视为涨停（主板 9.5≈10）")
+    # 市场环境档（阶段 9）：均值回归类（水下二次金叉，埋伏型）。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> StealthRallyConfig:

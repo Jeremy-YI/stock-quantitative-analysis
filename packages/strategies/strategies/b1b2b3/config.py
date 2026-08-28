@@ -41,6 +41,11 @@ class B1B2B3Config(BaseModel):
         8.0, description="5 日振幅（%）上限，B3 要求振幅 < 8% 的窄幅整理"
     )
     min_bars: int = Field(10, description="最少需要的历史 K 线根数，不足则跳过")
+    # 市场环境档（阶段 9）：均值回归类 = 避开强涨/火爆/深跌，要清淡市。
+    # 见 market.regime.REGIME_PROFILES 与 docs/样本外验证报告.md。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> B1B2B3Config:

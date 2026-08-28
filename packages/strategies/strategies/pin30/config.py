@@ -35,6 +35,10 @@ class Pin30Config(BaseModel):
     )
     j_b1w_threshold: float = Field(16.0, description="J < 16 视为 B1_W 超卖")
     min_bars: int = Field(120, description="最少历史 K 线根数（需覆盖 MA114）")
+    # 市场环境档（阶段 9）：均值回归类。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> Pin30Config:

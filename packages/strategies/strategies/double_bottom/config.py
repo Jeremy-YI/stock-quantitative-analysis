@@ -87,6 +87,10 @@ class DoubleBottomConfig(BaseModel):
 
     # ── 数据长度 ──
     min_bars: int = Field(150, description="最少历史 K 线根数，不足则跳过")
+    # 市场环境档（阶段 9）：均值回归类 = 避开强涨/火爆/深跌，要清淡市。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> DoubleBottomConfig:

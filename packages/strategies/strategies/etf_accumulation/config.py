@@ -23,6 +23,11 @@ class EtfAccumulationConfig(BaseModel):
     drawdown_window: int = Field(60, description="回撤基准：近 N 日最高价")
     divergence_window: int = Field(20, description="底背离比较窗口：近 N 根 K 线")
     min_bars: int = Field(60, description="最少需要的历史 K 线根数，不足则跳过")
+    # 市场环境档（阶段 9）：深跌吸筹类 = 恰恰要深回撤（ETF 跌幅 25%-40% 的甜点区），
+    # 不能套默认均值回归 filter（其 min_drawdown=-15% 会挡掉深跌买点）。
+    regime_profile: str = Field(
+        "deep_accumulation", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> EtfAccumulationConfig:

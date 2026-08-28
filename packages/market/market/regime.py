@@ -173,6 +173,39 @@ def _as_float(value) -> float | None:
     return f
 
 
+# ── 策略类型 → regime 过滤档（阶段 9：分策略配置，替代全局一刀切） ──
+#
+# 阶段 8 实测发现默认 filter 对「均值回归类」有效、对「深跌吸筹类」有害：
+#   - 均值回归类（水下多头 + 极缩量等）：避开强涨 / 火爆 / 深跌，要清淡市。
+#   - 深跌吸筹类（ETF 跌幅 25%-40% + 底背离）：恰恰需要深回撤才能触发，
+#     默认 filter 的 min_drawdown=-15% 会把它的买点全部挡掉。
+# 因此把 regime 条件按策略类型分开声明（见各策略 config 的 regime_profile 字段）。
+REGIME_PROFILES: dict[str, dict[str, float]] = {
+    # 均值回归类：大盘 20 日涨幅 < +4% 且 活跃度 < 1.2 且 回撤在 -15%~0。
+    "mean_reversion": {
+        "max_index_20d_return": 0.04,
+        "max_activity": 1.2,
+        "min_drawdown": -0.15,
+        "max_drawdown": 0.0,
+    },
+    # 深跌吸筹类：允许深回撤（下界放到 -40%，对应 ETF 跌幅 25%-40% 的甜点区），
+    # 同时避开暴涨市（大盘 20 日涨幅 < +10%）与极端火爆（活跃度 < 1.5）。
+    "deep_accumulation": {
+        "max_index_20d_return": 0.10,
+        "max_activity": 1.5,
+        "min_drawdown": -0.40,
+        "max_drawdown": 0.0,
+    },
+}
+
+
+def profile_params(profile: str | None) -> dict[str, float] | None:
+    """返回策略类型对应的 regime 过滤参数；未知 / None 返回 None（不过滤）。"""
+    if not profile:
+        return None
+    return REGIME_PROFILES.get(profile)
+
+
 def should_allow(
     index_20d_return: float | None,
     activity: float | None,

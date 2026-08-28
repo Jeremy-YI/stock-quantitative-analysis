@@ -15,6 +15,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from market.adjust import DEFAULT_ADJUST_MODE, AdjustMode
+from market.regime import profile_params as _profile_params
 from market.regime import should_allow as _regime_should_allow
 
 # 默认持有期（交易日）：对应 Jeremy 现用 top5_verify 的「持有 N 日」验证
@@ -76,6 +77,19 @@ class RegimeFilterConfig(BaseModel):
     min_drawdown: float = Field(-0.15, description="距 120 日高点回撤下限")
     max_drawdown: float = Field(0.0, description="距 120 日高点回撤上限")
 
+    @classmethod
+    def from_profile(cls, profile: str | None) -> "RegimeFilterConfig | None":
+        """按策略类型档（见 market.regime.REGIME_PROFILES）构造 filter；未知返回 None。"""
+        p = _profile_params(profile)
+        if not p:
+            return None
+        return cls(
+            max_index_20d_return=p["max_index_20d_return"],
+            max_activity=p["max_activity"],
+            min_drawdown=p["min_drawdown"],
+            max_drawdown=p["max_drawdown"],
+        )
+
     def allow(
         self, index_20d_return: float | None, activity: float | None, drawdown: float | None
     ) -> bool:
@@ -117,6 +131,20 @@ class PortfolioConfig(BaseModel):
     # 市场环境过滤：None = 不过滤（旧行为）；给定后只在允许的市场状态下开仓。
     regime_filter: RegimeFilterConfig | None = Field(
         None, description="市场环境过滤条件（见 market.regime 与 docs/市场环境模块说明.md）"
+    )
+    # 分策略市场环境过滤（阶段 9）：按策略名覆盖全局 regime_filter，实现「均值回归类」
+    # 与「深跌吸筹类」各自的 regime 条件（见各策略 config 的 regime_profile）。
+    # 某策略不在表中则回退到全局 regime_filter；两者皆 None 则不过滤。
+    regime_by_strategy: dict[str, RegimeFilterConfig] | None = Field(
+        None, description="按策略分别配置的市场环境过滤（键 = 策略名）"
+    )
+    # 3-2-2-2 分步建仓（阶段 9）：None = 一次性建仓（旧行为）；给定元组 = 分步建仓。
+    # 默认 (0.3, 0.2, 0.2, 0.2) 对应「首仓 30% + 后续三次各 20%」（合计 90%，留 10% 预备）。
+    stepwise_tranches: tuple[float, ...] | None = Field(
+        None, description="分步建仓节奏（各档占目标仓位的比例），None = 一次性建仓"
+    )
+    stepwise_interval_days: int = Field(
+        1, description="分步建仓相邻两档的间隔（交易日）"
     )
 
 

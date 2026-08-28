@@ -9,8 +9,10 @@ import pandas as pd
 import pytest
 
 from market.regime import (
+    REGIME_PROFILES,
     classify_regime,
     compute_market_series,
+    profile_params,
     should_allow,
     snapshot_at,
 )
@@ -93,3 +95,34 @@ def test_snapshot_at_missing_returns_none():
     # 无该日的快照
     assert snapshot_at(series, date(1999, 1, 1)) is None
     assert snapshot_at(pd.DataFrame(), date(2026, 1, 1)) is None
+
+
+def test_regime_profiles_two_classes():
+    """两类 regime 档：均值回归（避开深跌）vs 深跌吸筹（要深回撤）。"""
+    mr = REGIME_PROFILES["mean_reversion"]
+    da = REGIME_PROFILES["deep_accumulation"]
+    # 深跌吸筹的下界远深于均值回归（允许深回撤）
+    assert da["min_drawdown"] < mr["min_drawdown"]
+    # 深跌吸筹允许更高的涨幅 / 活跃度
+    assert da["max_index_20d_return"] > mr["max_index_20d_return"]
+    assert da["max_activity"] > mr["max_activity"]
+
+
+def test_profile_params_none_for_unknown():
+    assert profile_params("mean_reversion")["max_activity"] == 1.2
+    assert profile_params("deep_accumulation")["min_drawdown"] == -0.40
+    assert profile_params("none") is None
+    assert profile_params(None) is None
+    assert profile_params("unknown") is None
+
+
+def test_regime_filter_from_profile():
+    from backtest.config import RegimeFilterConfig
+
+    f = RegimeFilterConfig.from_profile("deep_accumulation")
+    assert f is not None
+    # 深跌吸筹档允许 -0.20 回撤开仓（默认均值回归档的 min_drawdown=-0.15 会拒绝）
+    assert f.allow(0.0, 1.0, -0.20) is True
+
+    assert RegimeFilterConfig.from_profile("none") is None
+    assert RegimeFilterConfig.from_profile(None) is None

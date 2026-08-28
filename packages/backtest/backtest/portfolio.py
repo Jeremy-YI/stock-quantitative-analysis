@@ -116,15 +116,22 @@ def _build_buy_groups(
 
 
 class Position:
-    """一笔持仓。"""
+    """一笔持仓（支持 3-2-2-2 分步建仓：多档买入后按平均成本计盈亏）。"""
 
-    __slots__ = ("symbol", "qty", "entry_price", "entry_ord")
+    __slots__ = ("symbol", "qty", "cost_basis", "entry_ord", "tranches_filled", "target_budget")
 
-    def __init__(self, symbol: str, qty: float, entry_price: float, entry_ord: int) -> None:
+    def __init__(self, symbol: str, qty: float, cost_basis: float, entry_ord: int) -> None:
         self.symbol = symbol
         self.qty = qty
-        self.entry_price = entry_price
+        self.cost_basis = cost_basis  # 累计买入金额（含滑点，不含费用，费用另计现金）
         self.entry_ord = entry_ord
+        self.tranches_filled = 1
+        self.target_budget = cost_basis  # 目标仓位（首档买入后由调用方回填）
+
+    @property
+    def avg_price(self) -> float:
+        """平均成本价（分步建仓后为加权平均）。"""
+        return self.cost_basis / self.qty if self.qty > 0 else 0.0
 
 
 def simulate_portfolio(
@@ -154,6 +161,9 @@ def simulate_portfolio(
     cfg = config or default_config()
     pcfg = cfg.portfolio
     rfilter = pcfg.regime_filter
+    rfilter_by_strategy = pcfg.regime_by_strategy or {}
+    tranches = pcfg.stepwise_tranches
+    interval = max(1, int(pcfg.stepwise_interval_days))
 
     # 预取每日开盘/收盘价（按日期字典，供 O(1) 取用 + 停牌前向填充）
     open_map: dict[str, dict[date, float]] = {}
@@ -206,73 +216,120 @@ def simulate_portfolio(
     skipped_buys = 0
     trades = 0
 
+    # 某日 regime 快照（同一天只取一次，供分策略 filter 复用）
+    def _regime_snap(day: date):
+        if regime_series is None:
+            return None
+        return snapshot_at(regime_series, day)
+
+    # 某策略当日是否允许开仓：优先分策略 filter，回退全局 filter；皆无则允许。
+    def _allow(strategy: str, snap) -> bool:
+        flt = rfilter_by_strategy.get(strategy, rfilter)
+        if flt is None:
+            return True
+        if snap is None or not flt.allow(
+            snap.index_20d_return, snap.activity, snap.drawdown
+        ):
+            return False
+        return True
+
     for day in days:
         ord_i = ord_map[day]
+        snap = _regime_snap(day)
 
-        # 0) 市场环境过滤：不在允许状态时当日不开仓（卖出不受限）
-        regime_ok = True
-        if rfilter is not None:
-            snap = snapshot_at(regime_series, day) if regime_series is not None else None
-            if snap is None or not rfilter.allow(
-                snap.index_20d_return, snap.activity, snap.drawdown
-            ):
-                regime_ok = False
+        # 1) 买入（当日开盘，处理「昨日触发」的信号；分策略 regime 过滤）
+        day_buys = buys_by_day.get(day, {})
+        if day_buys:
+            equity_now = _mark_to_market(cash, positions, close_map, day)
+            deployable_cap = equity_now * (1.0 - pcfg.reserve_ratio)
+            deployed_mv = _deployed(positions, close_map, day)
+            headroom = max(deployable_cap - deployed_mv, 0.0)
 
-        # 1) 买入（当日开盘，处理「昨日触发」的信号）
-        if regime_ok:
-            day_buys = buys_by_day.get(day, {})
-            if day_buys:
-                equity_now = _mark_to_market(cash, positions, close_map, day)
-                deployable_cap = equity_now * (1.0 - pcfg.reserve_ratio)
-                deployed_mv = _deployed(positions, close_map, day)
-                headroom = max(deployable_cap - deployed_mv, 0.0)
-
-                for strategy in sorted(day_buys.keys()):
-                    share = shares.get(strategy, 0.0)
-                    if share <= 0:
+            for strategy in sorted(day_buys.keys()):
+                share = shares.get(strategy, 0.0)
+                allowed = _allow(strategy, snap)
+                if share <= 0 or not allowed:
+                    # regime 不允许 / 无资金份额 → 该策略当日全部跳过（计入 skipped）
+                    if share > 0 and not allowed:
+                        skipped_buys += len(day_buys[strategy])
+                    continue
+                pool = headroom * share
+                remaining_pool = pool
+                for sig in day_buys[strategy]:
+                    symbol = sig.symbol
+                    if symbol in positions:
                         continue
-                    pool = headroom * share
-                    remaining_pool = pool
-                    for sig in day_buys[strategy]:
-                        symbol = sig.symbol
-                        if symbol in positions:
-                            continue
-                        if remaining_pool <= 0:
-                            break
-                        o = open_map.get(symbol, {}).get(day)
-                        pc = prev_close_map.get(symbol, {}).get(day)
-                        if o is None or pc is None or o <= 0:
-                            skipped_buys += 1
-                            continue
-                        if not can_buy_at_open(o, pc, symbol):
-                            skipped_buys += 1
-                            continue
+                    if remaining_pool <= 0:
+                        break
+                    o = open_map.get(symbol, {}).get(day)
+                    pc = prev_close_map.get(symbol, {}).get(day)
+                    if o is None or pc is None or o <= 0:
+                        skipped_buys += 1
+                        continue
+                    if not can_buy_at_open(o, pc, symbol):
+                        skipped_buys += 1
+                        continue
 
-                        # 单只仓位上限 / 该策略剩余资金池 / 可用现金 三者取最小
-                        budget = min(equity_now * pcfg.position_weight, remaining_pool, cash)
-                        if budget <= 0:
-                            break
+                    # 目标仓位 = 单只上限 / 策略剩余资金池 / 可用现金 三者取最小
+                    target_budget = min(equity_now * pcfg.position_weight, remaining_pool, cash)
+                    if target_budget <= 0:
+                        break
+                    # 分步建仓：首档只下 target_budget * tranches[0]；一次性则全下
+                    first_frac = tranches[0] if tranches else 1.0
+                    budget = target_budget * first_frac
 
-                        buy_px = apply_slippage(o, "buy", cfg.cost)
-                        if buy_px <= 0:
-                            skipped_buys += 1
-                            continue
-                        qty = budget / buy_px
-                        turnover = buy_px * qty
-                        fee = buy_cost(turnover, symbol, cfg.cost)
-                        total_cost = turnover + fee
-                        if total_cost > cash + 1e-9 or qty <= 0:
-                            skipped_buys += 1
-                            continue
+                    buy_px = apply_slippage(o, "buy", cfg.cost)
+                    if buy_px <= 0:
+                        skipped_buys += 1
+                        continue
+                    qty = budget / buy_px
+                    turnover = buy_px * qty
+                    fee = buy_cost(turnover, symbol, cfg.cost)
+                    total_cost = turnover + fee
+                    if total_cost > cash + 1e-9 or qty <= 0:
+                        skipped_buys += 1
+                        continue
 
-                        cash -= total_cost
-                        positions[symbol] = Position(symbol, qty, buy_px, ord_i)
-                        remaining_pool -= turnover
-                        filled_buys += 1
+                    cash -= total_cost
+                    pos = Position(symbol, qty, turnover, ord_i)
+                    pos.target_budget = target_budget
+                    positions[symbol] = pos
+                    remaining_pool -= target_budget
+                    filled_buys += 1
         else:
-            skipped_buys += sum(
-                len(lst) for lst in buys_by_day.get(day, {}).values()
-            )
+            skipped_buys += 0
+
+        # 1.5) 分步建仓：给已持仓、未建满的标的加下一档（当日开盘）
+        if tranches and positions:
+            for pos in list(positions.values()):
+                k = pos.tranches_filled
+                if k >= len(tranches):
+                    continue
+                # 第 k 档（0-based）在入场后第 k*interval 个交易日起可下
+                if ord_i - pos.entry_ord < k * interval:
+                    continue
+                o = open_map.get(pos.symbol, {}).get(day)
+                if o is None or o <= 0:
+                    continue
+                frac = tranches[k]
+                add_budget = pos.target_budget * frac
+                if add_budget <= 0 or cash <= 0:
+                    continue
+                add_budget = min(add_budget, cash)
+                buy_px = apply_slippage(o, "buy", cfg.cost)
+                if buy_px <= 0:
+                    continue
+                add_qty = add_budget / buy_px
+                turnover = buy_px * add_qty
+                fee = buy_cost(turnover, pos.symbol, cfg.cost)
+                total_cost = turnover + fee
+                if total_cost > cash + 1e-9 or add_qty <= 0:
+                    continue
+                cash -= total_cost
+                pos.qty += add_qty
+                pos.cost_basis += turnover
+                pos.tranches_filled += 1
+                filled_buys += 1
 
         # 2) 卖出（当日收盘，判断固定持有期 / 止盈止损，T+1 约束）
         for symbol in list(positions.keys()):
@@ -286,7 +343,8 @@ def simulate_portfolio(
                 continue  # 停牌：跳过，顺延
 
             holding_days = ord_i - pos.entry_ord
-            ret = c / pos.entry_price - 1.0 if pos.entry_price > 0 else 0.0
+            avg = pos.avg_price
+            ret = c / avg - 1.0 if avg > 0 else 0.0
             hit_stop = ret <= pcfg.stop_loss_pct
             hit_take = ret >= pcfg.take_profit_pct
             hit_hold = holding_days >= pcfg.max_holding_days

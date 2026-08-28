@@ -27,6 +27,10 @@ class MacdResonanceConfig(BaseModel):
     cross_dif_below: float = Field(
         0.0, description="底部金叉判定：金叉发生当周 DIF < 0（水下）"
     )
+    # 市场环境档（阶段 9）：均值回归类。
+    regime_profile: str = Field(
+        "mean_reversion", description="适用的 regime 过滤档（mean_reversion/deep_accumulation/none）"
+    )
 
 
 def default_config() -> MacdResonanceConfig:
