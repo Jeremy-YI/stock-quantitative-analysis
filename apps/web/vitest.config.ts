@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
+    // 组件/单测只跑 tests/ 目录；e2e/ 是 Playwright 的，交给 npx playwright test
+    include: ['tests/**/*.test.{ts,tsx}'],
+    exclude: ['e2e/**', 'node_modules/**', '**/test-results/**', '**/playwright-report/**'],
   },
   resolve: {
     alias: {

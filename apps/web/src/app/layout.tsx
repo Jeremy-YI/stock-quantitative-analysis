@@ -22,6 +22,12 @@ export default function RootLayout({
             href="/"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
+            概览
+          </Link>
+          <Link
+            href="/indicators"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
             技术指标
           </Link>
           <Link

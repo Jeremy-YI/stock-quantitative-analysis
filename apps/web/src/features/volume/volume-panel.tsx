@@ -19,7 +19,7 @@ export default function VolumePanel({ symbol }: VolumePanelProps) {
 
   return (
     <IndicatorPanel
-      title={data ? `${data.symbol} 日线量能` : '量能'}
+      title={data ? `${data.symbol} 日线 量能` : '量能'}
       legend={
         <>
           <span style={{ color: colors.mavol1 }}>● MAVOL1(5)</span>
