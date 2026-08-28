@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-datasource"
+version = "0.1.0"
+description = "通达信 hsjday 日线数据源（只读解析）"
+requires-python = ">=3.11"
+dependencies = ["pandas>=2.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["datasource*"]
