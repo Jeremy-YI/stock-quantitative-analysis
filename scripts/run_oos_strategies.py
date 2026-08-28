@@ -56,9 +56,20 @@ WINDOWS: dict[str, tuple[str, str]] = {
 WINDOW_LABELS = {"IS": "IS", "A": "OOS-A", "B": "OOS-B", "C": "OOS-C"}
 
 
-def load_universe(end: date) -> tuple[dict, dict[str, SymbolKind]]:
-    """一次性加载个股 + ETF 尾段 K 线（与 run_backtest.load_universe 一致）。"""
-    scanner = MarketScanner(HSJDAY)
+def load_universe(end: date, lookback: int = 800) -> tuple[dict, dict[str, SymbolKind]]:
+    """一次性加载个股 + ETF 尾段 K 线（与 run_backtest.load_universe 一致）。
+
+    关键修正（阶段 9）：通达信 .day 文件最新到数据末日（2026-08），而 OOS 窗口
+    结束日更早。``MarketScanner._read_day_tail`` 读的是「文件尾部 lookback 根」
+    （末尾=数据末日），若不处理，OOS 窗口早段会被截断成空/短历史。这里多读
+    ``_EXTRA_TAIL`` 根，再切到 ``date <= end`` 后取尾部 ``lookback`` 根，
+    保证每个窗口都拿到「截止 end 的完整回看」。
+
+    lookback 控制每只标的保留多少根：默认 800（覆盖 macd_resonance 需 30 月线）；
+    若排除 macd_resonance，其余六策略最多只回看 250 根，可用 300 大幅降内存。
+    """
+    _EXTRA_TAIL = 1000  # 覆盖 OOS 最早窗口（2023-01）到数据末日（2026-08）的bar数
+    scanner = MarketScanner(HSJDAY, lookback=lookback + _EXTRA_TAIL)
     candles: dict = {}
     kind_map: dict[str, SymbolKind] = {}
     for kind, kinds in (
@@ -67,6 +78,13 @@ def load_universe(end: date) -> tuple[dict, dict[str, SymbolKind]]:
     ):
         loaded = scanner.load_candles(end, filter_config=filter_for_kinds(kinds))
         for symbol, df in loaded.items():
+            if df is None or df.empty:
+                continue
+            df = df[df["date"] <= end]
+            if len(df) > lookback:
+                df = df.tail(lookback).reset_index(drop=True)
+            if df.empty:
+                continue
             candles.setdefault(symbol, df)
             kind_map[symbol] = kind
     return candles, kind_map
@@ -107,15 +125,17 @@ def load_is_signals() -> list:
     return signals
 
 
-def scan_window(window: str, jobs: int) -> list:
+def scan_window(window: str, jobs: int, lookback: int = 800, exclude: set[str] | None = None) -> list:
     start, end = (date.fromisoformat(x) for x in WINDOWS[window])
     t0 = time.time()
-    print("  加载全市场 K 线（尾段 800）...", flush=True)
-    candles, kind_map = load_universe(end)
+    print("  加载全市场 K 线（尾段 %d）..." % lookback, flush=True)
+    candles, kind_map = load_universe(end, lookback)
     print("  已加载 %d 只，耗时 %.1fs" % (len(candles), time.time() - t0), flush=True)
 
     symbols_by_strategy: dict[str, set[str]] = {}
     for strategy, mod in REGISTRY.items():
+        if exclude and strategy in exclude:
+            continue
         allowed = set(mod.TARGET_KINDS)
         symbols_by_strategy[strategy] = {
             s for s in candles if kind_map.get(s) in allowed
@@ -175,9 +195,14 @@ def main() -> None:
     parser.add_argument("--windows", nargs="+", default=["IS", "A", "B", "C"],
                         help="要跑的窗口（IS/A/B/C），默认全跑")
     parser.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
+    parser.add_argument("--lookback", type=int, default=800,
+                        help="单只标的回看根数（默认 800；排除 macd_resonance 后可用 300 降内存）")
+    parser.add_argument("--exclude", nargs="*", default=[],
+                        help="要排除的策略名（如 macd_resonance）")
     parser.add_argument("--out", default="data/oos_strategies.json")
     args = parser.parse_args()
 
+    exclude = set(args.exclude)
     results: dict = {}
     for window in args.windows:
         label = WINDOW_LABELS[window]
@@ -187,18 +212,22 @@ def main() -> None:
 
         if window == "IS":
             signals = load_is_signals()
+            if exclude:
+                signals = [s for s in signals if s.strategy not in exclude]
             print("  读缓存信号 %d 条" % len(signals), flush=True)
-            candles, kind_map = load_universe(end)
+            candles, kind_map = load_universe(end, args.lookback)
         else:
             cache_path = ROOT / "data" / ("oos_signals_%s.pkl" % label.lower())
             if cache_path.exists():
                 signals = pickle.load(open(cache_path, "rb"))
+                if exclude:
+                    signals = [s for s in signals if s.strategy not in exclude]
                 print("  读缓存信号 %d 条（%s）" % (len(signals), cache_path.name), flush=True)
             else:
-                signals = scan_window(window, args.jobs)
+                signals = scan_window(window, args.jobs, lookback=args.lookback, exclude=exclude)
                 cache_path.write_bytes(pickle.dumps(signals))
                 print("  信号缓存写入 %s" % cache_path.name, flush=True)
-            candles, kind_map = load_universe(end)
+            candles, kind_map = load_universe(end, args.lookback)
 
         summary = summarize(signals, candles, kind_map, start, end)
         results[label] = summary
