@@ -388,6 +388,63 @@ def print_earnings(state: dict, title: str, span_key: str = "") -> dict:
     return out
 
 
+def quarter_table_nl(state: dict, rule: str, hold: int) -> dict:
+    """严格不重叠口径的季度表（信号日 + 持有期的卖出日都在同一季度内）。"""
+    r = state["rule_nl"][rule][str(hold)]
+    b = state["base_nl"][str(hold)]
+    n = cell_to_q(r["n"])
+    win = cell_to_q(r["win"])
+    sret = cell_to_q(r["sum_ret"])
+    bn = cell_to_q(b["n"])
+    bwin = cell_to_q(b["win"])
+    bsret = cell_to_q(b["sum_ret"])
+    wr = safe_div(win, n)
+    ar = safe_div(sret, n)
+    return {
+        "n": n, "win_rate": wr, "avg_return": ar,
+        "excess_win_rate": wr - safe_div(bwin, bn),
+        "excess_return": ar - safe_div(bsret, bn),
+    }
+
+
+def print_nonoverlap(state: dict, title: str) -> dict:
+    """符号检验的独立性加固：只用「收益窗口完全落在同一季度内」的信号。
+
+    动机：25/60 日持有会让季度末的信号把收益窗口伸进下一季度，相邻季度的超额因此
+    存在序列相关，符号检验的「27 个独立样本」会被高估。这里把窗口跨季的信号全部剔掉，
+    27 个季度的收益窗口互不重叠，代价是季度末样本变少（60 日尤其明显）。
+    """
+    print("\n" + "=" * 132)
+    print("【%s】独立性加固：严格不重叠口径（收益窗口不跨季）的符号检验" % title)
+    print("=" * 132)
+    print("%-22s %-6s %10s %10s %10s %12s %12s %10s" % (
+        "规则", "持有", "信号n(合计)", "季度数", "正季度", "均值超额%", "中位超额%", "二项p"))
+    out: dict = {}
+    for rule in RULES:
+        for h in HOLDS:
+            t = quarter_table_nl(state, rule, h)
+            for metric in ("excess_return", "excess_win_rate"):
+                blk = sign_test_block(t[metric], t["n"], MIN_N_QUARTER)["suff"]
+                out["%s|%d|%s" % (rule, h, metric)] = blk
+            b = out["%s|%d|excess_return" % (rule, h)]
+            if b is None:
+                continue
+            print("%-22s %-6d %10d %10d %10d %12s %12s %10.4f" % (
+                RULE_NAMES[rule], h, int(np.nansum(t["n"])), b["n_quarters"], b["n_positive"],
+                fmt(b["mean"]), fmt(b["median"]), b["p_binom_two_sided"]))
+    print("\n  深水单针 短<=30 的逐季度不重叠超额（25 日）：")
+    t = quarter_table_nl(state, "deep30", 25)
+    row = ""
+    for qi, lab in enumerate(Q_LABELS):
+        row += "%s %s(n=%d)  " % (lab, fmt(t["excess_return"][qi]), t["n"][qi])
+        if (qi + 1) % 3 == 0:
+            print("    " + row)
+            row = ""
+    if row:
+        print("    " + row)
+    return out
+
+
 def print_survivorship(fwd: dict) -> dict:
     print("\n" + "=" * 132)
     print("幸存者偏差量化：每季度「本地有数据且满足 >=120 根前置 K 线」的沪深个股数 vs 公开上市家数")
@@ -511,6 +568,8 @@ def main() -> None:
 
     analysis["earnings_span20"] = print_earnings(fwd["state"], "前复权 / 沪深", "")
     analysis["earnings_span10"] = print_earnings(fwd["state"], "前复权 / 沪深", "10")
+    if "rule_nl" in fwd["state"]:
+        analysis["nonoverlap"] = print_nonoverlap(fwd["state"], "前复权 / 沪深")
     analysis["survivorship"] = print_survivorship(fwd)
     analysis["adjust_compare"] = print_adjust_compare(fwd, non)
 

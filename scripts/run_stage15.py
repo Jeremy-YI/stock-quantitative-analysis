@@ -160,6 +160,7 @@ QUARTERS = build_quarters()
 N_Q = len(QUARTERS)
 Q_LABELS = [q["label"] for q in QUARTERS]
 _Q_START_ORD = np.array([q["start"].toordinal() for q in QUARTERS], dtype=np.int64)
+_Q_END_ORD = np.array([q["end"].toordinal() for q in QUARTERS], dtype=np.int64)
 
 
 def quarter_ids(ordinals: np.ndarray) -> np.ndarray:
@@ -321,6 +322,12 @@ class State:
             r: {h: Accum() for h in HOLDS} for r in RULES
         }
         self.base10: dict[int, Accum] = {h: Accum() for h in HOLDS}
+        # 严格不重叠口径：只保留「信号日 + 持有期的卖出日仍落在同一季度内」的样本，
+        # 这样 27 个季度的收益窗口互不重叠，符号检验的独立性假设更硬。
+        self.rule_nl: dict[str, dict[int, Accum]] = {
+            r: {h: Accum() for h in HOLDS} for r in RULES
+        }
+        self.base_nl: dict[int, Accum] = {h: Accum() for h in HOLDS}
         # 每季度「有有效数据的股票数」（幸存者偏差量化）
         self.sym_per_q = np.zeros(N_Q, dtype=np.int64)
         self.done: list[str] = []
@@ -332,6 +339,8 @@ class State:
             "base": {str(h): self.base[h].to_json() for h in HOLDS},
             "rule10": {r: {str(h): self.rule10[r][h].to_json() for h in HOLDS} for r in RULES},
             "base10": {str(h): self.base10[h].to_json() for h in HOLDS},
+            "rule_nl": {r: {str(h): self.rule_nl[r][h].to_json() for h in HOLDS} for r in RULES},
+            "base_nl": {str(h): self.base_nl[h].to_json() for h in HOLDS},
             "sym_per_q": self.sym_per_q.tolist(),
             "done": self.done,
             "n_skipped": self.n_skipped,
@@ -344,9 +353,13 @@ class State:
             for h in HOLDS:
                 s.rule[r][h] = Accum.from_json(d["rule"][r][str(h)])
                 s.rule10[r][h] = Accum.from_json(d["rule10"][r][str(h)])
+                if "rule_nl" in d:
+                    s.rule_nl[r][h] = Accum.from_json(d["rule_nl"][r][str(h)])
         for h in HOLDS:
             s.base[h] = Accum.from_json(d["base"][str(h)])
             s.base10[h] = Accum.from_json(d["base10"][str(h)])
+            if "base_nl" in d:
+                s.base_nl[h] = Accum.from_json(d["base_nl"][str(h)])
         s.sym_per_q = np.asarray(d["sym_per_q"], dtype=np.int64)
         s.done = list(d["done"])
         s.n_skipped = int(d.get("n_skipped", 0))
@@ -445,6 +458,11 @@ def process_frame(
         c10 = cid10_all[okh]
         st.base[h].add(c20, ret, mae, mfe)
         st.base10[h].add(c10, ret, None, None)
+        # 严格不重叠：卖出日仍在同一季度内
+        qh = qid[okh]
+        nl = ordinals[jj] <= _Q_END_ORD[qh]
+        if nl.any():
+            st.base_nl[h].add(c20[nl], ret[nl], None, None)
         if h == HOLDS[0]:
             n_base_days = int(okh.sum())
         sub = {}
@@ -455,6 +473,9 @@ def process_frame(
             sub[rule] = mm
             st.rule[rule][h].add(c20[mm], ret[mm], mae[mm], mfe[mm])
             st.rule10[rule][h].add(c10[mm], ret[mm], None, None)
+            mn = mm & nl
+            if mn.any():
+                st.rule_nl[rule][h].add(c20[mn], ret[mn], None, None)
 
     # 幸存者偏差：本股在哪些季度有有效数据（用最短 hold 的有效日判定）
     j0 = idx + HOLDS[0]
