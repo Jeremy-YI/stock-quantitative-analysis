@@ -28,6 +28,7 @@ from __future__ import annotations
 import os
 import struct
 from datetime import date, datetime
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -78,8 +79,17 @@ def resolve_symbol_path(hsjday_root: Path, symbol: str) -> Path:
     return hsjday_root / market / "lday" / f"{market}{symbol}.day"
 
 
+@lru_cache(maxsize=65536)
 def _parse_date_int(date_int: int) -> date:
-    """YYYYMMDD 整数 → datetime.date。"""
+    """YYYYMMDD 整数 → datetime.date。
+
+    带 lru_cache（阶段 10 内存优化）：全市场扫描要解析 6000 只 × 上千根 K 线，
+    交易日总数只有几千个，缓存后
+      - strptime 只跑几千次（原来上千万次），加载明显变快；
+      - 所有标的**共享同一批 date 对象**，object 列只存指针，
+        全市场加载峰值少掉几百 MB 的重复 date 对象。
+    date 是不可变对象，共享实例不会有副作用。
+    """
     return datetime.strptime(str(date_int), "%Y%m%d").date()
 
 
