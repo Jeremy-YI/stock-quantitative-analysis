@@ -10,15 +10,15 @@ import { useState } from 'react'
 import { useRecommendations, useSectorList } from './use-recommendations'
 import type { Signal } from './types'
 
-// 策略名 → 中文标签（展示用）
+// 策略名 → 中文标签（与后端策略 LABEL 一致）
 const STRATEGY_LABEL: Record<string, string> = {
-  b1b2b3: 'B1/B2/B3',
+  b1b2b3: '超卖反弹',
   pin30: '单针',
-  double_bottom: '双底背离',
+  double_bottom: '双底',
   stealth_rally: '偷涨',
-  macd_volume_washout: '暴跌洗盘',
-  macd_resonance: 'MACD共振',
-  etf_accumulation: 'ETF积累',
+  macd_volume_washout: '缩量洗盘',
+  macd_resonance: '月周共振',
+  etf_accumulation: 'ETF抄底',
 }
 
 const DEFAULT_DATE = '2026-08-28'
