@@ -19,16 +19,55 @@ ROOT = Path(__file__).resolve().parents[1]
 
 DAYS = ["即时", "3日排行", "5日排行", "10日排行", "20日排行"]
 
+# 行业 → 对应 ETF 的额外关键词（同花顺行业名与 ETF 名不完全一致时用）
+ETF_KEYWORD_OVERRIDES = {
+    "化学制药": "医药",
+    "中药Ⅱ": "中药",
+    "光伏设备": "光伏",
+    "风电设备": "风电",
+    "养殖业": "养殖",
+    "农产品加工": "农业",
+    "种植业与林业": "农业",
+    "贵金属": "黄金",
+    "白酒": "酒",
+}
+
+
+def _load_etf_names() -> list[str]:
+    """读本地 ETF 名称表（data/stage17_etf_names.json），返回名称列表。"""
+    p = ROOT / "data" / "stage17_etf_names.json"
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        return [n for n in data.values() if isinstance(n, str)]
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def _match_etf(sector: str, etf_names: list[str]) -> str | None:
+    """按名称找行业对应的 ETF（优先含「xxETF」的、名字最短的）。"""
+    kw = ETF_KEYWORD_OVERRIDES.get(sector, sector)
+    candidates = [n for n in etf_names if "ETF" in n and kw in n]
+    if not candidates:
+        return None
+    # 优先：名字里出现「kwETF」（紧挨着），其次名字最短
+    candidates.sort(key=lambda n: (0 if kw + "ETF" in n else 1, len(n)))
+    name = candidates[0]
+    i = name.find("ETF")
+    return name[: i + 3] if i >= 0 else name
+
 
 def fetch(days: str) -> dict:
     """抓一个窗口的板块资金流，返回 {top_inflow, top_outflow}。"""
     import akshare as ak  # 延迟导入，仅本脚本需要
 
+    etf_names = _load_etf_names()
     df = ak.stock_fund_flow_industry(symbol=days)
     rows = []
     for _, r in df.iterrows():
+        sector = str(r["行业"])
         rows.append({
-            "sector": str(r["行业"]),
+            "sector": sector,
+            "etf": _match_etf(sector, etf_names),
             "change_pct": _f(r.get("行业-涨跌幅")),
             "inflow": _f(r.get("流入资金")),
             "outflow": _f(r.get("流出资金")),

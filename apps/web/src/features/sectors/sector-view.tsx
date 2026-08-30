@@ -71,6 +71,7 @@ function FlowColumn({
         <thead>
           <tr className="text-gray-500 text-xs border-b border-gray-100">
             <th className="text-left px-3 py-2">行业</th>
+            <th className="text-left px-3 py-2">ETF</th>
             <th className="text-right px-3 py-2">净额(亿)</th>
             <th className="text-right px-3 py-2">涨跌幅</th>
             <th className="text-left px-3 py-2">领涨股</th>
@@ -88,6 +89,7 @@ function FlowColumn({
                   {s.sector}
                 </Link>
               </td>
+              <td className="px-3 py-1.5 text-gray-500 text-xs">{s.etf || '—'}</td>
               <td className={`px-3 py-1.5 text-right font-mono ${s.net >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                 {s.net >= 0 ? '+' : ''}
                 {s.net.toFixed(2)}

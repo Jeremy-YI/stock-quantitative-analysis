@@ -13,6 +13,7 @@ class SectorFlow(BaseModel):
     """单个行业的资金流。金额单位：亿元。"""
 
     sector: str          # 行业名（同花顺口径）
+    etf: str | None = None  # 对应 ETF（名称匹配，无匹配则 None）
     change_pct: float    # 行业涨跌幅 %
     inflow: float        # 流入资金（亿）
     outflow: float       # 流出资金（亿）
