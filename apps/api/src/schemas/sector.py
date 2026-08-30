@@ -1,0 +1,27 @@
+"""板块资金流契约（top20 流入 / 流出 + 信号标签）。"""
+
+from __future__ import annotations
+
+from pydantic import BaseModel
+
+
+class SectorFlow(BaseModel):
+    """单个行业的资金流。金额单位：亿元。"""
+
+    sector: str          # 行业名（同花顺口径）
+    change_pct: float    # 行业涨跌幅 %
+    inflow: float        # 流入资金（亿）
+    outflow: float       # 流出资金（亿）
+    net: float           # 净额（亿，正=流入，负=流出）
+    companies: int       # 公司家数
+    leader: str          # 领涨股名称
+    leader_pct: float    # 领涨股涨幅 %
+    signal: str | None = None  # 信号标签（"连续净流出可建仓" 等，暂无则 None）
+
+
+class SectorFlowBody(BaseModel):
+    """板块资金流响应体。"""
+
+    days: str                       # 窗口：即时 / 3日 / 5日 / 10日 / 20日
+    top_inflow: list[SectorFlow]    # 净流入前 20
+    top_outflow: list[SectorFlow]   # 净流出前 20（net 为负）
