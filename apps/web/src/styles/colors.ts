@@ -16,4 +16,7 @@ export const colors = {
   rsiRef: '#94a3b8', // RSI 30/70 参考线
   mavol1: '#f59e0b', // MAVOL1（5 日量均线）
   mavol2: '#2563eb', // MAVOL2（10 日量均线）
+  lifeline: '#a855f7', // 生命线（背离中线）
+  yinVolumeLine: '#14b8a6', // 阴量定价线
+  attackDefense: '#f97316', // 进攻K防线
 } as const

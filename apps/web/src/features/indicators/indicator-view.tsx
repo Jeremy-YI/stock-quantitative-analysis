@@ -11,6 +11,7 @@ import MacdPanel from '@/features/macd/macd-panel'
 import KdjPanel from '@/features/kdj/kdj-panel'
 import RsiPanel from '@/features/rsi/rsi-panel'
 import VolumePanel from '@/features/volume/volume-panel'
+import PricingLinesPanel from '@/features/pricing-lines/pricing-lines-panel'
 
 import {
   field,
@@ -28,6 +29,7 @@ const TABS = [
   { value: 'kdj', label: 'KDJ' },
   { value: 'rsi', label: 'RSI' },
   { value: 'volume', label: '量能' },
+  { value: 'pricing', label: '定价线' },
 ]
 
 /**
@@ -72,6 +74,7 @@ export default function IndicatorView() {
       {tab === 'kdj' && <KdjPanel symbol={symbol} />}
       {tab === 'rsi' && <RsiPanel symbol={symbol} />}
       {tab === 'volume' && <VolumePanel symbol={symbol} />}
+      {tab === 'pricing' && <PricingLinesPanel symbol={symbol} />}
     </main>
   )
 }
