@@ -54,6 +54,16 @@ class StrategyService:
         self._repository.save(name, signals)
         return signals
 
+    def scan_subset(
+        self, name: str, as_of: date, symbols: list[str]
+    ) -> list[Signal]:
+        """只扫指定代码子集（板块成分股推荐用），不落库。"""
+        mod = self._get_strategy(name)
+        candles = self._scanner.load_candles(
+            as_of, filter_config=filter_for_kinds(mod.TARGET_KINDS), symbols=symbols
+        )
+        return mod.scan(candles, as_of)
+
     def get_signals(
         self, name: str, start: date | None = None, end: date | None = None
     ) -> list[Signal]:

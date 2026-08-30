@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from pydantic import BaseModel
+
+from strategies.signal import Signal
 
 
 class SectorFlow(BaseModel):
@@ -25,3 +29,24 @@ class SectorFlowBody(BaseModel):
     days: str                       # 窗口：即时 / 3日 / 5日 / 10日 / 20日
     top_inflow: list[SectorFlow]    # 净流入前 20
     top_outflow: list[SectorFlow]   # 净流出前 20（net 为负）
+
+
+class SectorInfo(BaseModel):
+    """板块元信息（名称 + 成分股数）。"""
+
+    name: str
+    stock_count: int
+
+
+class SectorListBody(BaseModel):
+    """板块列表响应体。"""
+
+    sectors: list[SectorInfo]
+
+
+class RecommendationsBody(BaseModel):
+    """板块个股推荐响应体（成分股 × 战法信号）。"""
+
+    sector: str
+    date: date
+    signals: list[Signal]
