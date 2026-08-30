@@ -5,7 +5,7 @@
  * - 选板块 + 选策略 + 选日期
  * - 展示该板块里触发所选策略的股票，按分数降序
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useRecommendations, useSectorList } from './use-recommendations'
 import type { Signal } from './types'
@@ -32,6 +32,14 @@ export default function RecommendationView() {
   const [sector, setSector] = useState('半导体')
   const [strategy, setStrategy] = useState('all')
   const [date, setDate] = useState(DEFAULT_DATE)
+
+  // 支持从「板块资金」页带 ?sector=xxx 跳转进来，自动选中该板块
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const s = params.get('sector')
+    if (s) setSector(s)
+  }, [])
+
   const { data, loading, error } = useRecommendations(sector, date)
 
   // 先按策略过滤，再按股票分组

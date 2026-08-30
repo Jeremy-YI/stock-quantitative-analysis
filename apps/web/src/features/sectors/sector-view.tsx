@@ -7,6 +7,7 @@
  * 每行显示：行业名、净额（亿，红涨绿跌）、行业涨跌幅、领涨股。
  */
 import { useState } from 'react'
+import Link from 'next/link'
 
 import useSectors from './use-sectors'
 import type { SectorFlow } from './types'
@@ -78,7 +79,15 @@ function FlowColumn({
         <tbody>
           {rows.map((s) => (
             <tr key={s.sector} className="border-b border-gray-50 hover:bg-gray-50">
-              <td className="px-3 py-1.5 font-medium">{s.sector}</td>
+              <td className="px-3 py-1.5 font-medium">
+                <Link
+                  href={`/recommendations?sector=${encodeURIComponent(s.sector)}`}
+                  className="text-blue-700 hover:underline"
+                  title="点开看成分股 + 信号"
+                >
+                  {s.sector}
+                </Link>
+              </td>
               <td className={`px-3 py-1.5 text-right font-mono ${s.net >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                 {s.net >= 0 ? '+' : ''}
                 {s.net.toFixed(2)}
