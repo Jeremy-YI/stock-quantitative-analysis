@@ -37,6 +37,18 @@ export default function RootLayout({
             个股推荐
           </Link>
           <Link
+            href="/news"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            最新消息
+          </Link>
+          <Link
+            href="/events"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            事件日历
+          </Link>
+          <Link
             href="/indicators"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
