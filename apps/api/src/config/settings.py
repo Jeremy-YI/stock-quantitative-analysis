@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     dashboard_snapshot_path: str = ""
     # 因子研究快照路径（run_research.py 离线生成，Research 只读）
     research_snapshot_path: str = ""
+    # LLM（DeepSeek，OpenAI 兼容接口）——供 AI 解读等功能
+    deepseek_api_key: str = ""
+    deepseek_base_url: str = "https://api.deepseek.com"
+    deepseek_model: str = "deepseek-chat"
 
     @property
     def hsjday_path(self) -> Path:

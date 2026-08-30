@@ -49,6 +49,12 @@ export default function RootLayout({
             事件日历
           </Link>
           <Link
+            href="/ai"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            AI 解读
+          </Link>
+          <Link
             href="/indicators"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
