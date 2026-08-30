@@ -31,6 +31,12 @@ export default function RootLayout({
             板块资金
           </Link>
           <Link
+            href="/recommendations"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            个股推荐
+          </Link>
+          <Link
             href="/indicators"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
