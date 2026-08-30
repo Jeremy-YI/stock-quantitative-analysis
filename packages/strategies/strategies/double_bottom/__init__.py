@@ -3,6 +3,7 @@
 from strategies.double_bottom.config import DoubleBottomConfig, default_config
 from strategies.double_bottom.strategy import (
     DESCRIPTION,
+    LABEL,
     NAME,
     SIGNAL_TYPE,
     TARGET_KINDS,
@@ -12,6 +13,7 @@ from strategies.double_bottom.strategy import (
 
 __all__ = [
     "DESCRIPTION",
+    "LABEL",
     "NAME",
     "SIGNAL_TYPE",
     "TARGET_KINDS",

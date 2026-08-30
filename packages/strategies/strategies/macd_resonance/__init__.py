@@ -3,6 +3,7 @@
 from strategies.macd_resonance.config import MacdResonanceConfig, default_config
 from strategies.macd_resonance.strategy import (
     DESCRIPTION,
+    LABEL,
     NAME,
     SIGNAL_TYPE,
     TARGET_KINDS,
@@ -11,6 +12,7 @@ from strategies.macd_resonance.strategy import (
 
 __all__ = [
     "DESCRIPTION",
+    "LABEL",
     "NAME",
     "SIGNAL_TYPE",
     "TARGET_KINDS",

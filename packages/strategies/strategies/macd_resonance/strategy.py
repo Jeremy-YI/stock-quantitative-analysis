@@ -22,6 +22,7 @@ from strategies.macd_resonance.config import MacdResonanceConfig, default_config
 from strategies.signal import Signal
 
 NAME = "macd_resonance"
+LABEL = "月周共振"
 DESCRIPTION = "月线 MACD 水上 + 周线 MACD 底部金叉（月周共振）"
 SIGNAL_TYPE = "macd_resonance"
 TARGET_KINDS = (SymbolKind.STOCK,)

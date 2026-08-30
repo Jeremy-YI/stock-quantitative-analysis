@@ -3,6 +3,7 @@
 from strategies.etf_accumulation.config import EtfAccumulationConfig, default_config
 from strategies.etf_accumulation.strategy import (
     DESCRIPTION,
+    LABEL,
     NAME,
     SIGNAL_TYPE,
     TARGET_KINDS,
@@ -11,6 +12,7 @@ from strategies.etf_accumulation.strategy import (
 
 __all__ = [
     "DESCRIPTION",
+    "LABEL",
     "NAME",
     "SIGNAL_TYPE",
     "TARGET_KINDS",

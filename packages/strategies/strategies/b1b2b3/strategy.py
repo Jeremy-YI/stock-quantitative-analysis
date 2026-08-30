@@ -23,6 +23,7 @@ from strategies.filters import SymbolKind
 from strategies.signal import Signal
 
 NAME = "b1b2b3"
+LABEL = "超卖反弹"
 DESCRIPTION = "B1 超卖 / B2 右侧确认 / B3 缩量洗盘中继（KDJ + 量价）"
 TARGET_KINDS = (SymbolKind.STOCK,)
 

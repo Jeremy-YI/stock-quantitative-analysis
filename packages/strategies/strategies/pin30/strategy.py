@@ -22,6 +22,7 @@ from strategies.pin30.config import Pin30Config, default_config
 from strategies.signal import Signal
 
 NAME = "pin30"
+LABEL = "单针"
 DESCRIPTION = "单针下30（moomoo 随机指标口径）+ B1_W 超卖（J<16）"
 TARGET_KINDS = (SymbolKind.STOCK,)
 

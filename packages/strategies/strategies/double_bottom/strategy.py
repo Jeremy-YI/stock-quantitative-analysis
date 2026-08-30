@@ -27,6 +27,7 @@ from strategies.filters import SymbolKind
 from strategies.signal import Signal
 
 NAME = "double_bottom"
+LABEL = "双底"
 DESCRIPTION = "双底齐平 + 底背离 + 缩量二次探底（W 底反弹型）"
 SIGNAL_TYPE = "double_bottom"
 TARGET_KINDS = (SymbolKind.STOCK,)

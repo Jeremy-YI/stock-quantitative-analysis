@@ -3,6 +3,7 @@
 from strategies.stealth_rally.config import StealthRallyConfig, default_config
 from strategies.stealth_rally.strategy import (
     DESCRIPTION,
+    LABEL,
     NAME,
     SIGNAL_TYPE,
     TARGET_KINDS,
@@ -12,6 +13,7 @@ from strategies.stealth_rally.strategy import (
 
 __all__ = [
     "DESCRIPTION",
+    "LABEL",
     "NAME",
     "SIGNAL_TYPE",
     "TARGET_KINDS",

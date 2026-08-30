@@ -36,6 +36,7 @@ class StrategyService:
             infos.append(
                 StrategyInfo(
                     name=name,
+                    label=mod.LABEL,
                     description=mod.DESCRIPTION,
                     config=cfg.model_dump(),
                     config_schema=type(cfg).model_json_schema(),

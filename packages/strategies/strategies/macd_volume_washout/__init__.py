@@ -6,6 +6,7 @@ from strategies.macd_volume_washout.config import (
 )
 from strategies.macd_volume_washout.strategy import (
     DESCRIPTION,
+    LABEL,
     NAME,
     SIGNAL_TYPE,
     TARGET_KINDS,
@@ -15,6 +16,7 @@ from strategies.macd_volume_washout.strategy import (
 
 __all__ = [
     "DESCRIPTION",
+    "LABEL",
     "NAME",
     "SIGNAL_TYPE",
     "TARGET_KINDS",

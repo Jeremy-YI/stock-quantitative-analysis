@@ -63,7 +63,7 @@ export default function StrategyView() {
             <option value="">请选择策略</option>
             {strategies.map((s) => (
               <option key={s.name} value={s.name}>
-                {s.name} — {s.description}
+                {s.label} — {s.description}
               </option>
             ))}
           </select>

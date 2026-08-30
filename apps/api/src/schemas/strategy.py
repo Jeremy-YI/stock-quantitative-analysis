@@ -14,6 +14,7 @@ class StrategyInfo(BaseModel):
     """单个策略的元信息（供 /strategies 列表展示）。"""
 
     name: str
+    label: str  # 简短中文名（展示用，无参数）
     description: str
     # 默认阈值（键值对）
     config: dict[str, Any]

@@ -19,6 +19,7 @@ from strategies.signal import Signal
 from strategies.stealth_rally.config import StealthRallyConfig, default_config
 
 NAME = "stealth_rally"
+LABEL = "偷涨"
 DESCRIPTION = "MACD 水下二次金叉 + 红柱确认 + 近10日无涨停（偷涨型）"
 SIGNAL_TYPE = "stealth_rally"
 TARGET_KINDS = (SymbolKind.STOCK,)

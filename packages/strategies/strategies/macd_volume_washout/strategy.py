@@ -27,6 +27,7 @@ from strategies.macd_volume_washout.config import (
 from strategies.signal import Signal
 
 NAME = "macd_volume_washout"
+LABEL = "缩量洗盘"
 DESCRIPTION = "MACD 水下多头（DIF<0 且 DIF>DEA）+ 60日量比 <0.6（极缩量洗盘）"
 SIGNAL_TYPE = "washout"
 TARGET_KINDS = (SymbolKind.STOCK,)

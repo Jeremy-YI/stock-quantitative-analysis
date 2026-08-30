@@ -6,6 +6,7 @@ export type { ApiResponse }
 
 export interface StrategyInfo {
   name: string
+  label: string  // 简短中文名（展示用）
   description: string
   config: Record<string, unknown>
   config_schema: Record<string, unknown>

@@ -23,6 +23,7 @@ from strategies.filters import SymbolKind
 from strategies.signal import Signal
 
 NAME = "etf_accumulation"
+LABEL = "ETF抄底"
 DESCRIPTION = "ETF 跌幅 25%-40% + 底背离（MACD/RSI 未创新低）"
 SIGNAL_TYPE = "etf_accumulation"
 TARGET_KINDS = (SymbolKind.ETF,)
