@@ -5,7 +5,7 @@ import '@/styles/globals.css'
 
 export const metadata: Metadata = {
   title: '股市量化平台',
-  description: 'A股技术指标与选股策略看板',
+  description: 'A股板块资金与个股推荐看板',
 }
 
 export default function RootLayout({
@@ -53,36 +53,6 @@ export default function RootLayout({
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             AI 解读
-          </Link>
-          <Link
-            href="/indicators"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            技术指标
-          </Link>
-          <Link
-            href="/strategies"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            选股策略
-          </Link>
-          <Link
-            href="/backtest"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            策略回测
-          </Link>
-          <Link
-            href="/research"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            因子研究
-          </Link>
-          <Link
-            href="/scheduler"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            任务调度
           </Link>
         </nav>
         {children}
