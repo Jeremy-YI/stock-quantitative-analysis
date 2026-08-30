@@ -91,6 +91,26 @@ class VolumeBody(BaseModel):
 
 
 # ---------------------------------------------------------------
+# 定价线（生命线 / 阴量定价线 / 进攻K防线）
+# ---------------------------------------------------------------
+class PricingLinePoint(BaseModel):
+    """单根 K 线对应的定价线数据点。值为 None 表示该日尚未定义（无前视保护）。"""
+
+    date: date
+    close: float
+    lifeline: float | None          # 生命线
+    yin_volume_line: float | None   # 阴量定价线
+    attack_defense: float | None    # 进攻K防线
+
+
+class PricingLinesBody(BaseModel):
+    """三条定价线响应体（生命线 / 阴量定价线 / 进攻K防线）。"""
+
+    symbol: str
+    series: list[PricingLinePoint]
+
+
+# ---------------------------------------------------------------
 # 查询参数（仅用于文档/校验，路由层用 Query 声明）
 # ---------------------------------------------------------------
 class MacdQuery(BaseModel):

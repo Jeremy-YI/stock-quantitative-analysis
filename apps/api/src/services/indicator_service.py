@@ -16,6 +16,7 @@ import pandas as pd
 from indicators.kdj import calc_kdj
 from indicators.macd import calc_macd
 from indicators.rsi import calc_rsi
+from indicators.stage14 import attack_defense_series, lifeline_series, yin_volume_line_series
 from indicators.volume import calc_volume_ma, calc_volume_ratio, classify_price_volume
 from repositories.daily_bar_repository import DailyBarRepository
 from schemas.indicator import (
@@ -23,6 +24,8 @@ from schemas.indicator import (
     KdjPoint,
     MacdBody,
     MacdPoint,
+    PricingLinePoint,
+    PricingLinesBody,
     RsiBody,
     RsiPoint,
     VolumeBody,
@@ -31,6 +34,12 @@ from schemas.indicator import (
 
 # API 输出统一保留的小数位数（指标数值量级小，4 位足够且避免浮点噪声）
 DECIMAL_PLACES = 4
+
+
+def _opt(v: float) -> float | None:
+    """NaN 转 None（定价线序列里「尚未定义」的日子返回 None 而不是 NaN）。"""
+    import math
+    return None if v is None or (isinstance(v, float) and math.isnan(v)) else round(v, DECIMAL_PLACES)
 
 
 class IndicatorService:
@@ -137,3 +146,33 @@ class IndicatorService:
             for i, row in enumerate(records)
         ]
         return VolumeBody(symbol=symbol, series=series)
+
+    # ---------------------------------------------------------------
+    # 定价线（生命线 / 阴量定价线 / 进攻K防线）
+    # ---------------------------------------------------------------
+    def get_pricing_lines(
+        self, symbol: str, start: date | None = None, end: date | None = None
+    ) -> PricingLinesBody:
+        """计算三条定价线的日度序列（阶段 12~14 的背离定价线）。"""
+        df, records = self._load(symbol, start, end)
+        highs = df["high"].tolist()
+        lows = df["low"].tolist()
+        opens = df["open"].tolist()
+        closes = df["close"].tolist()
+        vols = df["volume"].tolist()
+
+        lifeline = lifeline_series(highs, lows, closes)
+        yin = yin_volume_line_series(highs, lows, opens, closes, vols)
+        attack = attack_defense_series(opens, highs, lows, closes, symbol)
+
+        series = [
+            PricingLinePoint(
+                date=row["date"],
+                close=round(row["close"], DECIMAL_PLACES),
+                lifeline=_opt(lifeline[i]),
+                yin_volume_line=_opt(yin[i]),
+                attack_defense=_opt(attack[i]),
+            )
+            for i, row in enumerate(records)
+        ]
+        return PricingLinesBody(symbol=symbol, series=series)

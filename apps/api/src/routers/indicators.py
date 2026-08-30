@@ -7,7 +7,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Request
 
 from schemas.common import ApiResponse
-from schemas.indicator import KdjBody, MacdBody, RsiBody, VolumeBody
+from schemas.indicator import KdjBody, MacdBody, PricingLinesBody, RsiBody, VolumeBody
 from services.indicator_service import IndicatorService
 
 router = APIRouter(tags=["indicators"])
@@ -40,6 +40,18 @@ def get_macd(
 ) -> ApiResponse[MacdBody]:
     """计算指定标的的 MACD 指标序列。"""
     body = service.get_macd(symbol, start, end)
+    return ApiResponse(message="ok", body=body)
+
+
+@router.get("/indicators/pricing-lines", response_model=ApiResponse[PricingLinesBody])
+def get_pricing_lines(
+    symbol: str = _symbol_query(),
+    start: date | None = _start_query(),
+    end: date | None = _end_query(),
+    service: IndicatorService = Depends(get_indicator_service),
+) -> ApiResponse[PricingLinesBody]:
+    """计算指定标的的三条定价线序列（生命线 / 阴量定价线 / 进攻K防线）。"""
+    body = service.get_pricing_lines(symbol, start, end)
     return ApiResponse(message="ok", body=body)
 
 
