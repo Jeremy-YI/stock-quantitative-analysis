@@ -25,6 +25,12 @@ export default function RootLayout({
             概览
           </Link>
           <Link
+            href="/sectors"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            板块资金
+          </Link>
+          <Link
             href="/indicators"
             className="text-sm text-muted-foreground hover:text-foreground"
           >
