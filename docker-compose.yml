@@ -16,7 +16,6 @@ services:
   # ----------------------------------------------------------
   mysql:
     image: mysql:8.0
-    container_name: stock-mysql
     restart: unless-stopped
     environment:
       # root 密码 —— 仅本地开发用，生产环境务必改掉并通过环境变量注入
@@ -49,7 +48,6 @@ services:
       # 这些都在 apps/api 目录之外，所以上下文必须是仓库根）
       context: .
       dockerfile: apps/api/Dockerfile
-    container_name: stock-api
     restart: unless-stopped
     environment:
       # 容器里没有「~/Desktop」这个路径，所以把宿主机数据目录挂载后，
@@ -87,7 +85,6 @@ services:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
-    container_name: stock-web
     restart: unless-stopped
     # 把 Next.js 默认端口 3000 只暴露给内部网络，对外由 nginx 收口
     expose:
@@ -110,7 +107,6 @@ services:
   # ----------------------------------------------------------
   nginx:
     image: nginx:1.27-alpine
-    container_name: stock-nginx
     restart: unless-stopped
     ports:
       # 宿主机 80 端口 → 容器 80 端口，浏览器访问 http://localhost 即可
