@@ -143,3 +143,23 @@ class VolumeQuery(BaseModel):
     symbol: str = Field(pattern=SYMBOL_PATTERN)
     start: date | None = None
     end: date | None = None
+
+
+class CandlePoint(BaseModel):
+    """一根日 K 线。"""
+
+    date: date
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    amount: float
+
+
+class CandlesBody(BaseModel):
+    """K 线响应体。"""
+
+    symbol: str
+    name: str = ""
+    series: list[CandlePoint]

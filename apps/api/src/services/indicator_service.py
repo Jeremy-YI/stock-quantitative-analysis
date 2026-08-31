@@ -20,6 +20,8 @@ from indicators.stage14 import attack_defense_series, lifeline_series, yin_volum
 from indicators.volume import calc_volume_ma, calc_volume_ratio, classify_price_volume
 from repositories.daily_bar_repository import DailyBarRepository
 from schemas.indicator import (
+    CandlePoint,
+    CandlesBody,
     KdjBody,
     KdjPoint,
     MacdBody,
@@ -54,6 +56,32 @@ class IndicatorService:
         """取数：返回 DataFrame 及其 records 列表（供各指标共用）。"""
         df = self._repository.get_daily_bars(symbol, start, end)
         return df, df.to_dict("records")
+
+    # ---------------------------------------------------------------
+    # K 线（个股详情页画蜡烛图用）
+    # ---------------------------------------------------------------
+    def get_candles(
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        name: str = "",
+    ) -> CandlesBody:
+        """原始日 K 线（前复权与否跟仓储一致，这里只做取数 + 舍入）。"""
+        _, records = self._load(symbol, start, end)
+        series = [
+            CandlePoint(
+                date=row["date"],
+                open=round(row["open"], DECIMAL_PLACES),
+                high=round(row["high"], DECIMAL_PLACES),
+                low=round(row["low"], DECIMAL_PLACES),
+                close=round(row["close"], DECIMAL_PLACES),
+                volume=float(row["volume"]),
+                amount=float(row["amount"]),
+            )
+            for row in records
+        ]
+        return CandlesBody(symbol=symbol, name=name, series=series)
 
     # ---------------------------------------------------------------
     # MACD

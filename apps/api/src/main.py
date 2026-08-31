@@ -44,6 +44,7 @@ from services.market_service import MarketService
 from services.research_service import ResearchService
 from services.scheduler_service import SchedulerService
 from services.sector_service import SectorService
+from services.stock_meta_service import StockMetaService
 from services.strategy_service import StrategyService
 from strategies.scanner import MarketScanner, Scanner
 
@@ -105,6 +106,7 @@ def create_app(
     )
     app.state.research_service = ResearchService(settings.research_snapshot_path_resolved)
     app.state.sector_service = SectorService()
+    app.state.stock_meta_service = StockMetaService()
     app.state.market_service = MarketService()
     app.state.llm_service = LlmService(
         settings.deepseek_api_key, settings.deepseek_base_url, settings.deepseek_model

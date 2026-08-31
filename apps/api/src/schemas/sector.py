@@ -89,9 +89,24 @@ class SectorListBody(BaseModel):
     sectors: list[SectorInfo]
 
 
+class RecommendedStock(BaseModel):
+    """一只被推荐的个股（按最高分排序，前端直接渲染）。"""
+
+    symbol: str                 # 6 位代码
+    name: str                   # 证券简称（快照缺失时为空串）
+    score: float                # 该股触发信号里的最高分
+    signals: list[Signal]       # 触发的全部信号
+
+
 class RecommendationsBody(BaseModel):
-    """板块个股推荐响应体（成分股 × 战法信号）。"""
+    """板块个股推荐响应体（成分股 × 战法信号）。
+
+    stocks 是按股票聚合后的结果（含名称），signals 保留扁平列表向后兼容。
+    """
 
     sector: str
     date: date
     signals: list[Signal]
+    stocks: list[RecommendedStock] = []
+    excluded_st: int = 0          # 因风险警示（ST/退市）被剔除的股票数
+    names_available: bool = True  # 名称快照是否可用（false 时未做 ST 过滤）

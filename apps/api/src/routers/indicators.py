@@ -7,8 +7,16 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Request
 
 from schemas.common import ApiResponse
-from schemas.indicator import KdjBody, MacdBody, PricingLinesBody, RsiBody, VolumeBody
+from schemas.indicator import (
+    CandlesBody,
+    KdjBody,
+    MacdBody,
+    PricingLinesBody,
+    RsiBody,
+    VolumeBody,
+)
 from services.indicator_service import IndicatorService
+from services.stock_meta_service import StockMetaService
 
 router = APIRouter(tags=["indicators"])
 
@@ -16,6 +24,11 @@ router = APIRouter(tags=["indicators"])
 def get_indicator_service(request: Request) -> IndicatorService:
     """从应用状态取 service 实例（测试时可注入 fake repository）。"""
     return request.app.state.service
+
+
+def get_stock_meta_service(request: Request) -> StockMetaService:
+    """股票名称 / ST 服务。"""
+    return request.app.state.stock_meta_service
 
 
 def _symbol_query() -> str:
@@ -29,6 +42,19 @@ def _start_query() -> date | None:
 
 def _end_query() -> date | None:
     return Query(None, description="结束日（含，YYYY-MM-DD）")
+
+
+@router.get("/indicators/candles", response_model=ApiResponse[CandlesBody])
+def get_candles(
+    symbol: str = _symbol_query(),
+    start: date | None = _start_query(),
+    end: date | None = _end_query(),
+    service: IndicatorService = Depends(get_indicator_service),
+    meta: StockMetaService = Depends(get_stock_meta_service),
+) -> ApiResponse[CandlesBody]:
+    """日 K 线（个股详情页画蜡烛图 + 叠加买点用）。"""
+    body = service.get_candles(symbol, start, end, name=meta.name(symbol))
+    return ApiResponse(message="ok", body=body)
 
 
 @router.get("/indicators/macd", response_model=ApiResponse[MacdBody])
