@@ -18,6 +18,7 @@
  *   badge.tsx      Badge
  *   table.tsx      TableScroll / Table / THead / TBody / TR / TH / TD
  *   field.tsx      FilterBar / Field / TextInput / Select
+ *   sortable-table 表格排序（useTableSort + SortableTH）
  */
 
 export {
@@ -107,6 +108,14 @@ export {
   type TableProps,
   type TableScrollProps,
 } from './table'
+export {
+  SortableTH,
+  useTableSort,
+  type SortDirection,
+  type SortState,
+  type SortableTHProps,
+  type UseTableSortResult,
+} from './sortable-table'
 export { Field, FilterBar, Select, TextInput, controlBase, type FieldProps } from './field'
 
 // shadcn 侧基础件也从设计系统出口暴露，业务不用记两个路径

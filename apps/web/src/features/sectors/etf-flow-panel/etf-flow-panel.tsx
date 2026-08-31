@@ -11,6 +11,10 @@
  *   净流入    当日主力净流入 TOP
  *   净流出    当日主力净流出 TOP
  *
+ * 排序：规模 / 最新价 / 涨跌幅 / 净额 / 成交额 五列都能点表头排（大→小→小→大→取消），
+ * 走设计系统的 useTableSort + SortableTH。主题龙头视图一旦自定义排序，
+ * 会自动去掉大类分组行（跨类比较才有意义）。
+ *
  * 口径（脚注也写着，避免误读）：
  *   净额     主力净流入，东财大单口径，只有交易日当天有
  *   净申赎   份额变化 × 最新价，申赎的真金白银，需要隔日对比份额
@@ -20,9 +24,9 @@ import { useState } from 'react'
 import {
   Caption,
   Card,
-  CardContent,
   Num,
   Section,
+  SortableTH,
   StateHint,
   TBody,
   TD,
@@ -32,12 +36,16 @@ import {
   Table,
   TableScroll,
   Tabs,
+  useTableSort,
 } from '@/design'
 
 import useEtfFlow from '../use-etf-flow'
 import type { EtfFlow, EtfLeader } from '../types'
 
 type View = 'leaders' | 'inflow' | 'outflow'
+
+/** 可排序的数值列（key 与数据字段同名） */
+type SortKey = 'mcap' | 'price' | 'change_pct' | 'net' | 'turnover'
 
 const VIEWS = [
   { value: 'leaders', label: '主题龙头' },
@@ -51,11 +59,18 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
 
   const leaders = data?.leaders ?? []
   const ranking = view === 'inflow' ? (data?.top_inflow ?? []) : (data?.top_outflow ?? [])
-  const rows = view === 'leaders' ? leaders : ranking
+  const source: (EtfFlow | EtfLeader)[] = view === 'leaders' ? leaders : ranking
+
+  const { rows, sortKey, sortDir, onSort, sorted } = useTableSort<EtfFlow | EtfLeader, SortKey>(
+    source,
+  )
+  const sortState = { sortKey, sortDir }
 
   // 份额口径要隔日对比，首跑没有历史 → 整列不显示（宁可不给，也不给假数据）
-  const showShare = Boolean(data?.has_share_flow) && rows.some((r) => r.share_net !== null)
+  const showShare = Boolean(data?.has_share_flow) && rows.some((r: EtfFlow) => r.share_net !== null)
   const flowAvailable = data?.flow_available !== false
+  // 主题龙头视图未自定义排序时保留大类分组
+  const grouped = view === 'leaders' && !sorted
 
   return (
     <Section
@@ -86,30 +101,55 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
                 <TR>
                   {view === 'leaders' ? <TH>主题</TH> : <TH align='right'>#</TH>}
                   <TH>ETF</TH>
-                  <TH align='right' hideBelow='mobilePortrait'>
+                  <SortableTH
+                    sortKey='mcap'
+                    state={sortState}
+                    onSort={onSort}
+                    align='right'
+                    hideBelow='mobilePortrait'
+                  >
                     规模(亿)
-                  </TH>
-                  <TH align='right'>最新价</TH>
-                  <TH align='right'>涨跌幅</TH>
-                  <TH align='right'>净额(亿)</TH>
+                  </SortableTH>
+                  <SortableTH sortKey='price' state={sortState} onSort={onSort} align='right'>
+                    最新价
+                  </SortableTH>
+                  <SortableTH sortKey='change_pct' state={sortState} onSort={onSort} align='right'>
+                    涨跌幅
+                  </SortableTH>
+                  <SortableTH sortKey='net' state={sortState} onSort={onSort} align='right'>
+                    净额(亿)
+                  </SortableTH>
                   {showShare && (
                     <TH align='right' hideBelow='mobileLandscape'>
                       净申赎(亿)
                     </TH>
                   )}
-                  <TH align='right' hideBelow='mobileLandscape'>
+                  <SortableTH
+                    sortKey='turnover'
+                    state={sortState}
+                    onSort={onSort}
+                    align='right'
+                    hideBelow='mobileLandscape'
+                  >
                     成交额(亿)
-                  </TH>
+                  </SortableTH>
                   <TH align='right' hideBelow='desktop'>
                     换手
                   </TH>
                 </TR>
               </THead>
               <TBody>
-                {view === 'leaders'
-                  ? renderLeaderRows(leaders, showShare)
-                  : ranking.map((e, i) => (
-                      <EtfRow key={e.code} etf={e} index={i + 1} showShare={showShare} />
+                {grouped
+                  ? renderLeaderRows(rows as EtfLeader[], showShare)
+                  : rows.map((e: EtfFlow, i: number) => (
+                      <EtfRow
+                        key={e.code}
+                        etf={e}
+                        theme={view === 'leaders' ? (e as EtfLeader).theme : undefined}
+                        peers={view === 'leaders' ? (e as EtfLeader).peers : undefined}
+                        index={view === 'leaders' ? undefined : i + 1}
+                        showShare={showShare}
+                      />
                     ))}
               </TBody>
             </Table>
@@ -124,7 +164,8 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
           {showShare
             ? '净申赎 = 份额变化 × 最新价，是申购赎回的真实资金。'
             : '净申赎 = 份额变化 × 最新价，需隔日对比份额，下个交易日起显示。'}
-          规模取流通市值，主题龙头按规模选出。
+          规模取流通市值，主题龙头按规模选出。点表头可排序
+          {sorted ? '（已按自定义排序，大类分组已收起）' : ''}。
         </Caption>
       )}
     </Section>

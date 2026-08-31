@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -16,8 +17,10 @@ import {
   TH,
   Table,
   TableScroll,
+  SortableTH,
   Text,
   gridColsClass,
+  useTableSort,
 } from '@/design'
 import {
   BREAKPOINTS,
@@ -280,5 +283,88 @@ describe('Table', () => {
     expect(td.className).toContain('mobile-landscape:table-cell')
     expect(td.className).toContain('text-right')
     expect(td.className).toContain('font-mono')
+  })
+})
+
+describe('SortableTable', () => {
+  interface Row {
+    code: string
+    mcap: number
+    net: number | null
+  }
+  const rows: Row[] = [
+    { code: 'A', mcap: 100, net: 2 },
+    { code: 'B', mcap: 300, net: null },
+    { code: 'C', mcap: 200, net: -1 },
+  ]
+
+  function Harness() {
+    const {
+      rows: sorted,
+      sortKey,
+      sortDir,
+      onSort,
+      sorted: isSorted,
+    } = useTableSort<Row, 'mcap' | 'net'>(rows)
+    return (
+      <div>
+        <span data-testid='order'>{sorted.map((r: Row) => r.code).join('')}</span>
+        <span data-testid='state'>{`${sortKey ?? '-'}:${sortDir}:${isSorted}`}</span>
+        <table>
+          <thead>
+            <tr>
+              <SortableTH sortKey='mcap' state={{ sortKey, sortDir }} onSort={onSort}>
+                规模
+              </SortableTH>
+              <SortableTH sortKey='net' state={{ sortKey, sortDir }} onSort={onSort}>
+                净额
+              </SortableTH>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    )
+  }
+
+  it('点表头：先降序，再升序，第三次回到原始顺序', async () => {
+    render(<Harness />)
+    const head = screen.getByText('规模')
+    expect(screen.getByTestId('order').textContent).toBe('ABC')
+
+    await userEvent.click(head)
+    expect(screen.getByTestId('order').textContent).toBe('BCA') // 300/200/100
+    expect(screen.getByTestId('state').textContent).toBe('mcap:desc:true')
+
+    await userEvent.click(head)
+    expect(screen.getByTestId('order').textContent).toBe('ACB') // 100/200/300
+    expect(screen.getByTestId('state').textContent).toBe('mcap:asc:true')
+
+    await userEvent.click(head)
+    expect(screen.getByTestId('order').textContent).toBe('ABC')
+    expect(screen.getByTestId('state').textContent).toBe('-:desc:false')
+  })
+
+  it('换列时默认降序（金融表格先看大的）', async () => {
+    render(<Harness />)
+    await userEvent.click(screen.getByText('规模'))
+    await userEvent.click(screen.getByText('净额'))
+    expect(screen.getByTestId('state').textContent).toBe('net:desc:true')
+  })
+
+  it('空值永远排最后（不随方向翻转）', async () => {
+    render(<Harness />)
+    const netHead = screen.getByText('净额')
+    await userEvent.click(netHead) // desc: 2, -1, null
+    expect(screen.getByTestId('order').textContent).toBe('ACB')
+    await userEvent.click(netHead) // asc: -1, 2, null
+    expect(screen.getByTestId('order').textContent).toBe('CAB')
+  })
+
+  it('表头带 aria-sort，便于无障碍与断言', async () => {
+    render(<Harness />)
+    const th = screen.getByText('规模').closest('th')!
+    expect(th.getAttribute('aria-sort')).toBe('none')
+    await userEvent.click(th)
+    expect(th.getAttribute('aria-sort')).toBe('descending')
   })
 })

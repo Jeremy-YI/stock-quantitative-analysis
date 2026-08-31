@@ -15,10 +15,10 @@ import { cn } from '@/lib/utils'
 
 const PAGES = [
   { href: '/', label: '概览' },
-  { href: '/sectors', label: '板块资金' },
-  { href: '/recommendations', label: '个股推荐' },
   { href: '/news', label: '最新消息' },
   { href: '/events', label: '事件日历' },
+  { href: '/sectors', label: '板块资金' },
+  { href: '/recommendations', label: '个股推荐' },
   { href: '/ai', label: 'AI 解读' },
 ]
 
