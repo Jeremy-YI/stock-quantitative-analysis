@@ -52,12 +52,18 @@ class LlmService:
         data = resp.json()
         return data["choices"][0]["message"]["content"].strip()
 
-    def interpret(self, symbol: str, signals: list[Signal]) -> str:
-        """把一只票的信号列表翻译成一段自然语言解读。"""
+    def interpret(self, symbol: str, signals: list[Signal], context: str = "") -> str:
+        """把一只票的信号列表翻译成一段自然语言解读。
+
+        context 是检索增强（RAG）得到的背景资料，有则注入 prompt，
+        让解读有依据（比如能说清「单针」到底是什么），而不是只复述信号名。
+        """
         if not signals:
             return "该股票今日未触发任何战法信号，观望。"
 
         # 信号列表转成文字（给模型看的输入）
         lines = [f"- {s.strategy} / {s.signal_type}（评分 {s.score:.0f}）" for s in signals]
         user = f"股票代码 {symbol}，今日触发了以下信号：\n" + "\n".join(lines)
+        if context:
+            user += f"\n\n{context}"
         return self.chat(SYSTEM_PROMPT, user)

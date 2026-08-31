@@ -25,7 +25,7 @@
 ## 目录结构
 
 ```
-stock-platform/
+stock-quantitative-analysis/
 ├── apps/
 │   ├── api/                      # FastAPI 后端
 │   │   ├── src/{main,config,errors,routers,schemas,services,repositories}

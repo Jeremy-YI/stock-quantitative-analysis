@@ -40,6 +40,7 @@ from services.backtest_service import BacktestService
 from services.dashboard_service import DashboardService
 from services.indicator_service import IndicatorService
 from services.llm_service import LlmService
+from services.rag_service import RagService
 from services.market_service import MarketService
 from services.research_service import ResearchService
 from services.scheduler_service import SchedulerService
@@ -114,6 +115,9 @@ def create_app(
     app.state.stock_meta_service = StockMetaService()
     app.state.strategy_rating_service = StrategyRatingService()
     app.state.market_service = MarketService()
+    app.state.rag_service = RagService().build(
+        app.state.strategy_service.list_strategies()
+    )
     app.state.llm_service = LlmService(
         settings.deepseek_api_key, settings.deepseek_base_url, settings.deepseek_model
     )

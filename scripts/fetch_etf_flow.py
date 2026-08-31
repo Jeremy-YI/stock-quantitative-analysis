@@ -25,6 +25,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# 让脚本能 import 本地 datasource 包（复用 tdx 读取，不再自己 struct.unpack）
+sys.path.insert(0, str(ROOT / "packages" / "datasource"))
 
 # 排除的品种：这些不是「买板块」的载体，混进排行只会干扰
 EXCLUDE_KEYWORDS = (
@@ -276,47 +278,28 @@ def fetch(top: int = 20) -> dict:
 def _read_tdx_last_bars(
     code: str, root: Path, ref_price: float = 0.0
 ) -> tuple[str, float, float, float] | None:
-    """从本地通达信日线读最后两根，返回 (日期, 收盘, 涨跌幅%, 成交额亿)。
+    """读最后两根日线，返回 (日期, 收盘, 涨跌幅%, 成交额亿)。
 
-    为什么不走网络：东财 fund_etf_hist_em 连续请求会直接断连，而本地 hsjday 本来
-    就是全市场日线（含 ETF），读盘更快也更稳。
-
-    通达信 .day 格式：每 32 字节一根，<日期 i, 开 i, 高 i, 低 i, 收 i, 额 f, 量 i, 保留 i>。
-    坑：个股价格是 ×100，**基金/ETF 是 ×1000**。这里用 ref_price（由流通市值/份额
-    算出的近似净值）自动选比例，避开写死判断。
+    复用 datasource.tdx.reader（价格比例按代码前缀自动判定：个股 /100、ETF /1000），
+    不再自己 struct.unpack 重复实现——之前这里和 tdx reader 是两份会漂移的代码。
+    ref_price 参数保留仅为兼容旧调用，现已不参与判定。
     """
-    prefix = "sh" if code.startswith(("5", "6", "9", "11", "13")) else "sz"
-    path = root / prefix / "lday" / f"{prefix}{code}.day"
-    if not path.exists():
-        other = "sz" if prefix == "sh" else "sh"
-        path = root / other / "lday" / f"{other}{code}.day"
-        if not path.exists():
-            return None
+    from datasource.tdx import parse_day_file, resolve_symbol_path
 
-    raw = path.read_bytes()
-    if len(raw) < 64:
+    try:
+        df = parse_day_file(resolve_symbol_path(root, code))
+    except FileNotFoundError:
         return None
-    import struct
+    if df is None or len(df) < 2:
+        return None
 
-    last = struct.unpack("<IiiiifIi", raw[-32:])
-    prev = struct.unpack("<IiiiifIi", raw[-64:-32])
-    date = str(last[0])
-
-    close_raw = float(last[4])
-    prev_raw = float(prev[4])
-    # 选比例：距参考净值更近的那个（没参考值时默认 ETF 的 1000）
-    divisor = 1000.0
-    if ref_price > 0:
-        divisor = min(
-            (100.0, 1000.0),
-            key=lambda d: abs(close_raw / d - ref_price) / ref_price,
-        )
-
-    close = close_raw / divisor
-    prev_close = prev_raw / divisor
-    amount_yi = last[5] / 1e8
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+    close = float(last["close"])
+    prev_close = float(prev["close"])
+    amount_yi = float(last["amount"]) / 1e8
     change_pct = ((close - prev_close) / prev_close * 100) if prev_close else 0.0
-    return f"{date[:4]}-{date[4:6]}-{date[6:]}", close, change_pct, amount_yi
+    return str(last["date"]), close, change_pct, amount_yi
 
 
 def rebuild_leaders_from_stock(hsjday_root: str | None = None) -> dict:
