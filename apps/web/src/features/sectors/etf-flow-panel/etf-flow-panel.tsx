@@ -24,6 +24,7 @@ import { useState } from 'react'
 
 import {
   Caption,
+  LoadingState,
   Card,
   Num,
   Section,
@@ -83,7 +84,7 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
       }
       actions={<Tabs value={view} onValueChange={(v) => setView(v as View)} items={VIEWS} />}
     >
-      {loading && <StateHint>加载中…</StateHint>}
+      {loading && <LoadingState label='加载 ETF 资金流' skeleton rows={3} />}
       {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && rows.length === 0 && (

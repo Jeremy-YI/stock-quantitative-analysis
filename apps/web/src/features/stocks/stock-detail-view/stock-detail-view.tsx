@@ -15,6 +15,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
+  LoadingState,
   Caption,
   Card,
   CardContent,
@@ -162,7 +163,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
           </Button>
         }
       >
-        {candlesLoading && <Skeleton className='h-64 w-full' />}
+        {candlesLoading && <LoadingState label='加载日 K 线' skeleton rows={4} />}
         {candlesError && <StateHint kind='error'>K 线加载失败：{candlesError}</StateHint>}
         {!candlesLoading && !candlesError && series.length > 0 && (
           <Card className='p-2 shadow-none'>
@@ -173,7 +174,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
 
       {/* 买入信号 */}
       <Section title='买入信号' description={`扫描日 ${date} 触发的战法`}>
-        {signalsLoading && <Skeleton className='h-24 w-full' />}
+        {signalsLoading && <LoadingState label='扫描当日战法信号' skeleton rows={2} />}
         {!signalsLoading && signals.length === 0 && (
           <StateHint kind='empty'>该日没有触发任何战法信号</StateHint>
         )}

@@ -22,9 +22,7 @@ export default function useBacktest() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const poll = async (runId: string) => {
-    const [err, res] = await get<{ message: string; body: BacktestJob }>(
-      `/backtest/runs/${runId}`,
-    )
+    const [err, res] = await get<{ message: string; body: BacktestJob }>(`/backtest/runs/${runId}`)
     if (err || !res || !res.body) {
       setError(err instanceof Error ? err.message : '查询回测结果失败')
       setLoading(false)

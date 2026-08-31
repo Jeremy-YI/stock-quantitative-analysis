@@ -15,6 +15,7 @@ import Link from 'next/link'
 
 import {
   Badge,
+  LoadingState,
   Card,
   CardContent,
   CardHeader,
@@ -60,7 +61,7 @@ export default function SectorView() {
         items={DAYS.map((d) => ({ value: d, label: d }))}
       />
 
-      {loading && <StateHint>加载中…</StateHint>}
+      {loading && <LoadingState label='加载板块资金流' skeleton rows={4} />}
       {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && (

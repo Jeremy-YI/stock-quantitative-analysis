@@ -12,6 +12,8 @@ import Link from 'next/link'
 import {
   Badge,
   Caption,
+  EmptyState,
+  LoadingState,
   Stack,
   Card,
   Field,
@@ -99,7 +101,7 @@ export default function RecommendationView() {
         </Field>
       </FilterBar>
 
-      {loading && <StateHint>扫描中…</StateHint>}
+      {loading && <LoadingState label={`AI 正在扫描「${sector}」`} skeleton rows={5} />}
       {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && !loading && (
@@ -110,7 +112,10 @@ export default function RecommendationView() {
           </Text>
 
           {stocks.length === 0 ? (
-            <StateHint kind='empty'>该板块当日没有触发信号</StateHint>
+            <EmptyState
+              title='该板块当日没有触发信号'
+              description='换一个板块，或换一个扫描日再试'
+            />
           ) : (
             <Card className='overflow-hidden p-0 shadow-none'>
               <TableScroll bare>

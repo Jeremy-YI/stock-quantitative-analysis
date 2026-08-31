@@ -7,6 +7,7 @@
  */
 import {
   Badge,
+  LoadingState,
   Caption,
   Heading,
   Page,
@@ -39,7 +40,7 @@ export default function NewsView() {
         }
       />
 
-      {loading && <StateHint>加载中…</StateHint>}
+      {loading && <LoadingState label='加载最新消息' skeleton rows={4} />}
       {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && data.items.length === 0 && <StateHint kind='empty'>今天还没有消息</StateHint>}

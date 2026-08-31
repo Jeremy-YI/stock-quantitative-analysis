@@ -6,6 +6,7 @@
  */
 import {
   Badge,
+  LoadingState,
   Card,
   Page,
   PageHeader,
@@ -37,7 +38,7 @@ export default function EventsView() {
     <Page size='md'>
       <PageHeader title='事件日历' description={data?.note ?? '央行会议 / 关键数据 / 财报'} />
 
-      {loading && <StateHint>加载中…</StateHint>}
+      {loading && <LoadingState label='加载事件日历' skeleton rows={4} />}
       {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && (

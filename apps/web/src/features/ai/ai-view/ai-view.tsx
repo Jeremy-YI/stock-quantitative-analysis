@@ -10,6 +10,7 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
+  EmptyState,
   Card,
   CardContent,
   CardHeader,
@@ -63,6 +64,13 @@ export default function AiView() {
       </FilterBar>
 
       {error && <StateHint kind='error'>解读失败：{error}</StateHint>}
+
+      {!loading && !error && !result && (
+        <EmptyState
+          title='还没有解读结果'
+          description='输入 6 位股票代码和日期，点「AI 解读」，把当日触发的战法信号翻成人话。'
+        />
+      )}
 
       {result && (
         <Card>

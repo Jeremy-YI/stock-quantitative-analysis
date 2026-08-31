@@ -19,6 +19,7 @@ import Link from 'next/link'
 import {
   Badge,
   Caption,
+  LoadingState,
   Card,
   CardContent,
   CardHeader,
@@ -93,7 +94,7 @@ export default function OverviewView() {
 
       {/* 1 市场状态 */}
       <Section title='市场状态' description='大盘位置与开仓建议（本地日线计算，非实时）'>
-        {dashLoading && <Skeleton className='h-24 w-full' />}
+        {dashLoading && <LoadingState label='计算市场环境' rows={2} />}
         {!dashLoading && !regime && <StateHint kind='empty'>暂无市场环境快照</StateHint>}
         {regime && (
           <Grid cols={{ base: 2, mobileLandscape: 4 }} gap='sm'>
@@ -133,7 +134,7 @@ export default function OverviewView() {
             </Link>
           </CardHeader>
           <CardContent>
-            {flowLoading && <Skeleton className='h-32 w-full' />}
+            {flowLoading && <LoadingState label='加载资金主线' rows={3} />}
             {!flowLoading && inflow.length === 0 && (
               <StateHint kind='empty'>暂无资金流快照</StateHint>
             )}
@@ -166,7 +167,7 @@ export default function OverviewView() {
             </Link>
           </CardHeader>
           <CardContent>
-            {!etf && <Skeleton className='h-32 w-full' />}
+            {!etf && <LoadingState label='加载主题龙头 ETF' rows={3} />}
             {etf && etf.leaders.length === 0 && <StateHint kind='empty'>暂无 ETF 快照</StateHint>}
             {etf && etf.leaders.length > 0 && (
               <Stack gap='sm'>
@@ -205,7 +206,7 @@ export default function OverviewView() {
           </Link>
         }
       >
-        {picksLoading && <Skeleton className='h-24 w-full' />}
+        {picksLoading && <LoadingState label='扫描资金最强板块的个股' rows={2} />}
         {!picksLoading && topPicks.length === 0 && (
           <StateHint kind='empty'>该板块当日没有触发信号</StateHint>
         )}
@@ -244,7 +245,7 @@ export default function OverviewView() {
             </Link>
           </CardHeader>
           <CardContent>
-            {!news && <Skeleton className='h-32 w-full' />}
+            {!news && <LoadingState label='加载要闻' rows={3} />}
             {news && (
               <Stack gap='sm'>
                 {hotNews.map((n, i) => (
@@ -273,7 +274,7 @@ export default function OverviewView() {
             </Link>
           </CardHeader>
           <CardContent>
-            {!events && <Skeleton className='h-32 w-full' />}
+            {!events && <LoadingState label='加载临近事件' rows={3} />}
             {events && soonEvents.length === 0 && (
               <StateHint kind='empty'>未来 7 天没有高重要度事件</StateHint>
             )}
