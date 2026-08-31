@@ -52,7 +52,7 @@ class MySqlBacktestRunRepository:
         try:
             import pymysql  # 延迟导入
         except ImportError as exc:
-            raise RuntimeError("pymysql 未安装：pip install pymysql") from exc
+            raise RuntimeError("pymysql 未安装:pip install pymysql") from exc
 
         import os
 
