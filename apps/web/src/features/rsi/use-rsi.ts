@@ -22,18 +22,16 @@ export default function useRsi(symbol: string) {
     setLoading(true)
     setError(null)
 
-    get<ApiResponse<RsiBody>>(`/indicators/rsi?symbol=${symbol}`).then(
-      ([err, res]) => {
-        if (cancelled) return
-        if (err || !res || !res.body) {
-          setError(err instanceof Error ? err.message : '加载失败')
-          setData(null)
-        } else {
-          setData(res.body)
-        }
-        setLoading(false)
+    get<ApiResponse<RsiBody>>(`/indicators/rsi?symbol=${symbol}`).then(([err, res]) => {
+      if (cancelled) return
+      if (err || !res || !res.body) {
+        setError(err instanceof Error ? err.message : '加载失败')
+        setData(null)
+      } else {
+        setData(res.body)
       }
-    )
+      setLoading(false)
+    })
 
     return () => {
       cancelled = true

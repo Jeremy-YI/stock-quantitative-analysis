@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 
 // ECharts 依赖真实 canvas，jsdom 下用桩替换
 vi.mock('echarts-for-react', () => ({
-  default: () => <div data-testid="echarts" />,
+  default: () => <div data-testid='echarts' />,
 }))
 
 import DetailTable from '@/features/backtest/detail-table'
@@ -32,7 +32,7 @@ describe('backtest charts', () => {
             excess_win_rate: 0.15,
           },
         ]}
-      />
+      />,
     )
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
@@ -69,18 +69,13 @@ describe('backtest charts', () => {
             ],
           },
         ]}
-      />
+      />,
     )
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
 
   it('should render return histogram container', () => {
-    render(
-      <ReturnHistogram
-        holdDays={1}
-        bins={[{ lower: 0, upper: 0.02, count: 3 }]}
-      />
-    )
+    render(<ReturnHistogram holdDays={1} bins={[{ lower: 0, upper: 0.02, count: 3 }]} />)
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
 
@@ -96,7 +91,7 @@ describe('backtest charts', () => {
             excess_win_rate: 0.07,
           },
         ]}
-      />
+      />,
     )
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })

@@ -13,12 +13,14 @@
  * 两边必须一致，tests/design-system.test.tsx 有一致性断言。
  */
 
-/** 断点（px，min-width 口径，移动优先）。与 FFP theme.breakpoints.values 同名。 */
+import { breakpoints, containerMax, spacing, spacingScale } from '@/constants'
+
+/** 断点（px，min-width 口径，移动优先）。值来自 constants/global-theme（同 FFP）。 */
 export const BREAKPOINTS = {
-  mobilePortrait: 448,
-  mobileLandscape: 766,
-  desktop: 1200,
-  largeDevice: 1440,
+  mobilePortrait: breakpoints.mobilePortrait,
+  mobileLandscape: breakpoints.mobileLandscape,
+  desktop: breakpoints.desktop,
+  largeDevice: breakpoints.largeDevice,
 } as const
 
 export type Breakpoint = keyof typeof BREAKPOINTS
@@ -47,7 +49,7 @@ export type Responsive<T> = T | Partial<Record<ResponsiveKey, T>>
 
 /** 把 Responsive<T> 归一成断点映射（单值视为 base）。 */
 export function normalizeResponsive<T>(
-  value: Responsive<T> | undefined
+  value: Responsive<T> | undefined,
 ): Partial<Record<ResponsiveKey, T>> {
   if (value === undefined) return {}
   if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
@@ -107,24 +109,15 @@ export function breakpointLabel(bp: ResponsiveKey): string {
  * spacing(1)=4px、spacing(4)=16px、spacing(9)=40px…
  * Tailwind 侧对应 gap-1(4px) / gap-4(16px) / gap-10(40px)，换算见 SPACING_CLASS。
  */
-export const SPACING = [0, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64] as const
+export const SPACING = spacingScale
 
-/** FFP 的 spacing(n) → px。 */
-export function spacing(n: number): number {
-  return SPACING[n] ?? 0
-}
+export { spacing }
 
 /**
  * 内容最大宽度（不是固定宽度：宽度始终 100%，只在超宽屏收口）。
  * largeDevice(1440) 是 FFP 的最宽栅格，这里沿用同一口径。
  */
-export const CONTAINER_MAX = {
-  sm: 640,
-  md: 896,
-  lg: 1200,
-  xl: 1440,
-  full: null,
-} as const
+export const CONTAINER_MAX = containerMax
 
 export type ContainerSize = keyof typeof CONTAINER_MAX
 

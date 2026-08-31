@@ -4,24 +4,16 @@ import userEvent from '@testing-library/user-event'
 
 // 用桩替换四个指标 Panel，隔离数据拉取与 ECharts，专注测容器切换逻辑
 vi.mock('@/features/macd/macd-panel', () => ({
-  default: ({ symbol }: { symbol: string }) => (
-    <div data-testid="macd-panel">{symbol}</div>
-  ),
+  default: ({ symbol }: { symbol: string }) => <div data-testid='macd-panel'>{symbol}</div>,
 }))
 vi.mock('@/features/kdj/kdj-panel', () => ({
-  default: ({ symbol }: { symbol: string }) => (
-    <div data-testid="kdj-panel">{symbol}</div>
-  ),
+  default: ({ symbol }: { symbol: string }) => <div data-testid='kdj-panel'>{symbol}</div>,
 }))
 vi.mock('@/features/rsi/rsi-panel', () => ({
-  default: ({ symbol }: { symbol: string }) => (
-    <div data-testid="rsi-panel">{symbol}</div>
-  ),
+  default: ({ symbol }: { symbol: string }) => <div data-testid='rsi-panel'>{symbol}</div>,
 }))
 vi.mock('@/features/volume/volume-panel', () => ({
-  default: ({ symbol }: { symbol: string }) => (
-    <div data-testid="volume-panel">{symbol}</div>
-  ),
+  default: ({ symbol }: { symbol: string }) => <div data-testid='volume-panel'>{symbol}</div>,
 }))
 
 import IndicatorView from '@/features/indicators/indicator-view'

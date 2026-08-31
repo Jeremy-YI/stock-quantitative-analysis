@@ -21,7 +21,7 @@ export default function useScan(strategy: string | null, date: string) {
     setError(null)
 
     get<ApiResponse<{ strategy: string; date: string; signals: Signal[] }>>(
-      `/strategies/${strategy}/scan?date=${date}`
+      `/strategies/${strategy}/scan?date=${date}`,
     ).then(([err, res]) => {
       if (cancelled) return
       if (err || !res || !res.body) {

@@ -19,7 +19,7 @@ from typing import Collection, Protocol
 
 import pandas as pd
 
-from datasource.tdx import COLUMNS, RECORD_SIZE, parse_records
+from datasource.tdx import COLUMNS, RECORD_SIZE, parse_records, resolve_price_divisor, symbol_from_path
 from strategies.filters import FilterConfig, classify_symbol, kind_excluded, should_include
 
 # 扫描遍历的市场（顺序固定，保证输出可复现）
@@ -153,7 +153,7 @@ def _read_day_tail(path: Path, n_records: int) -> pd.DataFrame:
             f.seek(size - n_records * RECORD_SIZE)
             data = f.read()
 
-    records = parse_records(data)
+    records = parse_records(data, resolve_price_divisor(symbol_from_path(path)))
     if not records:
         return pd.DataFrame(columns=COLUMNS)
     return pd.DataFrame.from_records(records, columns=COLUMNS)

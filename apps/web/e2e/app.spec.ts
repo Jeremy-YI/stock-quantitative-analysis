@@ -133,8 +133,7 @@ test('5. 调度页任务列表渲染 → 手动触发可点（mock 后端）', a
   })
   const triggerRequest = page.waitForRequest(
     (req) =>
-      req.method() === 'POST' &&
-      req.url().includes('/api/v1/scheduler/jobs/daily_scan/trigger')
+      req.method() === 'POST' && req.url().includes('/api/v1/scheduler/jobs/daily_scan/trigger'),
   )
   await page.route('**/api/v1/scheduler/jobs/*/trigger', async (route) => {
     await route.fulfill({

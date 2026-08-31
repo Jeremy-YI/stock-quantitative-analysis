@@ -19,10 +19,7 @@ export default function useBacktest() {
     setError(null)
     setData(null)
 
-    const [err, res] = await post<{ message: string; body: BacktestRun }>(
-      '/backtest/runs',
-      request
-    )
+    const [err, res] = await post<{ message: string; body: BacktestRun }>('/backtest/runs', request)
     if (err || !res || !res.body) {
       setError(err instanceof Error ? err.message : '回测失败')
       setData(null)

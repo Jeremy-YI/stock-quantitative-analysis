@@ -29,7 +29,7 @@ export default function useSectors(days: string) {
           setData(res.body)
         }
         setLoading(false)
-      }
+      },
     )
 
     return () => {

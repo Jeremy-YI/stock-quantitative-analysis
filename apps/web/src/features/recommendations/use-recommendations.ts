@@ -31,7 +31,7 @@ export function useRecommendations(sector: string, date: string) {
     setError(null)
 
     get<ApiResponse<RecommendationsBody>>(
-      `/sectors/${encodeURIComponent(sector)}/recommendations?date=${date}`
+      `/sectors/${encodeURIComponent(sector)}/recommendations?date=${date}`,
     ).then(([err, res]) => {
       if (cancelled) return
       if (err || !res || !res.body) {

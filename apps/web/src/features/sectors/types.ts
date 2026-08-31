@@ -7,7 +7,7 @@ export type { ApiResponse }
 /** 单个行业的资金流。金额单位：亿元。 */
 export interface SectorFlow {
   sector: string
-  etf: string | null  // 对应 ETF
+  etf: string | null // 对应 ETF
   change_pct: number
   inflow: number
   outflow: number

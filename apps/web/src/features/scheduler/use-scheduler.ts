@@ -33,7 +33,7 @@ export default function useScheduler() {
             ? jobsErr.message
             : runsErr instanceof Error
               ? runsErr.message
-              : '加载失败'
+              : '加载失败',
         )
         setJobs([])
         setRuns([])
@@ -57,7 +57,7 @@ export default function useScheduler() {
     async (name: string) => {
       setTriggering(name)
       const [err, res] = await post<{ message: string; body: TriggerBody }>(
-        `/scheduler/jobs/${name}/trigger`
+        `/scheduler/jobs/${name}/trigger`,
       )
       setTriggering(null)
       if (err || !res?.body) {
@@ -67,7 +67,7 @@ export default function useScheduler() {
         load()
       }
     },
-    [load]
+    [load],
   )
 
   return { jobs, runs, loading, error, triggering, trigger, refresh: load }

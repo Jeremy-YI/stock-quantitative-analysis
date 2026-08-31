@@ -105,7 +105,7 @@ describe('design tokens · breakpoint', () => {
 describe('Grid', () => {
   it('cols 断点映射翻成完整类名（Tailwind 能扫到的字面量）', () => {
     expect(gridColsClass({ base: 1, mobileLandscape: 2, desktop: 4 })).toBe(
-      'grid-cols-1 mobile-landscape:grid-cols-2 desktop:grid-cols-4'
+      'grid-cols-1 mobile-landscape:grid-cols-2 desktop:grid-cols-4',
     )
     expect(gridColsClass(3)).toBe('grid-cols-3')
   })
@@ -161,7 +161,7 @@ describe('Typography', () => {
     const { container } = render(
       <Text size='caption' tone='muted' mono>
         文字
-      </Text>
+      </Text>,
     )
     const cls = container.firstElementChild!.className
     expect(cls).toContain('text-caption')
@@ -188,7 +188,7 @@ describe('Button', () => {
     const { container } = render(
       <Button variant='accent' size='lg' block>
         扫描
-      </Button>
+      </Button>,
     )
     const cls = container.firstElementChild!.className
     expect(cls).toContain('bg-accent')
@@ -273,7 +273,7 @@ describe('Table', () => {
             </TD>
           </tr>
         </tbody>
-      </table>
+      </table>,
     )
     expect(screen.getByText('ETF').className).toContain('mobile-landscape:table-cell')
     const td = screen.getByText('1.23')

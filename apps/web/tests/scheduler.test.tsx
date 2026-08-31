@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 
 import JobsTable from '@/features/scheduler/jobs-table'
 import RunsTable from '@/features/scheduler/runs-table'
-import { statusClass, statusLabel } from '@/features/scheduler/scheduler-styles'
+import { statusClass, statusLabel } from '@/features/scheduler/style'
 import type { Job, Run } from '@/features/scheduler/types'
 
 function makeJob(overrides: Partial<Job> = {}): Job {
@@ -77,7 +77,7 @@ describe('JobsTable', () => {
         jobs={[makeJob({ last_status: 'timeout', last_duration_seconds: 900 })]}
         triggering={null}
         onTrigger={vi.fn()}
-      />
+      />,
     )
     const status = screen.getByText('超时')
     expect(status.className).toContain('text-down')

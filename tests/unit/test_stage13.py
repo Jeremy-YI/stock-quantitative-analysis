@@ -4,12 +4,16 @@
 hsjday（``resolve_hsjday_root``），文件不存在则跳过（同 integration 测试口径）。
 
 复现口径（不得自己改 Jeremy 口径去凑）：
-- 生命线1 = 4.055（3/17 高 4.27 + 3/23 低 3.84）/2
-- 生命线2 = 3.880（5/21 高 4.17 + 6/09 低 3.59）/2
-- 进攻 K 中点（6/29）= 3.775、（8/07）= 4.210 —— (开盘+收盘)/2
+- 生命线1 = 0.4055（3/17 高 0.427 + 3/23 低 0.384）/2
+- 生命线2 = 0.3880（5/21 高 0.417 + 6/09 低 0.359）/2
+- 进攻 K 中点（6/29）= 0.3775、（8/07）= 0.4210 —— (开盘+收盘)/2
 - 7/06 长上影线（上影占全长 62%）
 - 7/07 跌破生命线、7/10 站回（洗盘）
-- 8/24 单针触发（短期 7.1、长期 49.0）且未破 4.21
+- 8/24 单针触发（短期 7.1、长期 49.0）且未破 0.421
+
+注：2026-08-31 修正通达信基金价格比例（ETF 是 ×1000 不是 ×100）后，
+本文件的价格锚点整体 ÷10（159828 医疗ETF 真实价 ~0.42，之前读成 ~4.2）。
+形态关系（生命线=(高+低)/2、进攻K中点、破位容错）不受影响，只是小数点位置。
 """
 
 from __future__ import annotations
@@ -52,7 +56,7 @@ def _idx(df: pd.DataFrame, s: str) -> int:
 
 
 def test_lifeline1(df_159828: pd.DataFrame) -> None:
-    """生命线1 = 4.055（3/17 高 4.27 + 3/23 低 3.84）。"""
+    """生命线1 = 0.4055（3/17 高 0.427 + 3/23 低 0.384）。"""
     df = df_159828
     highs = df["high"].astype(float).to_numpy()
     lows = df["low"].astype(float).to_numpy()
@@ -60,22 +64,22 @@ def test_lifeline1(df_159828: pd.DataFrame) -> None:
 
     i_top = _idx(df, "2026-03-17")
     i_bot = _idx(df, "2026-03-23")
-    assert highs[i_top] == pytest.approx(4.27, abs=1e-9)
-    assert lows[i_bot] == pytest.approx(3.84, abs=1e-9)
-    assert lifeline_value(highs[i_top], lows[i_bot]) == pytest.approx(4.055, abs=1e-9)
+    assert highs[i_top] == pytest.approx(0.427, abs=1e-9)
+    assert lows[i_bot] == pytest.approx(0.384, abs=1e-9)
+    assert lifeline_value(highs[i_top], lows[i_bot]) == pytest.approx(0.4055, abs=1e-9)
 
 
 def test_lifeline2(df_159828: pd.DataFrame) -> None:
-    """生命线2 = 3.880（5/21 高 4.17 + 6/09 低 3.59）。"""
+    """生命线2 = 0.3880（5/21 高 0.417 + 6/09 低 0.359）。"""
     df = df_159828
     highs = df["high"].astype(float).to_numpy()
     lows = df["low"].astype(float).to_numpy()
 
     i_top = _idx(df, "2026-05-21")
     i_bot = _idx(df, "2026-06-09")
-    assert highs[i_top] == pytest.approx(4.17, abs=1e-9)
-    assert lows[i_bot] == pytest.approx(3.59, abs=1e-9)
-    assert lifeline_value(highs[i_top], lows[i_bot]) == pytest.approx(3.880, abs=1e-9)
+    assert highs[i_top] == pytest.approx(0.417, abs=1e-9)
+    assert lows[i_bot] == pytest.approx(0.359, abs=1e-9)
+    assert lifeline_value(highs[i_top], lows[i_bot]) == pytest.approx(0.3880, abs=1e-9)
 
 
 def test_k3_pivots_match_anchors(df_159828: pd.DataFrame) -> None:
@@ -93,7 +97,7 @@ def test_k3_pivots_match_anchors(df_159828: pd.DataFrame) -> None:
 
 
 def test_bottom_divergences_reproduce_lifelines(df_159828: pd.DataFrame) -> None:
-    """底背离（收盘创新低 + 区间顶）能算出生命线 4.055 / 3.880。"""
+    """底背离（收盘创新低 + 区间顶）能算出生命线 0.4055 / 0.3880。"""
     df = df_159828
     highs = df["high"].astype(float).tolist()
     lows = df["low"].astype(float).tolist()
@@ -107,30 +111,30 @@ def test_bottom_divergences_reproduce_lifelines(df_159828: pd.DataFrame) -> None
 
     i_bot1 = _idx(df, "2026-03-23")
     i_bot2 = _idx(df, "2026-06-09")
-    assert i_bot1 in got and got[i_bot1] == pytest.approx(4.055, abs=1e-9)
-    assert i_bot2 in got and got[i_bot2] == pytest.approx(3.880, abs=1e-9)
+    assert i_bot1 in got and got[i_bot1] == pytest.approx(0.4055, abs=1e-9)
+    assert i_bot2 in got and got[i_bot2] == pytest.approx(0.3880, abs=1e-9)
 
 
 def test_attack_midpoint_629(df_159828: pd.DataFrame) -> None:
-    """进攻 K 中点 6/29 = 3.775（(开盘+收盘)/2，不是 (高+低)/2=3.75）。"""
+    """进攻 K 中点 6/29 = 0.3775（(开盘+收盘)/2，不是 (高+低)/2=0.375）。"""
     df = df_159828
     i = _idx(df, "2026-06-29")
     o = float(df["open"].iloc[i])
     c = float(df["close"].iloc[i])
-    assert attack_midpoint(o, c) == pytest.approx(3.775, abs=1e-9)
-    # (高+低)/2 = 3.75，与 Jeremy 用的 3.775 不同
+    assert attack_midpoint(o, c) == pytest.approx(0.3775, abs=1e-9)
+    # (高+低)/2 = 0.375，与 Jeremy 用的 0.3775 不同
     h = float(df["high"].iloc[i])
     l = float(df["low"].iloc[i])
-    assert (h + l) / 2 == pytest.approx(3.75, abs=1e-9)
+    assert (h + l) / 2 == pytest.approx(0.375, abs=1e-9)
 
 
 def test_attack_midpoint_807(df_159828: pd.DataFrame) -> None:
-    """进攻 K 中点 8/07 = 4.210。"""
+    """进攻 K 中点 8/07 = 0.4210。"""
     df = df_159828
     i = _idx(df, "2026-08-07")
     o = float(df["open"].iloc[i])
     c = float(df["close"].iloc[i])
-    assert attack_midpoint(o, c) == pytest.approx(4.210, abs=1e-9)
+    assert attack_midpoint(o, c) == pytest.approx(0.4210, abs=1e-9)
 
 
 def test_attack_candles_detected(df_159828: pd.DataFrame) -> None:
@@ -145,7 +149,7 @@ def test_attack_candles_detected(df_159828: pd.DataFrame) -> None:
 
 
 def test_attack_stack_824_not_broken(df_159828: pd.DataFrame) -> None:
-    """栈逻辑：8/24 当前有效进攻 K 中点 = 8/07 的 4.21，收盘 4.21 未破。"""
+    """栈逻辑：8/24 当前有效进攻 K 中点 = 8/07 的 0.421，收盘 0.421 未破。"""
     df = df_159828
     opens = df["open"].astype(float).tolist()
     closes = df["close"].astype(float).tolist()
@@ -156,14 +160,14 @@ def test_attack_stack_824_not_broken(df_159828: pd.DataFrame) -> None:
 
     i824 = _idx(df, "2026-08-24")
     cur = current_attack_midpoint(atk, closes, mids, i824)
-    assert cur == pytest.approx(4.210, abs=1e-9)
-    # 收盘 4.21 == 中点 4.21，不算破（破用收盘价、严格 < ）
-    assert float(df["close"].iloc[i824]) == pytest.approx(4.21, abs=1e-9)
+    assert cur == pytest.approx(0.4210, abs=1e-9)
+    # 收盘 0.421 == 中点 0.421，不算破（破用收盘价、严格 < ）
+    assert float(df["close"].iloc[i824]) == pytest.approx(0.421, abs=1e-9)
     assert not (float(df["close"].iloc[i824]) < cur)
 
 
 def test_upper_shadow_706(df_159828: pd.DataFrame) -> None:
-    """7/06 长上影线：开 3.93 高 4.02 低 3.89 收 3.94，上影占全长 61.5%。"""
+    """7/06 长上影线：开 3.93 高 4.02 低 3.89 收 0.394，上影占全长 61.5%。"""
     df = df_159828
     i = _idx(df, "2026-07-06")
     o = float(df["open"].iloc[i])
@@ -178,18 +182,18 @@ def test_upper_shadow_706(df_159828: pd.DataFrame) -> None:
 
 
 def test_lifeline_break_and_recover(df_159828: pd.DataFrame) -> None:
-    """7/07 收盘 3.81 破生命线 3.88，7/10 收盘 3.94 站回（洗盘）。"""
+    """7/07 收盘 0.381 破生命线 0.388，7/10 收盘 0.394 站回（洗盘）。"""
     df = df_159828
     closes = df["close"].astype(float).to_numpy()
     i707 = _idx(df, "2026-07-07")
     i710 = _idx(df, "2026-07-10")
-    lifeline = 3.880
+    lifeline = 0.3880
     assert float(closes[i707]) < lifeline
     assert float(closes[i710]) > lifeline
 
 
 def test_pin_824(df_159828: pd.DataFrame) -> None:
-    """8/24 单针触发：短期随机 7.1、长期 49.0，且未破 4.21。"""
+    """8/24 单针触发：短期随机 7.1、长期 49.0，且未破 0.421。"""
     df = df_159828
     closes = df["close"].astype(float).to_numpy()
     lows = df["low"].astype(float).to_numpy()
@@ -206,11 +210,11 @@ def test_pin_824(df_159828: pd.DataFrame) -> None:
     assert float(short[i824]) == pytest.approx(7.14, abs=0.05)
     assert float(long_[i824]) == pytest.approx(49.0, abs=0.1)
     assert float(short[i824]) <= 30.0
-    assert float(closes[i824]) >= 4.21 - 1e-9  # 未破 4.21
+    assert float(closes[i824]) >= 0.421 - 1e-9  # 未破 0.421
 
 
 def test_macd_hist_increment_capital(df_159828: pd.DataFrame) -> None:
-    """增量资金：3/23~3/26 绿柱 3/24 最深(-0.050)后连续收缩，价格仍跌。"""
+    """增量资金：3/23~3/26 绿柱 3/24 最深(-0.0050)后连续收缩，价格仍跌。"""
     df = df_159828
     closes = df["close"].astype(float).tolist()
     _, _, hist = calc_macd(closes)
@@ -218,7 +222,7 @@ def test_macd_hist_increment_capital(df_159828: pd.DataFrame) -> None:
     i24 = _idx(df, "2026-03-24")
     i25 = _idx(df, "2026-03-25")
     i26 = _idx(df, "2026-03-26")
-    assert float(hist[i24]) == pytest.approx(-0.0495, abs=5e-3)
+    assert float(hist[i24]) == pytest.approx(-0.00495, abs=5e-4)
     # 3/24 最深，之后连续收缩（变浅）
     assert float(hist[i24]) <= float(hist[i23])
     assert float(hist[i25]) > float(hist[i24])

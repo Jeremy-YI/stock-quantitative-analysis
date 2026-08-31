@@ -18,18 +18,16 @@ export default function useStrategies() {
     setLoading(true)
     setError(null)
 
-    get<ApiResponse<{ strategies: StrategyInfo[] }>>('/strategies').then(
-      ([err, res]) => {
-        if (cancelled) return
-        if (err || !res || !res.body) {
-          setError(err instanceof Error ? err.message : '加载失败')
-          setData([])
-        } else {
-          setData(res.body.strategies)
-        }
-        setLoading(false)
+    get<ApiResponse<{ strategies: StrategyInfo[] }>>('/strategies').then(([err, res]) => {
+      if (cancelled) return
+      if (err || !res || !res.body) {
+        setError(err instanceof Error ? err.message : '加载失败')
+        setData([])
+      } else {
+        setData(res.body.strategies)
       }
-    )
+      setLoading(false)
+    })
 
     return () => {
       cancelled = true

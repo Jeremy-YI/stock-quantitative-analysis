@@ -12,7 +12,7 @@
  *   up = 红（涨）  down = 绿（跌）  neutral = 灰（平）
  * ============================================================ */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ------------------------------------------------------------
  * 1. 断点（Breakpoint）—— 命名对齐 FreshFarmPicking 的 global-theme.ts
@@ -79,8 +79,8 @@
   --text-caption--line-height: 1.45;
 
   /* 数字/代码用等宽，表格对齐更稳 */
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
   /* ----------------------------------------------------------
    * 3. 容器宽度（Container）：不是「固定宽度」，是「最大宽度」
@@ -146,7 +146,7 @@
 
 /* 暗色主题（预留：给 <html data-theme="dark"> 即生效，当前未开启）。
  * 需要做暗色资讯风时只改这一块，组件层零改动。 */
-[data-theme="dark"] {
+[data-theme='dark'] {
   --background: #0a0a0b;
   --foreground: #ededed;
   --card: #121214;

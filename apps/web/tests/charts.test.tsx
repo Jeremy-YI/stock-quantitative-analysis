@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 
 // ECharts 依赖真实浏览器 canvas，jsdom 下用桩替换，只验证图表组件能挂载并传入数据
 vi.mock('echarts-for-react', () => ({
-  default: () => <div data-testid="echarts" />,
+  default: () => <div data-testid='echarts' />,
 }))
 
 import MacdChart from '@/features/macd/macd-chart'
@@ -13,27 +13,17 @@ import VolumeChart from '@/features/volume/volume-chart'
 
 describe('indicator charts', () => {
   it('should render MACD chart container', () => {
-    render(
-      <MacdChart
-        series={[{ date: '2026-01-02', close: 10, dif: 0, dea: 0, macd: 0 }]}
-      />
-    )
+    render(<MacdChart series={[{ date: '2026-01-02', close: 10, dif: 0, dea: 0, macd: 0 }]} />)
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
 
   it('should render KDJ chart container', () => {
-    render(
-      <KdjChart
-        series={[{ date: '2026-01-02', close: 10, k: 50, d: 50, j: 50 }]}
-      />
-    )
+    render(<KdjChart series={[{ date: '2026-01-02', close: 10, k: 50, d: 50, j: 50 }]} />)
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
 
   it('should render RSI chart container', () => {
-    render(
-      <RsiChart series={[{ date: '2026-01-02', close: 10, rsi: 50 }]} />
-    )
+    render(<RsiChart series={[{ date: '2026-01-02', close: 10, rsi: 50 }]} />)
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })
 
@@ -51,7 +41,7 @@ describe('indicator charts', () => {
             relation: '—',
           },
         ]}
-      />
+      />,
     )
     expect(screen.getByTestId('echarts')).toBeTruthy()
   })

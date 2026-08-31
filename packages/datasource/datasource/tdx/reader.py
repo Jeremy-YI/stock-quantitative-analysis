@@ -21,6 +21,10 @@
     20     f32     成交额（元）
     24     u32     成交量（手）
     28     u32     保留位
+
+价格比例有个坑：**个股/可转债是 ×100，场内基金（ETF/LOF）是 ×1000**。
+所以 510300 的收盘价 4.679 在文件里存的是 4679，按 /100 会读成 46.79（大 10 倍）。
+统一走 resolve_price_divisor(symbol) 判定，别在调用方各写一套。
 """
 
 from __future__ import annotations
@@ -46,6 +50,14 @@ COLUMNS = ["date", "open", "high", "low", "close", "volume", "amount"]
 # 板块前缀（阶段 1 覆盖 A 股个股，ETF/债券/北交所扩展见 TODO）
 _SH_PREFIXES = ("60", "68")
 _BJ_PREFIXES = ("43", "83", "87", "88", "92")
+
+# 场内基金前缀：沪市 50/51/52/56/58（含 588 科创 ETF），深市 15/16/18
+# 注意 58 是科创板 ETF、68 是科创板个股，别混
+_FUND_PREFIXES = ("50", "51", "52", "56", "58", "15", "16", "18")
+
+# 价格比例
+PRICE_DIVISOR_STOCK = 100.0
+PRICE_DIVISOR_FUND = 1000.0
 
 
 def resolve_hsjday_root() -> Path:
@@ -79,6 +91,22 @@ def resolve_symbol_path(hsjday_root: Path, symbol: str) -> Path:
     return hsjday_root / market / "lday" / f"{market}{symbol}.day"
 
 
+def is_fund(symbol: str) -> bool:
+    """是否场内基金（ETF/LOF）。"""
+    return symbol.startswith(_FUND_PREFIXES)
+
+
+def resolve_price_divisor(symbol: str) -> float:
+    """代码 → 价格比例：场内基金 1000，其余（个股/可转债）100。"""
+    return PRICE_DIVISOR_FUND if is_fund(symbol) else PRICE_DIVISOR_STOCK
+
+
+def symbol_from_path(path: str | Path) -> str:
+    """从 .day 文件名反解代码：sh510300.day → 510300。"""
+    stem = Path(path).stem
+    return stem[2:] if len(stem) > 2 and stem[:2] in {"sh", "sz", "bj"} else stem
+
+
 @lru_cache(maxsize=65536)
 def _parse_date_int(date_int: int) -> date:
     """YYYYMMDD 整数 → datetime.date。
@@ -93,10 +121,11 @@ def _parse_date_int(date_int: int) -> date:
     return datetime.strptime(str(date_int), "%Y%m%d").date()
 
 
-def parse_records(data: bytes) -> list[dict]:
+def parse_records(data: bytes, price_divisor: float = PRICE_DIVISOR_STOCK) -> list[dict]:
     """解析 .day 文件的原始字节，返回记录字典列表（纯函数，便于单测）。
 
-    价格统一换算成元（除以 100），成交量保留原始「手」。
+    价格换算成元；比例由调用方给（个股 100 / 场内基金 1000，见 resolve_price_divisor）。
+    成交量保留原始「手」。
     """
     records: list[dict] = []
     for offset in range(0, len(data) - RECORD_SIZE + 1, RECORD_SIZE):
@@ -107,10 +136,10 @@ def parse_records(data: bytes) -> list[dict]:
         records.append(
             {
                 "date": _parse_date_int(date_int),
-                "open": op / 100.0,
-                "high": hi / 100.0,
-                "low": lo / 100.0,
-                "close": cl / 100.0,
+                "open": op / price_divisor,
+                "high": hi / price_divisor,
+                "low": lo / price_divisor,
+                "close": cl / price_divisor,
                 "volume": volume,
                 "amount": amount,
             }
@@ -134,7 +163,9 @@ def parse_day_file(path: str | Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(f".day 文件不存在：{path}")
 
-    records = parse_records(path.read_bytes())
+    records = parse_records(
+        path.read_bytes(), resolve_price_divisor(symbol_from_path(path))
+    )
     if not records:
         return pd.DataFrame(columns=COLUMNS)
     return pd.DataFrame.from_records(records, columns=COLUMNS)

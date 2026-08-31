@@ -57,11 +57,7 @@ export {
   type ShowProps,
 } from './breakpoint'
 
-export {
-  BLOCK_VISIBLE_FROM,
-  CELL_VISIBLE_FROM,
-  HIDDEN_FROM,
-} from './visibility'
+export { BLOCK_VISIBLE_FROM, CELL_VISIBLE_FROM, HIDDEN_FROM } from './visibility'
 
 export {
   SOFT_TONE,
@@ -111,14 +107,7 @@ export {
   type TableProps,
   type TableScrollProps,
 } from './table'
-export {
-  Field,
-  FilterBar,
-  Select,
-  TextInput,
-  controlBase,
-  type FieldProps,
-} from './field'
+export { Field, FilterBar, Select, TextInput, controlBase, type FieldProps } from './field'
 
 // shadcn 侧基础件也从设计系统出口暴露，业务不用记两个路径
 export {

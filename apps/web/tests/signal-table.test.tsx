@@ -1,4 +1,4 @@
-import { describe, expect, it, vi} from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 import SignalTable, { changePct } from '@/features/strategies/signal-table'
@@ -8,7 +8,7 @@ function makeSignal(
   symbol: string,
   signalType: string,
   score: number,
-  metrics: Signal['metrics']
+  metrics: Signal['metrics'],
 ): Signal {
   return {
     symbol,

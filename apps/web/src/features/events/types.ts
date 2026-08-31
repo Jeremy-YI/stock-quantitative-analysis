@@ -3,7 +3,7 @@
 export interface EventItem {
   date: string
   name: string
-  type: string     // 央行会议 / 数据 / 财报
+  type: string // 央行会议 / 数据 / 财报
   importance: string // 高 / 中 / 低
 }
 

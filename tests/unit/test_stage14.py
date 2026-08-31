@@ -2,15 +2,19 @@
 
 把 Jeremy 的架构复现成断言（数据源 = 本地通达信 hsjday，文件不存在则 skip）：
 
-- **阶段性底部** 3/23-3/26：绿柱 3/24 最深(-0.050) → 3/25(-0.040) → 3/26(-0.038) 收缩
+- **阶段性底部** 3/23-3/26：绿柱 3/24 最深(-0.0050) → 3/25(-0.0040) → 3/26(-0.00038) 收缩
   → 柱状底部确认日 = 3/25（收缩第一天）。
-- **阶段性顶部** 7/06：红柱 7/03 最高(+0.082) → 7/06(+0.082) 收缩，叠加长上影 61.5%。
-- **7/29 绿柱底背离买点**：绿柱 7/28(-0.003) → 7/29(-0.001) 收缩 → 柱状底部确认日 = 7/29。
-- **8/24 单针 + 未破 4.21 = 洗盘**：单针(短 7.1)触发，进攻 K 防线 4.21，收盘 4.21 未破。
+- **阶段性顶部** 7/06：红柱 7/03 最高(+0.0082) → 7/06(+0.0082) 收缩，叠加长上影 61.5%。
+- **7/29 绿柱底背离买点**：绿柱 7/28(-0.0003) → 7/29(-0.0001) 收缩 → 柱状底部确认日 = 7/29。
+- **8/24 单针 + 未破 0.421 = 洗盘**：单针(短 7.1)触发，进攻 K 防线 0.421，收盘 0.421 未破。
 
 复现口径（不得自己改 Jeremy 口径去凑）：
 - 柱状极值用已收盘 bar 判定，确认日 = 收缩第一天，尾盘买用收盘价。
 - 破位容错：连续 2 个交易日收盘跌破才算破，单日破不算。
+
+注：2026-08-31 修正通达信基金价格比例（ETF 是 ×1000 不是 ×100）后，
+本文件的价格锚点整体 ÷10（159828 医疗ETF 真实价 ~0.42，之前读成 ~4.2）。
+形态关系（生命线=(高+低)/2、进攻K中点、破位容错）不受影响，只是小数点位置。
 """
 
 from __future__ import annotations
@@ -59,12 +63,12 @@ def _idx(df: pd.DataFrame, s: str) -> int:
 
 
 def test_stage_bottom_325(df_159828: pd.DataFrame, hist_159828: np.ndarray) -> None:
-    """阶段性底部 3/25：绿柱 3/24 最深(-0.050)后 3/25(-0.040) 收缩。"""
+    """阶段性底部 3/25：绿柱 3/24 最深(-0.0050)后 3/25(-0.0040) 收缩。"""
     i25 = _idx(df_159828, "2026-03-25")
     i24 = _idx(df_159828, "2026-03-24")
     i26 = _idx(df_159828, "2026-03-26")
     # 3/24 最深，之后连续收缩
-    assert float(hist_159828[i24]) == pytest.approx(-0.0495, abs=5e-3)
+    assert float(hist_159828[i24]) == pytest.approx(-0.00495, abs=5e-4)
     assert float(hist_159828[i25]) > float(hist_159828[i24])
     assert float(hist_159828[i26]) > float(hist_159828[i25])
     for n in (5, 10):
@@ -72,18 +76,18 @@ def test_stage_bottom_325(df_159828: pd.DataFrame, hist_159828: np.ndarray) -> N
 
 
 def test_stage_bottom_729(df_159828: pd.DataFrame, hist_159828: np.ndarray) -> None:
-    """7/29 绿柱底背离买点：绿柱 7/28(-0.003) → 7/29(-0.001) 收缩。"""
+    """7/29 绿柱底背离买点：绿柱 7/28(-0.0003) → 7/29(-0.0001) 收缩。"""
     i28 = _idx(df_159828, "2026-07-28")
     i29 = _idx(df_159828, "2026-07-29")
     assert float(hist_159828[i28]) < 0.0
     assert float(hist_159828[i29]) > float(hist_159828[i28])
-    assert float(hist_159828[i29]) == pytest.approx(-0.0007, abs=5e-3)
+    assert float(hist_159828[i29]) == pytest.approx(-0.00007, abs=5e-4)
     for n in (5, 10, 20):
         assert i29 in detect_hist_stage_bottoms(hist_159828.tolist(), n), f"N={n} 应命中 7/29"
 
 
 def test_stage_top_706(df_159828: pd.DataFrame, hist_159828: np.ndarray) -> None:
-    """阶段性顶部 7/06：红柱 7/03 最高(+0.082)后 7/06(+0.082) 收缩。"""
+    """阶段性顶部 7/06：红柱 7/03 最高(+0.0082)后 7/06(+0.0082) 收缩。"""
     i03 = _idx(df_159828, "2026-07-03")
     i06 = _idx(df_159828, "2026-07-06")
     assert float(hist_159828[i03]) > 0.0
@@ -111,22 +115,22 @@ def test_stage_bottom_n20_misses_325(df_159828: pd.DataFrame, hist_159828: np.nd
 
 
 def test_lifeline_series_reproduces_3880(df_159828: pd.DataFrame) -> None:
-    """生命线序列在 7/07 处 = 3.880（5/21 高4.17 + 6/09 低3.59）/2。"""
+    """生命线序列在 7/07 处 = 0.3880（5/21 高0.417 + 6/09 低0.359）/2。"""
     highs = df_159828["high"].astype(float).tolist()
     lows = df_159828["low"].astype(float).tolist()
     closes = df_159828["close"].astype(float).tolist()
     ll = lifeline_series(highs, lows, closes, k=3)
     i707 = _idx(df_159828, "2026-07-07")
-    assert ll[i707] == pytest.approx(3.880, abs=1e-9)
+    assert ll[i707] == pytest.approx(0.3880, abs=1e-9)
 
 
 def test_2day_tolerance_707(df_159828: pd.DataFrame) -> None:
-    """破位容错：7/07 收盘 3.81 破生命线 3.88 但仅 1 日 → 不算破；7/08 连续 2 日 → 算破。"""
+    """破位容错：7/07 收盘 0.381 破生命线 0.388 但仅 1 日 → 不算破；7/08 连续 2 日 → 算破。"""
     closes = df_159828["close"].astype(float).tolist()
     i706 = _idx(df_159828, "2026-07-06")
     i707 = _idx(df_159828, "2026-07-07")
     i708 = _idx(df_159828, "2026-07-08")
-    lifeline = 3.880
+    lifeline = 0.3880
     assert float(closes[i707]) < lifeline          # 7/07 单日破
     assert float(closes[i706]) >= lifeline         # 前日未破
     assert line_broken_2day(closes, lifeline, i707) is False  # 单日破不算（洗盘容错）
@@ -135,7 +139,7 @@ def test_2day_tolerance_707(df_159828: pd.DataFrame) -> None:
 
 
 def test_washout_824_attack_not_broken(df_159828: pd.DataFrame) -> None:
-    """8/24 单针 + 进攻 K 防线 4.21 未破（收盘 4.21 == 4.21）→ 判为洗盘。"""
+    """8/24 单针 + 进攻 K 防线 0.421 未破（收盘 0.421 == 0.421）→ 判为洗盘。"""
     opens = df_159828["open"].astype(float).tolist()
     highs = df_159828["high"].astype(float).tolist()
     lows = df_159828["low"].astype(float).tolist()
@@ -147,12 +151,12 @@ def test_washout_824_attack_not_broken(df_159828: pd.DataFrame) -> None:
     den = hv - lv
     short = np.where(den <= 0, 50.0, (closes - lv) / (den + 0.0001) * 100.0)
     assert float(short[i824]) <= 30.0
-    # 进攻 K 防线 = 4.21（8/07 进攻 K 中点）
+    # 进攻 K 防线 = 0.421（8/07 进攻 K 中点）
     ad = attack_defense_series(opens, highs, lows, closes, "etf")
-    assert ad[i824] == pytest.approx(4.210, abs=1e-9)
-    assert float(closes[i824]) == pytest.approx(4.210, abs=1e-9)
-    # 2 日容错：收盘 4.21 未破 4.21 → 不破 → 洗盘
+    assert ad[i824] == pytest.approx(0.4210, abs=1e-9)
+    assert float(closes[i824]) == pytest.approx(0.4210, abs=1e-9)
+    # 2 日容错：收盘 0.421 未破 0.421 → 不破 → 洗盘
     assert line_broken_2day(closes, ad[i824], i824) is False
     # 进攻 K 中点公式正确性（8/07）
     i807 = _idx(df_159828, "2026-08-07")
-    assert attack_midpoint(float(opens[i807]), float(closes[i807])) == pytest.approx(4.210, abs=1e-9)
+    assert attack_midpoint(float(opens[i807]), float(closes[i807])) == pytest.approx(0.4210, abs=1e-9)

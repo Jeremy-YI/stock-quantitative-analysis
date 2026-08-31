@@ -95,7 +95,10 @@ export default function DesignSystemPage() {
         <Grid cols={{ base: 2, mobileLandscape: 4 }} gap='sm'>
           <Stat label='当前档位' value={bp} />
           <Stat label='视口宽度' value={`${width}px`} />
-          <Stat label='设备类' value={isMobile ? '手机' : isPad ? '平板' : isDesktop ? '桌面' : '—'} />
+          <Stat
+            label='设备类'
+            value={isMobile ? '手机' : isPad ? '平板' : isDesktop ? '桌面' : '—'}
+          />
           <Stat label='容器上限' value='desktop 1200px' />
         </Grid>
         <Caption>{label}</Caption>
@@ -133,7 +136,10 @@ export default function DesignSystemPage() {
         <Grid cols={{ base: 2, mobilePortrait: 3, desktop: 5 }} gap='sm'>
           {COLOR_TOKENS.map((c) => (
             <div key={c.token} className='rounded-lg border border-border p-2'>
-              <div className='h-8 w-full rounded' style={{ backgroundColor: `var(--${c.token})` }} />
+              <div
+                className='h-8 w-full rounded'
+                style={{ backgroundColor: `var(--${c.token})` }}
+              />
               <Caption className='mt-1.5 block font-mono'>{c.token}</Caption>
               <Caption className='block'>{c.usage}</Caption>
             </div>

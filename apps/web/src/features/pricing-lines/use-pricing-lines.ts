@@ -32,7 +32,7 @@ export default function usePricingLines(symbol: string) {
           setData(res.body)
         }
         setLoading(false)
-      }
+      },
     )
 
     return () => {

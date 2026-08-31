@@ -13,7 +13,7 @@ const items = [
 
 describe('Tabs', () => {
   it('should render all tab items', () => {
-    render(<Tabs value="macd" onValueChange={() => {}} items={items} />)
+    render(<Tabs value='macd' onValueChange={() => {}} items={items} />)
     expect(screen.getByRole('tab', { name: 'MACD' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'KDJ' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'RSI' })).toBeTruthy()
@@ -21,18 +21,14 @@ describe('Tabs', () => {
   })
 
   it('should mark the active tab as selected', () => {
-    render(<Tabs value="kdj" onValueChange={() => {}} items={items} />)
-    expect(
-      screen.getByRole('tab', { name: 'KDJ' }).getAttribute('aria-selected')
-    ).toBe('true')
-    expect(
-      screen.getByRole('tab', { name: 'MACD' }).getAttribute('aria-selected')
-    ).toBe('false')
+    render(<Tabs value='kdj' onValueChange={() => {}} items={items} />)
+    expect(screen.getByRole('tab', { name: 'KDJ' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('tab', { name: 'MACD' }).getAttribute('aria-selected')).toBe('false')
   })
 
   it('should call onValueChange when a tab is clicked', async () => {
     const onValueChange = vi.fn()
-    render(<Tabs value="macd" onValueChange={onValueChange} items={items} />)
+    render(<Tabs value='macd' onValueChange={onValueChange} items={items} />)
     await userEvent.click(screen.getByRole('tab', { name: 'KDJ' }))
     expect(onValueChange).toHaveBeenCalledWith('kdj')
   })

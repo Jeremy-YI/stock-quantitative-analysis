@@ -16,16 +16,12 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN">
-      <body className="flex min-h-screen flex-col antialiased">
+    <html lang='zh-CN'>
+      <body className='flex min-h-screen flex-col antialiased'>
         <Nav />
-        <div className="flex-1">{children}</div>
+        <div className='flex-1'>{children}</div>
       </body>
     </html>
   )

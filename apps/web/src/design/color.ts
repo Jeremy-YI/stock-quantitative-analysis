@@ -6,15 +6,7 @@
  */
 
 export type Tone =
-  | 'default'
-  | 'muted'
-  | 'accent'
-  | 'up'
-  | 'down'
-  | 'neutral'
-  | 'warn'
-  | 'danger'
-  | 'info'
+  'default' | 'muted' | 'accent' | 'up' | 'down' | 'neutral' | 'warn' | 'danger' | 'info'
 
 /** 文字色。 */
 export const TEXT_TONE: Record<Tone, string> = {

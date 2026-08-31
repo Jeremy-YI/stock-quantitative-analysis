@@ -30,7 +30,7 @@ const PAGES = [
 /** 页面不应该出现横向滚动（允许 1px 取整误差）。 */
 async function expectNoHorizontalOverflow(page: Page) {
   const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   )
   expect(overflow, `页面横向溢出 ${overflow}px`).toBeLessThanOrEqual(1)
 }
@@ -40,9 +40,9 @@ for (const vp of VIEWPORTS) {
     test(`响应式 ${vp.name}(${vp.width}) · ${p.slug}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height })
       await page.goto(p.url)
-      await expect(
-        page.getByRole('heading', { level: 1, name: p.ready })
-      ).toBeVisible({ timeout: 60_000 })
+      await expect(page.getByRole('heading', { level: 1, name: p.ready })).toBeVisible({
+        timeout: 60_000,
+      })
       await expectNoHorizontalOverflow(page)
       await page.screenshot({
         path: path.join(outDir, `${p.slug}-${vp.name}.png`),

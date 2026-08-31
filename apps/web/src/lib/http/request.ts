@@ -31,10 +31,7 @@ export function get<T>(path: string): Promise<HttpResult<T>> {
   return request<T>(path)
 }
 
-export function post<T>(
-  path: string,
-  body?: unknown
-): Promise<HttpResult<T>> {
+export function post<T>(path: string, body?: unknown): Promise<HttpResult<T>> {
   return request<T>(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
