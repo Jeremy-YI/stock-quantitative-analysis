@@ -73,7 +73,9 @@ async def test_create_run_verify_200(client):
     job = body["body"]
     assert job["run_id"]
     assert job["strategy"] == "b1b2b3"
-    assert job["status"] in ("queued", "running")  # 立即返回，不在请求里算
+    # status 是瞬态（后台线程可能已经跑完，也可能还在 queued/running），
+    # 只断言是合法状态之一，不赌时序
+    assert job["status"] in ("queued", "running", "done")
 
     run = await _wait_done(client, job["run_id"])
     assert run["status"] == "done"
