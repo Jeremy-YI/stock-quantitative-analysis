@@ -39,3 +39,4 @@ data/
 # 日志
 *.log
 npm-debug.log*
+.next-build/
