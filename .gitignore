@@ -28,8 +28,14 @@ blob-report/
 # 调度器报告输出（FileNotifier 写的 Markdown，运行时生成，不入库）
 reports/
 
-# 数据产物（演示数据 / 概览页快照 / 回测结果 JSON，全部由脚本现场生成，不入库）
-data/
+# 数据产物（运行时生成的不入库：资金流快照 / 回测结果 / pkl 缓存 / demo_hsjday）
+data/*
+# 但「种子数据」要入库——fresh clone 和 CI 需要它们（新闻/事件/板块成分股/名称表/ETF名录）
+!data/news.json
+!data/events.json
+!data/sector_stocks.json
+!data/stock_names.json
+!data/etf_universe.json
 
 # 系统 / 编辑器
 .DS_Store

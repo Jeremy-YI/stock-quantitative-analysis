@@ -115,11 +115,74 @@ async def test_signals_date_filter(client):
     assert res.json()["body"]["signals"] == []
 
 
-# —— 市场资讯详情接口 ——
-async def test_news_detail_ok(client):
-    from main import create_app  # noqa: F401
+# —— 市场资讯详情接口（用临时数据，不依赖 gitignored 的 data/ 目录）——
+import json as _json
+import tempfile as _tempfile
+from services.market_service import MarketService
 
-    res = await client.get("/api/v1/news/walsh-hawkish-sept-rate-odds")
+
+@pytest.fixture()
+async def market_client(tmp_path):
+    """独立 app，market_service 注入临时 news/events 数据。"""
+    news = tmp_path / "news.json"
+    news.write_text(
+        _json.dumps(
+            {
+                "date": "2026-08-30",
+                "source": "test",
+                "items": [
+                    {
+                        "id": "walsh-hawkish-sept-rate-odds",
+                        "title": "沃什放鹰",
+                        "impact": "改变定价",
+                        "level": "P0",
+                        "outlook": "outlook",
+                        "sources": 3,
+                        "detail": "detail",
+                        "topics": ["黄金"],
+                        "related_symbols": [{"symbol": "518880", "name": "黄金ETF", "reason": "r"}],
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    events = tmp_path / "events.json"
+    events.write_text(
+        _json.dumps(
+            {
+                "events": [
+                    {
+                        "id": "fomc-meeting",
+                        "date": "2026-09-16",
+                        "name": "美联储 FOMC 利率决议",
+                        "type": "央行会议",
+                        "importance": "高",
+                        "description": "desc",
+                        "history": [{"date": "2026-07-29", "note": "note"}],
+                    }
+                ]
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    app = create_app(
+        Settings(hsjday_root="/tmp"),
+        repository=None,
+        strategy_scanner=FakeScanner(_decline_candles()),
+        scan_repository=InMemoryScanResultRepository(),
+    )
+    app.state.market_service = MarketService(news_path=str(news), events_path=str(events))
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:
+        yield c
+
+
+async def test_news_detail_ok(market_client):
+    res = await market_client.get("/api/v1/news/walsh-hawkish-sept-rate-odds")
     assert res.status_code == 200
     body = res.json()["body"]
     assert body["item"]["id"] == "walsh-hawkish-sept-rate-odds"
@@ -128,13 +191,13 @@ async def test_news_detail_ok(client):
     assert isinstance(body["related_news"], list)  # 相关消息（可能为空，但是列表）
 
 
-async def test_news_detail_404(client):
-    res = await client.get("/api/v1/news/does-not-exist")
+async def test_news_detail_404(market_client):
+    res = await market_client.get("/api/v1/news/does-not-exist")
     assert res.status_code == 404
 
 
-async def test_event_detail_ok(client):
-    res = await client.get("/api/v1/events/fomc-meeting")
+async def test_event_detail_ok(market_client):
+    res = await market_client.get("/api/v1/events/fomc-meeting")
     assert res.status_code == 200
     body = res.json()["body"]
     assert body["event"]["name"] == "美联储 FOMC 利率决议"
@@ -142,6 +205,6 @@ async def test_event_detail_ok(client):
     assert len(body["event"]["history"]) >= 1
 
 
-async def test_event_detail_404(client):
-    res = await client.get("/api/v1/events/does-not-exist")
+async def test_event_detail_404(market_client):
+    res = await market_client.get("/api/v1/events/does-not-exist")
     assert res.status_code == 404

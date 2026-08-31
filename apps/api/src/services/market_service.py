@@ -26,8 +26,12 @@ _EVENTS_PATH = _REPO_ROOT / "data" / "events.json"
 class MarketService:
     """市场资讯查询服务（无状态）。"""
 
+    def __init__(self, news_path: str | None = None, events_path: str | None = None) -> None:
+        self._news_path = Path(news_path) if news_path else _NEWS_PATH
+        self._events_path = Path(events_path) if events_path else _EVENTS_PATH
+
     def get_news(self) -> NewsBody:
-        raw = self._load(_NEWS_PATH)
+        raw = self._load(self._news_path)
         return NewsBody(
             date=raw.get("date", ""),
             source=raw.get("source", ""),
@@ -35,7 +39,7 @@ class MarketService:
         )
 
     def get_events(self) -> EventsBody:
-        raw = self._load(_EVENTS_PATH)
+        raw = self._load(self._events_path)
         return EventsBody(
             note=raw.get("note", ""),
             events=[EventItem(**x) for x in raw.get("events", [])],
@@ -43,7 +47,7 @@ class MarketService:
 
     def get_news_detail(self, news_id: str) -> NewsDetailBody | None:
         """单条消息详情 + 相关消息（同主题）。"""
-        raw = self._load(_NEWS_PATH)
+        raw = self._load(self._news_path)
         items = [NewsItem(**x) for x in raw.get("items", [])]
         target = next((x for x in items if x.id == news_id), None)
         if target is None:
@@ -62,7 +66,7 @@ class MarketService:
 
     def get_event_detail(self, event_id: str) -> EventDetailBody | None:
         """单个事件详情（说明 + 历史数据）。"""
-        raw = self._load(_EVENTS_PATH)
+        raw = self._load(self._events_path)
         events = [EventItem(**x) for x in raw.get("events", [])]
         target = next((x for x in events if x.id == event_id), None)
         if target is None:
