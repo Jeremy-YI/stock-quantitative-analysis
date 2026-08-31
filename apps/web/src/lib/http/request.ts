@@ -17,8 +17,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<HttpResult<
     const res = await fetch(`${BASE_URL}${path}`, init)
     if (!res.ok) {
       // 后端错误响应统一是 { message }，尽量把语义串抛给调用方
-      const body = (await res.json().catch(() => ({}))) as { message?: string }
-      return [new Error(body.message ?? `HTTP ${res.status}`), undefined]
+      const body = (await res.json().catch(() => ({}))) as { message?: string; detail?: string }
+      return [new Error(body.message ?? body.detail ?? `HTTP ${res.status}`), undefined]
     }
     const data = (await res.json()) as T
     return [null, data]

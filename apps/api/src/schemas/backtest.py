@@ -38,6 +38,22 @@ class BacktestRunBody(BaseModel):
     report: BacktestReport
 
 
+class BacktestJob(BaseModel):
+    """异步回测任务的状态（POST 立即返回，GET 轮询结果）。
+
+    回测是全市场逐日扫描的重活（单策略约 30s/交易日），同步执行会让前端
+    fetch 超时并拿到 500 —— 所以发起后立刻返回 run_id + 状态，结果好了再查。
+    """
+
+    run_id: str
+    status: str          # queued / running / done / failed
+    strategy: str | None
+    start: date
+    end: date
+    error: str | None = None
+    report: BacktestReport | None = None
+
+
 class DecayBody(BaseModel):
     """策略衰减曲线响应体。"""
 

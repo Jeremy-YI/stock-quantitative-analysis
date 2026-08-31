@@ -14,6 +14,19 @@ from repositories.backtest_repository import InMemoryBacktestRunRepository
 from tests.helpers import make_candle_df
 
 
+async def _wait_done(client: httpx.AsyncClient, run_id: str) -> dict:
+    """轮询直到回测完成（异步执行，POST 立即返回，结果要等后台线程）。"""
+    import asyncio
+
+    for _ in range(200):  # 最多约 10s
+        res = await client.get(f"/api/v1/backtest/runs/{run_id}")
+        job = res.json()["body"]
+        if job["status"] in ("done", "failed"):
+            return job
+        await asyncio.sleep(0.05)
+    raise AssertionError("回测任务超时未完成")
+
+
 def _decline_candles() -> dict[str, pd.DataFrame]:
     """一只持续下跌的标的（触发 B1 超卖），供 fake 扫描器返回。"""
     closes = [100 * (0.98**i) for i in range(60)]
@@ -57,10 +70,13 @@ async def test_create_run_verify_200(client):
     assert res.status_code == 200
     body = res.json()
     assert body["message"] == "ok"
-    run = body["body"]
-    assert run["run_id"]
-    assert run["strategy"] == "b1b2b3"
-    # 验证报告存在，且含按策略统计
+    job = body["body"]
+    assert job["run_id"]
+    assert job["strategy"] == "b1b2b3"
+    assert job["status"] in ("queued", "running")  # 立即返回，不在请求里算
+
+    run = await _wait_done(client, job["run_id"])
+    assert run["status"] == "done"
     report = run["report"]
     assert report["verification"]["total_signals"] >= 0
     assert report["verification"]["hold_days"]
@@ -78,7 +94,8 @@ async def test_create_run_portfolio_200(client):
         },
     )
     assert res.status_code == 200
-    run = res.json()["body"]
+    job = res.json()["body"]
+    run = await _wait_done(client, job["run_id"])
     assert run["report"]["portfolio"] is not None
 
 
@@ -95,7 +112,7 @@ async def test_get_run_200_and_404(client):
 
     missing = await client.get("/api/v1/backtest/runs/nope")
     assert missing.status_code == 404
-    assert "message" in missing.json()
+    assert "detail" in missing.json()
 
 
 async def test_create_run_404_unknown_strategy(client):

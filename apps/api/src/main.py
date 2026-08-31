@@ -99,7 +99,10 @@ def create_app(
     app.state.strategy_service = StrategyService(scanner, scan_repo)
 
     backtest_repo = backtest_repository or InMemoryBacktestRunRepository()
-    app.state.backtest_service = BacktestService(scanner, backtest_repo, settings)
+    app.state.backtest_jobs = {}
+    app.state.backtest_service = BacktestService(
+        scanner, backtest_repo, settings, jobs=app.state.backtest_jobs
+    )
 
     sched = scheduler_instance or _build_default_scheduler(settings)
     app.state.scheduler_service = SchedulerService(sched)

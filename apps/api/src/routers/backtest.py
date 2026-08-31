@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import threading
+import traceback
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from schemas.backtest import BacktestRunBody, BacktestRunRequest, DecayBody
+from schemas.backtest import BacktestJob, BacktestRunRequest, DecayBody
 from schemas.common import ApiResponse
 from services.backtest_service import BacktestService
 
@@ -18,24 +20,60 @@ def get_backtest_service(request: Request) -> BacktestService:
     return request.app.state.backtest_service
 
 
-@router.post("/backtest/runs", response_model=ApiResponse[BacktestRunBody])
+@router.post("/backtest/runs", response_model=ApiResponse[BacktestJob])
 def create_run(
     payload: BacktestRunRequest,
+    request: Request,
     service: BacktestService = Depends(get_backtest_service),
-) -> ApiResponse[BacktestRunBody]:
-    """发起回测（同步执行），返回任务与完整报告。"""
-    run = service.create_run(payload)
-    return ApiResponse(message="ok", body=run)
+) -> ApiResponse[BacktestJob]:
+    """发起回测（异步执行）。
+
+    回测是全市场逐日扫描的重活（单策略约 30s/交易日），同步跑会让前端超时 500。
+    所以这里立刻返回 run_id + status，后台线程算完后结果可查询。
+    """
+    store = request.app.state.backtest_jobs
+    run_id = service.create_run_async(payload)
+
+    # 占位：finish_run 要据此重建请求
+    store[run_id] = {
+        "run_id": run_id,
+        "status": "queued",
+        "strategy": payload.strategy,
+        "start": payload.start,
+        "end": payload.end,
+        "mode": payload.mode,
+        "hold_days": payload.hold_days,
+        "regime_filter": payload.regime_filter,
+        "error": None,
+        "report": None,
+    }
+
+    def _worker() -> None:
+        store[run_id]["status"] = "running"
+        try:
+            run = service.finish_run(run_id)
+            store[run_id].update(status="done", report=run.report, error=None)
+            service._repository.save(run)  # noqa: SLF001 - 落库供 get_run 读
+        except Exception as exc:  # noqa: BLE001
+            store[run_id].update(status="failed", error=str(exc))
+            store[run_id]["traceback"] = traceback.format_exc()
+
+    job = store[run_id]
+    threading.Thread(target=_worker, daemon=True).start()
+    return ApiResponse(message="ok", body=BacktestJob(**job))
 
 
-@router.get("/backtest/runs/{run_id}", response_model=ApiResponse[BacktestRunBody])
+@router.get("/backtest/runs/{run_id}", response_model=ApiResponse[BacktestJob])
 def get_run(
     run_id: str,
-    service: BacktestService = Depends(get_backtest_service),
-) -> ApiResponse[BacktestRunBody]:
-    """查询回测结果。"""
-    run = service.get_run(run_id)
-    return ApiResponse(message="ok", body=run)
+    request: Request,
+) -> ApiResponse[BacktestJob]:
+    """查询回测任务状态与结果（前端轮询这个）。"""
+    store = request.app.state.backtest_jobs
+    job = store.get(run_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="回测任务不存在")
+    return ApiResponse(message="ok", body=BacktestJob(**job))
 
 
 @router.get("/backtest/decay", response_model=ApiResponse[DecayBody])

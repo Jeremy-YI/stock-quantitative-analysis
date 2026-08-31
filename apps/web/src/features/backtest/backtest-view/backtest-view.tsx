@@ -77,8 +77,8 @@ export default function BacktestView() {
     submit({ strategy: strategy || null, start, end, mode, regime_filter: regimeFilter })
   }
 
-  const verification = run?.report.verification
-  const portfolio = run?.report.portfolio
+  const verification = run?.report?.verification
+  const portfolio = run?.report?.portfolio
 
   const strategiesWithDecay = useMemo(
     () =>
@@ -183,7 +183,13 @@ export default function BacktestView() {
         </Button>
       </form>
 
-      {loading && <Skeleton className='h-64 w-full' />}
+      {loading && (
+        <div className='w-full rounded-lg border border-border bg-surface px-4 py-3 text-body-sm text-muted-foreground'>
+          {run?.status === 'running'
+            ? '回测进行中（全市场逐日扫描，单策略约 30s/交易日，请稍候）…'
+            : '正在发起回测…'}
+        </div>
+      )}
       {!loading && error && <p className='text-down'>{error}</p>}
 
       {!loading && run && verification && (

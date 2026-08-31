@@ -34,13 +34,46 @@ class BacktestService:
         scanner: Scanner,
         repository: BacktestRunRepository,
         settings: Settings,
+        jobs: dict | None = None,
     ) -> None:
         self._scanner = scanner
         self._repository = repository
         self._settings = settings
+        self._jobs: dict = jobs if jobs is not None else {}
 
-    def create_run(self, request: BacktestRunRequest) -> BacktestRunBody:
-        """同步执行一次回测并落库。"""
+    def create_run_async(self, request: BacktestRunRequest) -> str:
+        """注册一次回测任务并返回 run_id（不执行计算，立即返回）。"""
+        strategies = self._resolve_strategies(request.strategy)
+        if request.start > request.end:
+            raise DomainError("回测起始日不能晚于结束日")
+        return uuid4().hex
+
+    def finish_run(self, run_id: str) -> BacktestRunBody:
+        """真正执行一次回测（由后台线程调用），返回完整报告。"""
+        return self.create_run(run_id)
+
+    def create_run(self, request: BacktestRunRequest | str) -> BacktestRunBody:
+        """执行一次回测并落库。
+
+        request 可以是请求体（同步路径，测试/脚本用），也可以是 run_id（异步路径，
+        由 create_run_async 先注册、后台线程再调 finish_run 执行）。
+        """
+        if isinstance(request, str):
+            # 异步路径：run_id 已在 store 里占位，这里只补算报告
+            job = self._jobs[request]
+            req = BacktestRunRequest(
+                strategy=job["strategy"],
+                start=job["start"],
+                end=job["end"],
+                mode=job.get("mode", "verify"),
+                hold_days=job.get("hold_days"),
+                regime_filter=job.get("regime_filter", False),
+            )
+            run_id = request
+            request = req
+        else:
+            run_id = uuid4().hex
+
         strategies = self._resolve_strategies(request.strategy)
         if request.start > request.end:
             raise DomainError("回测起始日不能晚于结束日")
@@ -62,7 +95,7 @@ class BacktestService:
         report = BacktestReport(verification=verification, portfolio=portfolio)
 
         run = BacktestRunBody(
-            run_id=uuid4().hex,
+            run_id=run_id,
             strategy=request.strategy,
             start=request.start,
             end=request.end,

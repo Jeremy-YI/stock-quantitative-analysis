@@ -1,6 +1,6 @@
 'use client'
 
-import type { BacktestRun } from '../types'
+import type { BacktestJob } from '../types'
 import { statCard, statGrid, statLabel, statValue } from '../style'
 
 function pct(v: number | null | undefined): string {
@@ -21,13 +21,13 @@ function colorClass(v: number | null | undefined): string {
 }
 
 export interface StatCardsProps {
-  run: BacktestRun
+  run: BacktestJob
 }
 
 /** 找出超额胜率最高（最正）的策略与持有期。 */
-function bestExcess(run: BacktestRun) {
+function bestExcess(run: BacktestJob) {
   let best: { strategy: string; value: number } | null = null
-  for (const s of run.report.verification.by_strategy) {
+  for (const s of run.report!.verification.by_strategy) {
     for (const h of s.holds) {
       if (h.excess_win_rate === null) continue
       if (best === null || h.excess_win_rate > best.value) {
@@ -39,9 +39,9 @@ function bestExcess(run: BacktestRun) {
 }
 
 /** 找出选择性最强（占比最小）的策略。 */
-function bestSelectivity(run: BacktestRun) {
+function bestSelectivity(run: BacktestJob) {
   let best: { strategy: string; value: number } | null = null
-  for (const s of run.report.verification.by_strategy) {
+  for (const s of run.report!.verification.by_strategy) {
     if (s.selectivity === null) continue
     if (best === null || s.selectivity < best.value) {
       best = { strategy: s.strategy, value: s.selectivity }
@@ -52,8 +52,8 @@ function bestSelectivity(run: BacktestRun) {
 
 /** 回测统计指标卡片（总信号 / 组合收益 / 回撤 / 夏普 / 成交 / 建仓 / 超额 / 选择性）。 */
 export default function StatCards({ run }: StatCardsProps) {
-  const v = run.report.verification
-  const p = run.report.portfolio
+  const v = run.report!.verification
+  const p = run.report!.portfolio
   const excess = bestExcess(run)
   const selectivity = bestSelectivity(run)
 

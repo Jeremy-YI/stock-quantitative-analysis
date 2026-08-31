@@ -111,6 +111,17 @@ export interface BacktestReport {
   portfolio: PortfolioReport | null
 }
 
+/** 异步回测任务（POST 立即返回，GET 轮询结果）。 */
+export interface BacktestJob {
+  run_id: string
+  status: 'queued' | 'running' | 'done' | 'failed'
+  strategy: string | null
+  start: string
+  end: string
+  error: string | null
+  report: BacktestReport | null
+}
+
 export interface BacktestRun {
   run_id: string
   strategy: string | null
