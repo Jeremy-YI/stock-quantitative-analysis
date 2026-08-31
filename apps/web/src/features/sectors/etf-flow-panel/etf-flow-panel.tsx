@@ -19,6 +19,7 @@
  *   净额     主力净流入，东财大单口径，只有交易日当天有
  *   净申赎   份额变化 × 最新价，申赎的真金白银，需要隔日对比份额
  */
+import Link from 'next/link'
 import { useState } from 'react'
 
 import {
@@ -140,7 +141,7 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
               </THead>
               <TBody>
                 {grouped
-                  ? renderLeaderRows(rows as EtfLeader[], showShare)
+                  ? renderLeaderRows(rows as EtfLeader[], showShare, data?.date)
                   : rows.map((e: EtfFlow, i: number) => (
                       <EtfRow
                         key={e.code}
@@ -149,6 +150,7 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
                         peers={view === 'leaders' ? (e as EtfLeader).peers : undefined}
                         index={view === 'leaders' ? undefined : i + 1}
                         showShare={showShare}
+                        date={data?.date}
                       />
                     ))}
               </TBody>
@@ -164,7 +166,7 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
           {showShare
             ? '净申赎 = 份额变化 × 最新价，是申购赎回的真实资金。'
             : '净申赎 = 份额变化 × 最新价，需隔日对比份额，下个交易日起显示。'}
-          规模取流通市值，主题龙头按规模选出。点表头可排序
+          规模取流通市值，主题龙头按规模选出。点 ETF 名称看 K 线与信号，点表头可排序
           {sorted ? '（已按自定义排序，大类分组已收起）' : ''}。
         </Caption>
       )}
@@ -173,7 +175,7 @@ export default function EtfFlowPanel({ top = 15 }: { top?: number }) {
 }
 
 /** 主题龙头：按大类插入分组小标题行（正式报表的做法，不用彩色标签堆）。 */
-function renderLeaderRows(leaders: EtfLeader[], showShare: boolean) {
+function renderLeaderRows(leaders: EtfLeader[], showShare: boolean, date?: string) {
   const out: React.ReactNode[] = []
   let current = ''
 
@@ -198,6 +200,7 @@ function renderLeaderRows(leaders: EtfLeader[], showShare: boolean) {
         theme={item.theme}
         peers={item.peers}
         showShare={showShare}
+        date={date}
       />,
     )
   })
@@ -229,12 +232,15 @@ function EtfRow({
   peers,
   index,
   showShare,
+  date,
 }: {
   etf: EtfFlow
   theme?: string
   peers?: number
   index?: number
   showShare: boolean
+  /** 快照日：带进详情页当信号扫描日 */
+  date?: string
 }) {
   return (
     <TR hoverable>
@@ -253,7 +259,13 @@ function EtfRow({
       <TD nowrap className='py-2.5'>
         <span className='flex flex-col leading-tight mobile-portrait:flex-row mobile-portrait:items-baseline mobile-portrait:gap-2'>
           <span className='font-mono text-caption text-muted-foreground'>{etf.code}</span>
-          <span className='truncate'>{etf.name}</span>
+          <Link
+            href={`/stocks/${etf.code}${date ? `?date=${date}` : ''}`}
+            className='truncate font-medium text-accent hover:underline'
+            title='点开看 K 线与信号'
+          >
+            {etf.name}
+          </Link>
         </span>
       </TD>
       <TD align='right' hideBelow='mobilePortrait' mono>

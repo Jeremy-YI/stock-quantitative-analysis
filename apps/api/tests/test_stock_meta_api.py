@@ -151,3 +151,29 @@ async def test_stock_signals_endpoint(app):
     body = res.json()["body"]
     assert body["stocks"][0]["name"] == "贵州茅台"
     assert body["signals"][0]["strategy"] == "b1b2b3"
+
+
+def test_etf_name_falls_back_to_universe(tmp_path):
+    """ETF 不在 A股名称表里，要能从 etf_universe.json 兜底拿到名称。
+
+    这是「点开 ETF 看不到内容」的一半原因：名称空 + 取数 404。
+    """
+    import json as _json
+
+    names = tmp_path / "stock_names.json"
+    names.write_text(_json.dumps(NAMES, ensure_ascii=False), encoding="utf-8")
+    etfs = tmp_path / "etf_universe.json"
+    etfs.write_text(
+        _json.dumps({"512480": "半导体ETF国联安", "588200": "科创芯片ETF嘉实"}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    meta = StockMetaService(names_path=str(names), etf_names_path=str(etfs))
+    assert meta.name("512480") == "半导体ETF国联安"
+    assert meta.name("600519") == "贵州茅台"  # A股仍走主表
+    assert meta.name("999999") == ""
+    # 基金没有 ST 概念
+    assert meta.is_fund("512480") is True
+    assert meta.is_fund("159915") is True
+    assert meta.is_fund("600519") is False
+    assert meta.is_st("512480") is False

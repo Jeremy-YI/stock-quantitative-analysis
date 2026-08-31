@@ -72,3 +72,24 @@ def test_parse_day_file_autodetects_fund(tmp_path) -> None:
     stock.write_bytes(_bar(20260828, 145000))
     df2 = parse_day_file(stock)
     assert df2["close"].iloc[-1] == pytest.approx(1450.0)
+
+
+@pytest.mark.parametrize(
+    "symbol,market",
+    [
+        ("600519", "sh"),
+        ("688981", "sh"),
+        ("512480", "sh"),  # 沪市 ETF，之前被误判成 sz 导致取数 404
+        ("588200", "sh"),  # 科创板 ETF
+        ("510300", "sh"),
+        ("110059", "sh"),  # 沪市可转债
+        ("000001", "sz"),
+        ("300750", "sz"),
+        ("159915", "sz"),  # 深市 ETF
+        ("430017", "bj"),
+    ],
+)
+def test_resolve_market(symbol: str, market: str) -> None:
+    from datasource.tdx.reader import resolve_market
+
+    assert resolve_market(symbol) == market

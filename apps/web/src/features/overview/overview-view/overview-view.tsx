@@ -174,7 +174,12 @@ export default function OverviewView() {
                   <div key={e.code} className='flex items-baseline justify-between gap-2'>
                     <span className='min-w-0 truncate'>
                       <span className='text-body-sm text-muted-foreground'>{e.theme}</span>
-                      <span className='ml-2 font-medium'>{e.name}</span>
+                      <Link
+                        href={`/stocks/${e.code}${etf.date ? `?date=${etf.date}` : ''}`}
+                        className='ml-2 font-medium text-accent hover:underline'
+                      >
+                        {e.name}
+                      </Link>
                     </span>
                     <span className='flex shrink-0 items-baseline gap-3 font-mono text-body-sm'>
                       <span className='text-muted-foreground'>{e.mcap.toFixed(0)}亿</span>

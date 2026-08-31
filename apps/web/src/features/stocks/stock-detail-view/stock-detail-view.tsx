@@ -69,6 +69,13 @@ export interface StockDetailViewProps {
 
 const DEFAULT_DATE = '2026-08-28'
 
+/** 场内基金代码前缀（与后端 StockMetaService.is_fund 同口径） */
+const FUND_PREFIXES = ['50', '51', '52', '56', '58', '15', '16', '18']
+
+function isFund(symbol: string): boolean {
+  return FUND_PREFIXES.some((p) => symbol.startsWith(p))
+}
+
 export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDetailViewProps) {
   // 默认加载近 2 年（够往外缩），初始视窗由图表落在最近约 2 个月
   const [fullHistory, setFullHistory] = useState(false)
@@ -77,6 +84,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
   const { data: signalData, loading: signalsLoading } = useStockSignals(symbol, date)
   const [indicator, setIndicator] = useState('macd')
   const chartHeight = useChartHeight()
+  const fund = isFund(symbol)
 
   const series = candles?.series ?? []
   const last = series[series.length - 1]
@@ -91,12 +99,20 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
           <span className='flex flex-wrap items-baseline gap-2'>
             <span>{candles?.name || symbol}</span>
             <span className='font-mono text-h4 text-muted-foreground'>{symbol}</span>
+            {fund && (
+              <Badge tone='muted' size='sm'>
+                场内基金
+              </Badge>
+            )}
           </span>
         }
         description={`信号扫描日 ${date}`}
         actions={
-          <Link href='/recommendations' className='text-body-sm text-accent hover:underline'>
-            返回个股推荐
+          <Link
+            href={fund ? '/sectors' : '/recommendations'}
+            className='text-body-sm text-accent hover:underline'
+          >
+            {fund ? '返回板块资金' : '返回个股推荐'}
           </Link>
         }
       />
