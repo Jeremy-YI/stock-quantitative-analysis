@@ -28,6 +28,8 @@ export default function PricingLinesChart({ series }: PricingLinesChartProps) {
     grid: { left: 60, right: 20, top: 40, bottom: 40 },
     xAxis: { type: 'category', data: dates },
     yAxis: { scale: true },
+    // 滚轮/双指可缩放，默认铺满当前周期
+    dataZoom: [{ type: 'inside', xAxisIndex: [0] }],
     series: [
       {
         name: '收盘价',

@@ -6,8 +6,12 @@ import { get } from '@/lib/http/request'
 
 import type { ApiResponse, CandlesBody } from './types'
 
-/** 拉个股日 K 线（可选起始日，默认后端给全量）。 */
-export default function useCandles(symbol: string, start?: string) {
+/**
+ * 拉个股日 K 线。
+ * limit = 只取最后 N 个交易日（默认由调用方给，图上一般 1~2 个月）；
+ * 不传则拿全量（几年的数据，只在「全部」视图用）。
+ */
+export default function useCandles(symbol: string, limit?: number) {
   const [data, setData] = useState<CandlesBody | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,7 +22,7 @@ export default function useCandles(symbol: string, start?: string) {
     setLoading(true)
     setError(null)
 
-    const qs = start ? `&start=${start}` : ''
+    const qs = limit ? `&limit=${limit}` : ''
     get<ApiResponse<CandlesBody>>(`/indicators/candles?symbol=${symbol}${qs}`).then(
       ([err, res]) => {
         if (cancelled) return
@@ -35,7 +39,7 @@ export default function useCandles(symbol: string, start?: string) {
     return () => {
       cancelled = true
     }
-  }, [symbol, start])
+  }, [symbol, limit])
 
   return { data, loading, error }
 }

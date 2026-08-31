@@ -11,10 +11,12 @@ const PricingLinesChart = dynamic(() => import('../pricing-lines-chart'), { ssr:
 
 export interface PricingLinesPanelProps {
   symbol: string
+  /** 只显示最后 N 个交易日（指标仍按全量历史计算） */
+  limit?: number
 }
 
-export default function PricingLinesPanel({ symbol }: PricingLinesPanelProps) {
-  const { data, loading, error } = usePricingLines(symbol)
+export default function PricingLinesPanel({ symbol, limit }: PricingLinesPanelProps) {
+  const { data, loading, error } = usePricingLines(symbol, limit)
 
   return (
     <IndicatorPanel

@@ -44,6 +44,8 @@ export default function VolumeChart({ series }: VolumeChartProps) {
       { scale: true, gridIndex: 0 },
       { scale: true, gridIndex: 1 },
     ],
+    // 滚轮/双指可缩放，默认铺满当前周期
+    dataZoom: [{ type: 'inside', xAxisIndex: [0, 1] }],
     series: [
       {
         name: '收盘价',

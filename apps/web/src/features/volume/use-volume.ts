@@ -10,7 +10,7 @@ import type { VolumeBody } from './types'
 /**
  * 拉取量能指标数据。返回 { data, loading, error }。
  */
-export default function useVolume(symbol: string) {
+export default function useVolume(symbol: string, limit?: number) {
   const [data, setData] = useState<VolumeBody | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +22,9 @@ export default function useVolume(symbol: string) {
     setLoading(true)
     setError(null)
 
-    get<ApiResponse<VolumeBody>>(`/indicators/volume?symbol=${symbol}`).then(([err, res]) => {
+    get<ApiResponse<VolumeBody>>(
+      `/indicators/volume?symbol=${symbol}${limit ? `&limit=${limit}` : ''}`,
+    ).then(([err, res]) => {
       if (cancelled) return
       if (err || !res || !res.body) {
         setError(err instanceof Error ? err.message : '加载失败')
@@ -36,7 +38,7 @@ export default function useVolume(symbol: string) {
     return () => {
       cancelled = true
     }
-  }, [symbol])
+  }, [symbol, limit])
 
   return { data, loading, error }
 }

@@ -12,10 +12,12 @@ const VolumeChart = dynamic(() => import('../volume-chart'), { ssr: false })
 
 export interface VolumePanelProps {
   symbol: string
+  /** 只显示最后 N 个交易日（指标仍按全量历史计算） */
+  limit?: number
 }
 
-export default function VolumePanel({ symbol }: VolumePanelProps) {
-  const { data, loading, error } = useVolume(symbol)
+export default function VolumePanel({ symbol, limit }: VolumePanelProps) {
+  const { data, loading, error } = useVolume(symbol, limit)
 
   return (
     <IndicatorPanel

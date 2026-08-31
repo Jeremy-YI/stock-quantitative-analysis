@@ -44,6 +44,18 @@ def _opt(v: float) -> float | None:
     return None if v is None or (isinstance(v, float) and math.isnan(v)) else round(v, DECIMAL_PLACES)
 
 
+def _tail(series: list, limit: int | None) -> list:
+    """只保留最后 limit 个点。
+
+    关键：**指标一律用全量历史计算**（MACD 的 EMA、定价线的背离都需要长预热），
+    只在返回前截取尾部。图上默认给近 1~2 个月，用户要看更长再放大，
+    这样既不失真也不传几千个点。
+    """
+    if limit and limit > 0:
+        return series[-limit:]
+    return series
+
+
 class IndicatorService:
     """指标计算服务。"""
 
@@ -65,6 +77,7 @@ class IndicatorService:
         symbol: str,
         start: date | None = None,
         end: date | None = None,
+        limit: int | None = None,
         name: str = "",
     ) -> CandlesBody:
         """原始日 K 线（前复权与否跟仓储一致，这里只做取数 + 舍入）。"""
@@ -81,13 +94,17 @@ class IndicatorService:
             )
             for row in records
         ]
-        return CandlesBody(symbol=symbol, name=name, series=series)
+        return CandlesBody(symbol=symbol, name=name, series=_tail(series, limit))
 
     # ---------------------------------------------------------------
     # MACD
     # ---------------------------------------------------------------
     def get_macd(
-        self, symbol: str, start: date | None = None, end: date | None = None
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        limit: int | None = None,
     ) -> MacdBody:
         df, records = self._load(symbol, start, end)
         closes = df["close"].tolist()
@@ -103,13 +120,17 @@ class IndicatorService:
             )
             for i, row in enumerate(records)
         ]
-        return MacdBody(symbol=symbol, series=series)
+        return MacdBody(symbol=symbol, series=_tail(series, limit))
 
     # ---------------------------------------------------------------
     # KDJ
     # ---------------------------------------------------------------
     def get_kdj(
-        self, symbol: str, start: date | None = None, end: date | None = None
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        limit: int | None = None,
     ) -> KdjBody:
         df, records = self._load(symbol, start, end)
         result = calc_kdj(
@@ -126,13 +147,17 @@ class IndicatorService:
             )
             for i, row in enumerate(records)
         ]
-        return KdjBody(symbol=symbol, series=series)
+        return KdjBody(symbol=symbol, series=_tail(series, limit))
 
     # ---------------------------------------------------------------
     # RSI
     # ---------------------------------------------------------------
     def get_rsi(
-        self, symbol: str, start: date | None = None, end: date | None = None
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        limit: int | None = None,
     ) -> RsiBody:
         df, records = self._load(symbol, start, end)
         result = calc_rsi(df["close"].tolist())
@@ -145,13 +170,17 @@ class IndicatorService:
             )
             for i, row in enumerate(records)
         ]
-        return RsiBody(symbol=symbol, series=series)
+        return RsiBody(symbol=symbol, series=_tail(series, limit))
 
     # ---------------------------------------------------------------
     # 量能
     # ---------------------------------------------------------------
     def get_volume(
-        self, symbol: str, start: date | None = None, end: date | None = None
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        limit: int | None = None,
     ) -> VolumeBody:
         df, records = self._load(symbol, start, end)
         closes = df["close"].tolist()
@@ -173,13 +202,17 @@ class IndicatorService:
             )
             for i, row in enumerate(records)
         ]
-        return VolumeBody(symbol=symbol, series=series)
+        return VolumeBody(symbol=symbol, series=_tail(series, limit))
 
     # ---------------------------------------------------------------
     # 定价线（生命线 / 阴量定价线 / 进攻K防线）
     # ---------------------------------------------------------------
     def get_pricing_lines(
-        self, symbol: str, start: date | None = None, end: date | None = None
+        self,
+        symbol: str,
+        start: date | None = None,
+        end: date | None = None,
+        limit: int | None = None,
     ) -> PricingLinesBody:
         """计算三条定价线的日度序列（阶段 12~14 的背离定价线）。"""
         df, records = self._load(symbol, start, end)
@@ -203,4 +236,4 @@ class IndicatorService:
             )
             for i, row in enumerate(records)
         ]
-        return PricingLinesBody(symbol=symbol, series=series)
+        return PricingLinesBody(symbol=symbol, series=_tail(series, limit))

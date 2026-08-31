@@ -10,7 +10,7 @@ import type { RsiBody } from './types'
 /**
  * 拉取 RSI 指标数据。返回 { data, loading, error }。
  */
-export default function useRsi(symbol: string) {
+export default function useRsi(symbol: string, limit?: number) {
   const [data, setData] = useState<RsiBody | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +22,9 @@ export default function useRsi(symbol: string) {
     setLoading(true)
     setError(null)
 
-    get<ApiResponse<RsiBody>>(`/indicators/rsi?symbol=${symbol}`).then(([err, res]) => {
+    get<ApiResponse<RsiBody>>(
+      `/indicators/rsi?symbol=${symbol}${limit ? `&limit=${limit}` : ''}`,
+    ).then(([err, res]) => {
       if (cancelled) return
       if (err || !res || !res.body) {
         setError(err instanceof Error ? err.message : '加载失败')
@@ -36,7 +38,7 @@ export default function useRsi(symbol: string) {
     return () => {
       cancelled = true
     }
-  }, [symbol])
+  }, [symbol, limit])
 
   return { data, loading, error }
 }

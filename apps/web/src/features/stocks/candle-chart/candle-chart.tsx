@@ -68,9 +68,10 @@ export default function CandleChart({ series, signals = [], height = 420 }: Cand
       { scale: true, gridIndex: 0, splitLine: { show: true } },
       { scale: true, gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } },
     ],
+    // 数据已按所选周期截取，默认铺满整窗；滚轮/拖动可继续放大缩小
     dataZoom: [
-      { type: 'inside', xAxisIndex: [0, 1], start: 60, end: 100 },
-      { type: 'slider', xAxisIndex: [0, 1], height: 16, bottom: 4, start: 60, end: 100 },
+      { type: 'inside', xAxisIndex: [0, 1], start: 0, end: 100 },
+      { type: 'slider', xAxisIndex: [0, 1], height: 16, bottom: 4, start: 0, end: 100 },
     ],
     series: [
       {

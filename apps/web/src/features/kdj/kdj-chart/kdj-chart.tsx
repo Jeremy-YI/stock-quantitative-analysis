@@ -37,6 +37,8 @@ export default function KdjChart({ series }: KdjChartProps) {
       { scale: true, gridIndex: 0 },
       { min: 0, max: 100, gridIndex: 1 },
     ],
+    // 滚轮/双指可缩放，默认铺满当前周期
+    dataZoom: [{ type: 'inside', xAxisIndex: [0, 1] }],
     series: [
       {
         name: '收盘价',

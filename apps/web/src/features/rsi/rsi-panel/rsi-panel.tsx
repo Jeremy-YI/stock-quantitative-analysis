@@ -12,10 +12,12 @@ const RsiChart = dynamic(() => import('../rsi-chart'), { ssr: false })
 
 export interface RsiPanelProps {
   symbol: string
+  /** 只显示最后 N 个交易日（指标仍按全量历史计算） */
+  limit?: number
 }
 
-export default function RsiPanel({ symbol }: RsiPanelProps) {
-  const { data, loading, error } = useRsi(symbol)
+export default function RsiPanel({ symbol, limit }: RsiPanelProps) {
+  const { data, loading, error } = useRsi(symbol, limit)
 
   return (
     <IndicatorPanel

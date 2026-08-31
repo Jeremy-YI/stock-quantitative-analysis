@@ -11,10 +11,12 @@ const MacdChart = dynamic(() => import('../macd-chart'), { ssr: false })
 
 export interface MacdPanelProps {
   symbol: string
+  /** 只显示最后 N 个交易日（指标仍按全量历史计算） */
+  limit?: number
 }
 
-export default function MacdPanel({ symbol }: MacdPanelProps) {
-  const { data, loading, error } = useMacd(symbol)
+export default function MacdPanel({ symbol, limit }: MacdPanelProps) {
+  const { data, loading, error } = useMacd(symbol, limit)
 
   return (
     <IndicatorPanel

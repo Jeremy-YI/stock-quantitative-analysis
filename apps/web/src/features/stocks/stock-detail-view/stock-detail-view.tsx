@@ -44,6 +44,7 @@ import PricingLinesPanel from '@/features/pricing-lines/pricing-lines-panel'
 import RsiPanel from '@/features/rsi/rsi-panel'
 import VolumePanel from '@/features/volume/volume-panel'
 
+import { DEFAULT_RANGE, RANGE_OPTIONS, rangeLimit } from '../range'
 import { strategyLabel } from '../strategy-label'
 import useCandles from '../use-candles'
 import useStockSignals from '../use-stock-signals'
@@ -68,7 +69,9 @@ export interface StockDetailViewProps {
 const DEFAULT_DATE = '2026-08-28'
 
 export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDetailViewProps) {
-  const { data: candles, loading: candlesLoading, error: candlesError } = useCandles(symbol)
+  const [range, setRange] = useState(DEFAULT_RANGE)
+  const limit = rangeLimit(range)
+  const { data: candles, loading: candlesLoading, error: candlesError } = useCandles(symbol, limit)
   const { data: signalData, loading: signalsLoading } = useStockSignals(symbol, date)
   const [indicator, setIndicator] = useState('macd')
   const chartHeight = useChartHeight()
@@ -109,7 +112,17 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
       </Grid>
 
       {/* K 线 */}
-      <Section title='日K 与买点' description='买点标记 B = 当日触发的战法信号'>
+      <Section
+        title='日K 与买点'
+        description='买点标记 B = 当日触发的战法信号；默认看近 2 个月，可切周期或在图上拖动缩放'
+        actions={
+          <Tabs
+            value={range}
+            onValueChange={setRange}
+            items={RANGE_OPTIONS.map((r) => ({ value: r.value, label: r.label }))}
+          />
+        }
+      >
         {candlesLoading && <Skeleton className='h-64 w-full' />}
         {candlesError && <StateHint kind='error'>K 线加载失败：{candlesError}</StateHint>}
         {!candlesLoading && !candlesError && series.length > 0 && (
@@ -151,13 +164,14 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
       {/* 指标细看 */}
       <Section
         title='指标'
+        description='与上方 K 线同周期；指标按全量历史计算，只截取显示窗口'
         actions={<Tabs value={indicator} onValueChange={setIndicator} items={INDICATORS} />}
       >
-        {indicator === 'macd' && <MacdPanel symbol={symbol} />}
-        {indicator === 'kdj' && <KdjPanel symbol={symbol} />}
-        {indicator === 'rsi' && <RsiPanel symbol={symbol} />}
-        {indicator === 'volume' && <VolumePanel symbol={symbol} />}
-        {indicator === 'pricing' && <PricingLinesPanel symbol={symbol} />}
+        {indicator === 'macd' && <MacdPanel symbol={symbol} limit={limit} />}
+        {indicator === 'kdj' && <KdjPanel symbol={symbol} limit={limit} />}
+        {indicator === 'rsi' && <RsiPanel symbol={symbol} limit={limit} />}
+        {indicator === 'volume' && <VolumePanel symbol={symbol} limit={limit} />}
+        {indicator === 'pricing' && <PricingLinesPanel symbol={symbol} limit={limit} />}
       </Section>
     </Page>
   )

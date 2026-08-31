@@ -194,3 +194,33 @@ async def test_volume_404_symbol_not_found(client):
 async def test_volume_422_invalid_symbol(client):
     res = await client.get("/api/v1/indicators/volume", params={"symbol": "abc"})
     assert res.status_code == 422
+
+
+async def test_indicator_limit_returns_tail(client):
+    """limit 只截展示窗口：返回最后 N 个点，且指标仍按全量历史算。
+
+    做法验证：全量最后一个点的 dif 必须与带 limit 时的最后一个点一致
+    （如果 limit 影响了计算，EMA 预热不足，值会不一样）。
+    """
+    full = await client.get("/api/v1/indicators/macd?symbol=600519")
+    tail = await client.get("/api/v1/indicators/macd?symbol=600519&limit=10")
+    assert full.status_code == 200 and tail.status_code == 200
+
+    full_series = full.json()["body"]["series"]
+    tail_series = tail.json()["body"]["series"]
+    assert len(tail_series) == 10
+    assert len(full_series) > 10
+    assert tail_series == full_series[-10:]
+
+
+async def test_candles_limit_and_name(client):
+    res = await client.get("/api/v1/indicators/candles?symbol=600519&limit=5")
+    assert res.status_code == 200
+    body = res.json()["body"]
+    assert len(body["series"]) == 5
+    assert set(body["series"][0]) >= {"date", "open", "high", "low", "close", "volume", "amount"}
+
+
+async def test_indicator_limit_out_of_range(client):
+    res = await client.get("/api/v1/indicators/macd?symbol=600519&limit=1")
+    assert res.status_code == 422  # ge=5

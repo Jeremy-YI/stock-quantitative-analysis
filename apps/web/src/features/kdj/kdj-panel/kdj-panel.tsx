@@ -12,10 +12,12 @@ const KdjChart = dynamic(() => import('../kdj-chart'), { ssr: false })
 
 export interface KdjPanelProps {
   symbol: string
+  /** 只显示最后 N 个交易日（指标仍按全量历史计算） */
+  limit?: number
 }
 
-export default function KdjPanel({ symbol }: KdjPanelProps) {
-  const { data, loading, error } = useKdj(symbol)
+export default function KdjPanel({ symbol, limit }: KdjPanelProps) {
+  const { data, loading, error } = useKdj(symbol, limit)
 
   return (
     <IndicatorPanel

@@ -11,7 +11,7 @@ import type { MacdBody } from './types'
  * 拉取 MACD 指标数据。默认代码 600519（贵州茅台）。
  * 返回 { data, loading, error }，组件据此渲染图表 / 骨架屏 / 错误提示。
  */
-export default function useMacd(symbol: string) {
+export default function useMacd(symbol: string, limit?: number) {
   const [data, setData] = useState<MacdBody | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +23,9 @@ export default function useMacd(symbol: string) {
     setLoading(true)
     setError(null)
 
-    get<ApiResponse<MacdBody>>(`/indicators/macd?symbol=${symbol}`).then(([err, res]) => {
+    get<ApiResponse<MacdBody>>(
+      `/indicators/macd?symbol=${symbol}${limit ? `&limit=${limit}` : ''}`,
+    ).then(([err, res]) => {
       if (cancelled) return
       if (err || !res || !res.body) {
         setError(err instanceof Error ? err.message : '加载失败')
@@ -37,7 +39,7 @@ export default function useMacd(symbol: string) {
     return () => {
       cancelled = true
     }
-  }, [symbol])
+  }, [symbol, limit])
 
   return { data, loading, error }
 }
