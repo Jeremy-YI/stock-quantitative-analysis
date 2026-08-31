@@ -9,7 +9,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from schemas.market import EventItem, EventsBody, NewsBody, NewsItem
+from schemas.market import (
+    EventDetailBody,
+    EventItem,
+    EventsBody,
+    NewsBody,
+    NewsDetailBody,
+    NewsItem,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[4]
 _NEWS_PATH = _REPO_ROOT / "data" / "news.json"
@@ -33,6 +40,34 @@ class MarketService:
             note=raw.get("note", ""),
             events=[EventItem(**x) for x in raw.get("events", [])],
         )
+
+    def get_news_detail(self, news_id: str) -> NewsDetailBody | None:
+        """单条消息详情 + 相关消息（同主题）。"""
+        raw = self._load(_NEWS_PATH)
+        items = [NewsItem(**x) for x in raw.get("items", [])]
+        target = next((x for x in items if x.id == news_id), None)
+        if target is None:
+            return None
+        related = [
+            x
+            for x in items
+            if x.id != news_id and set(x.topics) & set(target.topics)
+        ]
+        return NewsDetailBody(
+            item=target,
+            date=raw.get("date", ""),
+            source=raw.get("source", ""),
+            related_news=related,
+        )
+
+    def get_event_detail(self, event_id: str) -> EventDetailBody | None:
+        """单个事件详情（说明 + 历史数据）。"""
+        raw = self._load(_EVENTS_PATH)
+        events = [EventItem(**x) for x in raw.get("events", [])]
+        target = next((x for x in events if x.id == event_id), None)
+        if target is None:
+            return None
+        return EventDetailBody(event=target, note=raw.get("note", ""))
 
     @staticmethod
     def _load(path: Path) -> dict:

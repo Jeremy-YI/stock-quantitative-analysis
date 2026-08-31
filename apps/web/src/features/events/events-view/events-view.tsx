@@ -4,6 +4,8 @@
  * 事件日历页：关键会议 / 数据 / 财报，按日期升序，重要度徽标。
  * 小屏把「类型」列收起（信息密度跟着屏幕给），日期列等宽不换行。
  */
+import Link from 'next/link'
+
 import {
   Badge,
   LoadingState,
@@ -68,11 +70,15 @@ export default function EventsView() {
 
 function EventRow({ event }: { event: EventItem }) {
   return (
-    <TR hoverable>
+    <TR hoverable className='cursor-pointer'>
       <TD mono nowrap className='text-muted-foreground'>
         {event.date}
       </TD>
-      <TD className='font-medium'>{event.name}</TD>
+      <TD>
+        <Link href={`/events/${event.id}`} className='font-medium text-accent hover:underline'>
+          {event.name}
+        </Link>
+      </TD>
       <TD hideBelow='mobilePortrait'>
         <Badge tone='muted' size='sm'>
           {event.type}

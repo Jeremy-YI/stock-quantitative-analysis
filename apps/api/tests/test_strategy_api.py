@@ -113,3 +113,35 @@ async def test_signals_date_filter(client):
     )
     assert res.status_code == 200
     assert res.json()["body"]["signals"] == []
+
+
+# —— 市场资讯详情接口 ——
+async def test_news_detail_ok(client):
+    from main import create_app  # noqa: F401
+
+    res = await client.get("/api/v1/news/walsh-hawkish-sept-rate-odds")
+    assert res.status_code == 200
+    body = res.json()["body"]
+    assert body["item"]["id"] == "walsh-hawkish-sept-rate-odds"
+    assert body["item"]["detail"]  # 有全文
+    assert len(body["item"]["related_symbols"]) >= 1  # 有相关标的
+    assert isinstance(body["related_news"], list)  # 相关消息（可能为空，但是列表）
+
+
+async def test_news_detail_404(client):
+    res = await client.get("/api/v1/news/does-not-exist")
+    assert res.status_code == 404
+
+
+async def test_event_detail_ok(client):
+    res = await client.get("/api/v1/events/fomc-meeting")
+    assert res.status_code == 200
+    body = res.json()["body"]
+    assert body["event"]["name"] == "美联储 FOMC 利率决议"
+    assert body["event"]["description"]
+    assert len(body["event"]["history"]) >= 1
+
+
+async def test_event_detail_404(client):
+    res = await client.get("/api/v1/events/does-not-exist")
+    assert res.status_code == 404

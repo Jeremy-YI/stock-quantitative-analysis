@@ -5,6 +5,8 @@
  * 每条 = 标题 + 影响评级徽标 + 未来导向 + 来源数。
  * 阅读流页面用 Container size="sm"（Page size 传下去），行宽控制在易读区间。
  */
+import Link from 'next/link'
+
 import {
   Badge,
   LoadingState,
@@ -58,24 +60,29 @@ export default function NewsView() {
 
 function NewsCard({ item }: { item: NewsItem }) {
   return (
-    <li className='rounded-lg border border-border bg-card p-4 transition-colors hover:bg-surface-hover mobile-portrait:p-5'>
-      {/* 手机上徽标掉到标题下面，桌面上贴右侧 */}
-      <div className='flex flex-col gap-2 mobile-portrait:flex-row mobile-portrait:items-start mobile-portrait:justify-between mobile-portrait:gap-4'>
-        <Heading level={3} className='min-w-0'>
-          {item.title}
-        </Heading>
-        <Badge
-          tone={IMPACT_TONE[item.impact] ?? 'neutral'}
-          className='self-start mobile-portrait:shrink-0'
-        >
-          {item.impact}
-        </Badge>
-      </div>
-      <Text size='body' tone='muted' className='mt-2'>
-        <span className='text-foreground/60'>未来导向：</span>
-        {item.outlook}
-      </Text>
-      <Caption className='mt-1.5'>来源 {item.sources} 条</Caption>
+    <li>
+      <Link
+        href={`/news/${item.id}`}
+        className='block rounded-lg border border-border bg-card p-4 transition-colors hover:bg-surface-hover mobile-portrait:p-5'
+      >
+        {/* 手机上徽标掉到标题下面，桌面上贴右侧 */}
+        <div className='flex flex-col gap-2 mobile-portrait:flex-row mobile-portrait:items-start mobile-portrait:justify-between mobile-portrait:gap-4'>
+          <Heading level={3} className='min-w-0'>
+            {item.title}
+          </Heading>
+          <Badge
+            tone={IMPACT_TONE[item.impact] ?? 'neutral'}
+            className='self-start mobile-portrait:shrink-0'
+          >
+            {item.impact}
+          </Badge>
+        </div>
+        <Text size='body' tone='muted' className='mt-2'>
+          <span className='text-foreground/60'>未来导向：</span>
+          {item.outlook}
+        </Text>
+        <Caption className='mt-1.5'>来源 {item.sources} 条 · 点开看详情与相关标的</Caption>
+      </Link>
     </li>
   )
 }
