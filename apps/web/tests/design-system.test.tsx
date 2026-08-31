@@ -36,6 +36,7 @@ import {
 import { pickResponsive } from '@/design/breakpoint'
 import { cellVisibleFrom } from '@/design/visibility'
 import { changeTextClass, toneForChange, toneForStatus } from '@/design/color'
+import { VISIBLE_BARS, tailZoom } from '@/lib/chart-zoom'
 
 describe('design tokens · breakpoint', () => {
   it('CSS 与 TS 两侧断点必须一致（globals.css 的 --breakpoint-* 是 rem，16px 基准）', () => {
@@ -366,5 +367,32 @@ describe('SortableTable', () => {
     expect(th.getAttribute('aria-sort')).toBe('none')
     await userEvent.click(th)
     expect(th.getAttribute('aria-sort')).toBe('descending')
+  })
+})
+
+describe('chart-zoom · tailZoom', () => {
+  it('初始视窗停在最后 44 根（约 2 个月），不是从头铺满', () => {
+    const zoom = tailZoom(500) as Array<{ startValue: number; endValue: number; type: string }>
+    expect(zoom).toHaveLength(1) // 默认只给滚轮缩放
+    expect(zoom[0].type).toBe('inside')
+    expect(zoom[0].startValue).toBe(456)
+    expect(zoom[0].endValue).toBe(499)
+  })
+
+  it('主图带滑块，方便发现「可以往外缩」', () => {
+    const zoom = tailZoom(500, { slider: true }) as Array<{ type: string }>
+    expect(zoom.map((z) => z.type)).toEqual(['inside', 'slider'])
+  })
+
+  it('数据不足 44 根时从 0 开始，不越界', () => {
+    const zoom = tailZoom(10) as Array<{ startValue: number; endValue: number }>
+    expect(zoom[0].startValue).toBe(0)
+    expect(zoom[0].endValue).toBe(9)
+  })
+
+  it('空数据不报错', () => {
+    const zoom = tailZoom(0) as Array<{ startValue: number; endValue: number }>
+    expect(zoom[0].startValue).toBe(0)
+    expect(zoom[0].endValue).toBe(0)
   })
 })

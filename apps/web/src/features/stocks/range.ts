@@ -1,31 +1,14 @@
 /**
- * 图表周期（交易日口径）。
+ * 图表数据窗口（不是「固定周期档位」）。
  *
- * 为什么默认 2 个月：一屏看几年的日线毫无意义（形态全糊成一团），
- * 短线决策看的是最近 1~2 个月的结构；要看更长用户自己切或在图上缩放。
- * 指标一律用全量历史计算，这里只控制**显示窗口**。
+ * 交互约定（Jeremy 2026-08-31 定）：
+ *   - 一次加载近 2 年日线，**初始视窗只给最近约 2 个月**
+ *   - 想看更长，用户在图上往外缩 / 拖底部滑块，自己决定看多少
+ *   - 不给 1个月/3个月/1年 这种固定按钮，避免每换一次都要等一次网络
+ *
+ * 值集中在 lib/chart-zoom.ts（图表侧也要用同一份）。
  */
+export { HISTORY_BARS, VISIBLE_BARS } from '@/lib/chart-zoom'
 
-export interface RangeOption {
-  value: string
-  label: string
-  /** 交易日数量；0 = 全部 */
-  limit: number
-}
-
-export const RANGE_OPTIONS: RangeOption[] = [
-  { value: '1m', label: '1个月', limit: 22 },
-  { value: '2m', label: '2个月', limit: 44 },
-  { value: '3m', label: '3个月', limit: 66 },
-  { value: '6m', label: '6个月', limit: 125 },
-  { value: '1y', label: '1年', limit: 250 },
-  { value: 'all', label: '全部', limit: 0 },
-]
-
-/** 默认 2 个月 */
-export const DEFAULT_RANGE = '2m'
-
-export function rangeLimit(value: string): number | undefined {
-  const found = RANGE_OPTIONS.find((r) => r.value === value)
-  return found && found.limit > 0 ? found.limit : undefined
-}
+/** 「加载全部历史」时用：不传 limit，后端返回全量 */
+export const FULL_HISTORY = undefined

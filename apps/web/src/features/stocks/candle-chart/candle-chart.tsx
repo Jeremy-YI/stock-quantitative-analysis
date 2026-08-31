@@ -3,6 +3,7 @@
 import ReactECharts from 'echarts-for-react'
 import type { EChartsOption } from 'echarts'
 
+import { tailZoom } from '@/lib/chart-zoom'
 import { colors } from '@/styles/colors'
 
 import type { CandlePoint, Signal } from '../types'
@@ -68,11 +69,8 @@ export default function CandleChart({ series, signals = [], height = 420 }: Cand
       { scale: true, gridIndex: 0, splitLine: { show: true } },
       { scale: true, gridIndex: 1, splitLine: { show: false }, axisLabel: { show: false } },
     ],
-    // 数据已按所选周期截取，默认铺满整窗；滚轮/拖动可继续放大缩小
-    dataZoom: [
-      { type: 'inside', xAxisIndex: [0, 1], start: 0, end: 100 },
-      { type: 'slider', xAxisIndex: [0, 1], height: 16, bottom: 4, start: 0, end: 100 },
-    ],
+    // 默认只看最近约 2 个月，往外缩可一直看到已加载的更早历史
+    dataZoom: tailZoom(dates.length, { axes: [0, 1], slider: true }),
     series: [
       {
         name: '日K',

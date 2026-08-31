@@ -14,6 +14,7 @@ import { useState } from 'react'
 
 import {
   Badge,
+  Button,
   Caption,
   Card,
   CardContent,
@@ -44,7 +45,7 @@ import PricingLinesPanel from '@/features/pricing-lines/pricing-lines-panel'
 import RsiPanel from '@/features/rsi/rsi-panel'
 import VolumePanel from '@/features/volume/volume-panel'
 
-import { DEFAULT_RANGE, RANGE_OPTIONS, rangeLimit } from '../range'
+import { HISTORY_BARS } from '../range'
 import { strategyLabel } from '../strategy-label'
 import useCandles from '../use-candles'
 import useStockSignals from '../use-stock-signals'
@@ -69,8 +70,9 @@ export interface StockDetailViewProps {
 const DEFAULT_DATE = '2026-08-28'
 
 export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDetailViewProps) {
-  const [range, setRange] = useState(DEFAULT_RANGE)
-  const limit = rangeLimit(range)
+  // 默认加载近 2 年（够往外缩），初始视窗由图表落在最近约 2 个月
+  const [fullHistory, setFullHistory] = useState(false)
+  const limit = fullHistory ? undefined : HISTORY_BARS
   const { data: candles, loading: candlesLoading, error: candlesError } = useCandles(symbol, limit)
   const { data: signalData, loading: signalsLoading } = useStockSignals(symbol, date)
   const [indicator, setIndicator] = useState('macd')
@@ -114,13 +116,20 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
       {/* K 线 */}
       <Section
         title='日K 与买点'
-        description='买点标记 B = 当日触发的战法信号；默认看近 2 个月，可切周期或在图上拖动缩放'
+        description={
+          fullHistory
+            ? '买点标记 B = 当日触发的战法信号；已加载全部历史，图上滚轮/滑块自由缩放'
+            : '买点标记 B = 当日触发的战法信号；初始看最近约 2 个月，往外缩可看到近 2 年'
+        }
         actions={
-          <Tabs
-            value={range}
-            onValueChange={setRange}
-            items={RANGE_OPTIONS.map((r) => ({ value: r.value, label: r.label }))}
-          />
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => setFullHistory((v) => !v)}
+            title='默认只加载近 2 年，需要更早的历史再点这里'
+          >
+            {fullHistory ? '只看近 2 年' : '加载全部历史'}
+          </Button>
         }
       >
         {candlesLoading && <Skeleton className='h-64 w-full' />}
@@ -164,7 +173,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
       {/* 指标细看 */}
       <Section
         title='指标'
-        description='与上方 K 线同周期；指标按全量历史计算，只截取显示窗口'
+        description='与上方 K 线同数据窗口；指标按全量历史计算，图上可自由缩放'
         actions={<Tabs value={indicator} onValueChange={setIndicator} items={INDICATORS} />}
       >
         {indicator === 'macd' && <MacdPanel symbol={symbol} limit={limit} />}

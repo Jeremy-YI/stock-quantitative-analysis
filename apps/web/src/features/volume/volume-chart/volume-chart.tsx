@@ -3,6 +3,7 @@
 import ReactECharts from 'echarts-for-react'
 import type { EChartsOption } from 'echarts'
 
+import { tailZoom } from '@/lib/chart-zoom'
 import { colors } from '@/styles/colors'
 
 import type { VolumePoint } from '../types'
@@ -44,8 +45,8 @@ export default function VolumeChart({ series }: VolumeChartProps) {
       { scale: true, gridIndex: 0 },
       { scale: true, gridIndex: 1 },
     ],
-    // 滚轮/双指可缩放，默认铺满当前周期
-    dataZoom: [{ type: 'inside', xAxisIndex: [0, 1] }],
+    // 初始停在最近约 2 个月，滚轮/双指往外缩可看更早历史
+    dataZoom: tailZoom(dates.length, { axes: [0, 1] }),
     series: [
       {
         name: '收盘价',
