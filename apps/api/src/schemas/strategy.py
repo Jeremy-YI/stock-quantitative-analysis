@@ -41,3 +41,30 @@ class SignalsBody(BaseModel):
 
     strategy: str
     signals: list[Signal]
+
+
+class StrategyRatingWindow(BaseModel):
+    """某个区间的回测表现。"""
+
+    excess_win_rate: float
+    n: int = 0
+    selectivity: float | None = None
+
+
+class StrategyRating(BaseModel):
+    """单个策略的回测评级（scripts/build_strategy_ratings.py 机械判定）。"""
+
+    label: str
+    rating: str          # robust / oos_positive / regime / insufficient / no_edge / overfit
+    client_safe: bool    # 能否出现在给客户的推荐里
+    reason: str
+    windows: dict[str, StrategyRatingWindow] = {}
+
+
+class StrategyRatingsBody(BaseModel):
+    """策略评级表（root 回测页 + 推荐页共用）。"""
+
+    as_of: str = ""
+    source: str = ""
+    criteria: dict = {}
+    strategies: dict[str, StrategyRating] = {}

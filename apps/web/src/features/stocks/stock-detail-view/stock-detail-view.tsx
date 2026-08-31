@@ -46,7 +46,9 @@ import RsiPanel from '@/features/rsi/rsi-panel'
 import VolumePanel from '@/features/volume/volume-panel'
 
 import { HISTORY_BARS } from '../range'
+import { ratingMeta } from '../rating'
 import { strategyLabel } from '../strategy-label'
+import useStrategyRatings from '../use-strategy-ratings'
 import useCandles from '../use-candles'
 import useStockSignals from '../use-stock-signals'
 import type { Signal } from '../types'
@@ -82,6 +84,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
   const limit = fullHistory ? undefined : HISTORY_BARS
   const { data: candles, loading: candlesLoading, error: candlesError } = useCandles(symbol, limit)
   const { data: signalData, loading: signalsLoading } = useStockSignals(symbol, date)
+  const { data: ratings } = useStrategyRatings()
   const [indicator, setIndicator] = useState('macd')
   const chartHeight = useChartHeight()
   const fund = isFund(symbol)
@@ -91,6 +94,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
   const prev = series[series.length - 2]
   const changePct = last && prev ? ((last.close - prev.close) / prev.close) * 100 : null
   const signals = signalData?.signals ?? []
+  const riskReasons = signalData?.excluded_risk?.[0]?.reasons ?? []
 
   return (
     <Page size='lg'>
@@ -128,6 +132,16 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
         <Stat label='成交额(亿)' value={last ? (last.amount / 1e8).toFixed(2) : '—'} />
         <Stat label='触发信号' value={String(signals.length)} />
       </Grid>
+
+      {/* 风控提示：看图之前先知道当日有没有硬伤 */}
+      {riskReasons.length > 0 && (
+        <div className='rounded-lg border border-warn-border bg-warn-soft px-4 py-3'>
+          <Text size='body-sm' className='text-warn'>
+            风控提示：当日命中 {riskReasons.join('、')} ——
+            按回测里「放量必差、追高必差」的稳健结论， 这种形态不进客户推荐。
+          </Text>
+        </div>
+      )}
 
       {/* K 线 */}
       <Section
@@ -170,6 +184,7 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
                 <THead>
                   <TR>
                     <TH>战法</TH>
+                    <TH>回测评级</TH>
                     <TH>信号</TH>
                     <TH align='right'>分数</TH>
                     <TH hideBelow='mobileLandscape'>关键指标</TH>
@@ -177,7 +192,11 @@ export default function StockDetailView({ symbol, date = DEFAULT_DATE }: StockDe
                 </THead>
                 <TBody>
                   {signals.map((s, i) => (
-                    <SignalRow key={i} signal={s} />
+                    <SignalRow
+                      key={i}
+                      signal={s}
+                      rating={ratings?.strategies?.[s.strategy]?.rating ?? 'unknown'}
+                    />
                   ))}
                 </TBody>
               </Table>
@@ -213,7 +232,7 @@ function Stat({ label, value, num }: { label: string; value: string; num?: numbe
   )
 }
 
-function SignalRow({ signal }: { signal: Signal }) {
+function SignalRow({ signal, rating }: { signal: Signal; rating: string }) {
   // metrics 里挑最有信息量的几个展示，避免一屏塞满
   const entries = Object.entries(signal.metrics).slice(0, 4)
   return (
@@ -221,6 +240,11 @@ function SignalRow({ signal }: { signal: Signal }) {
       <TD nowrap>
         <Badge tone='accent' size='sm'>
           {strategyLabel(signal.strategy)}
+        </Badge>
+      </TD>
+      <TD nowrap>
+        <Badge tone={ratingMeta(rating).tone} size='sm' title={ratingMeta(rating).hint}>
+          {ratingMeta(rating).label}
         </Badge>
       </TD>
       <TD nowrap>{signal.signal_type}</TD>

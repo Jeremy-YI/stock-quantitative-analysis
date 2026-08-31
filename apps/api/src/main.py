@@ -45,6 +45,7 @@ from services.research_service import ResearchService
 from services.scheduler_service import SchedulerService
 from services.sector_service import SectorService
 from services.stock_meta_service import StockMetaService
+from services.strategy_rating_service import StrategyRatingService
 from services.strategy_service import StrategyService
 from strategies.scanner import MarketScanner, Scanner
 
@@ -90,6 +91,7 @@ def create_app(
 
     # 依赖注入：service 挂到 app.state，路由里通过 Depends 取用
     repo = repository or TdxDailyBarRepository(settings.hsjday_path)
+    app.state.repository = repo  # 风控过滤要按当日 K 线形态判断
     app.state.service = IndicatorService(repo)
 
     scanner = strategy_scanner or MarketScanner(settings.hsjday_path)
@@ -107,6 +109,7 @@ def create_app(
     app.state.research_service = ResearchService(settings.research_snapshot_path_resolved)
     app.state.sector_service = SectorService()
     app.state.stock_meta_service = StockMetaService()
+    app.state.strategy_rating_service = StrategyRatingService()
     app.state.market_service = MarketService()
     app.state.llm_service = LlmService(
         settings.deepseek_api_key, settings.deepseek_base_url, settings.deepseek_model

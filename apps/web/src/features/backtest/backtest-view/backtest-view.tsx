@@ -18,6 +18,7 @@ import ReturnHistogram from '../return-histogram'
 import StatCards from '../stat-cards'
 import type { HistogramBin, StrategyResult } from '../types'
 import useBacktest from '../use-backtest'
+import StrategyRatingTable from '../strategy-rating-table'
 
 const STRATEGIES = [
   'b1b2b3',
@@ -104,7 +105,17 @@ export default function BacktestView() {
     <main className={pageWrapper}>
       <header className={header}>
         <h1 className={pageTitle}>策略回测</h1>
+        <span className='rounded-md border border-warn-border bg-warn-soft px-2 py-1 text-caption font-medium text-warn'>
+          机构内部（root）· 不给客户看
+        </span>
       </header>
+
+      <p className='w-full text-body-sm text-muted-foreground'>
+        只有「客户可见 = 可推荐」的战法会进个股推荐；其余即使触发也只在 root 内部展示。
+        不赚钱或大跌的，不放进推荐口径。
+      </p>
+
+      <StrategyRatingTable />
 
       <form className={form} onSubmit={handleSubmit}>
         <div className={field}>

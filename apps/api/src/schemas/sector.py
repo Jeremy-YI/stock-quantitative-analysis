@@ -96,6 +96,15 @@ class RecommendedStock(BaseModel):
     name: str                   # 证券简称（快照缺失时为空串）
     score: float                # 该股触发信号里的最高分
     signals: list[Signal]       # 触发的全部信号
+    ratings: list[str] = []     # 触发策略的回测评级（robust / oos_positive / regime …）
+
+
+class ExcludedStock(BaseModel):
+    """被风控剔除的标的（透明展示，不静默丢弃）。"""
+
+    symbol: str
+    name: str
+    reasons: list[str]          # 命中的风险项（放量长上影 / 放量阴线 / 追高…）
 
 
 class RecommendationsBody(BaseModel):
@@ -110,3 +119,8 @@ class RecommendationsBody(BaseModel):
     stocks: list[RecommendedStock] = []
     excluded_st: int = 0          # 因风险警示（ST/退市）被剔除的股票数
     names_available: bool = True  # 名称快照是否可用（false 时未做 ST 过滤）
+    # 回测门槛：只有 client_safe 的策略能进客户可见的推荐
+    strategies_used: list[str] = []      # 本次实际参与的策略
+    strategies_blocked: list[str] = []   # 因回测不过关被挡掉的策略
+    ratings_available: bool = True       # 评级表是否可用
+    excluded_risk: list[ExcludedStock] = []  # 被风控剔除的标的及原因

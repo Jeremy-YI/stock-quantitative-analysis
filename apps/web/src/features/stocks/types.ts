@@ -37,6 +37,13 @@ export interface RecommendedStock {
   name: string
   score: number
   signals: Signal[]
+  ratings: string[]
+}
+
+export interface ExcludedStock {
+  symbol: string
+  name: string
+  reasons: string[]
 }
 
 export interface StockSignalsBody {
@@ -46,4 +53,9 @@ export interface StockSignalsBody {
   stocks: RecommendedStock[]
   excluded_st: number
   names_available: boolean
+  strategies_used: string[]
+  strategies_blocked: string[]
+  ratings_available: boolean
+  /** 当日命中的风控项（放量长上影 / 放量阴线 / 追高…） */
+  excluded_risk: ExcludedStock[]
 }

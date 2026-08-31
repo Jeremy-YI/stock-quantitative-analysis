@@ -13,13 +13,21 @@ import { useEffect, useState } from 'react'
 import { Container } from '@/design'
 import { cn } from '@/lib/utils'
 
-const PAGES = [
+interface NavItem {
+  href: string
+  label: string
+  /** root = 机构内部页，不给客户看（导航上会标出来） */
+  root?: boolean
+}
+
+const PAGES: NavItem[] = [
   { href: '/', label: '概览' },
   { href: '/news', label: '最新消息' },
   { href: '/events', label: '事件日历' },
   { href: '/sectors', label: '板块资金' },
   { href: '/recommendations', label: '个股推荐' },
   { href: '/ai', label: 'AI 解读' },
+  { href: '/backtest', label: '回测', root: true },
 ]
 
 export default function Nav() {
@@ -83,6 +91,11 @@ export default function Nav() {
               )}
             >
               {p.label}
+              {p.root && (
+                <span className='ml-1 rounded border border-warn-border bg-warn-soft px-1 text-[10px] font-medium text-warn'>
+                  root
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -106,6 +119,11 @@ export default function Nav() {
                     )}
                   >
                     {p.label}
+                    {p.root && (
+                      <span className='ml-1 rounded border border-warn-border bg-warn-soft px-1 text-[10px] font-medium text-warn'>
+                        root
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}

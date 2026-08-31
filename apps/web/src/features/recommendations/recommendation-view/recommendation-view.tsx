@@ -12,6 +12,7 @@ import Link from 'next/link'
 import {
   Badge,
   Caption,
+  Stack,
   Card,
   Field,
   FilterBar,
@@ -30,6 +31,7 @@ import {
   Text,
   TextInput,
 } from '@/design'
+import { ratingMeta } from '@/features/stocks/rating'
 import { STRATEGIES, strategyLabel } from '@/features/stocks/strategy-label'
 
 import { useRecommendations, useSectorList } from '../use-recommendations'
@@ -62,7 +64,10 @@ export default function RecommendationView() {
 
   return (
     <Page size='lg'>
-      <PageHeader title='个股推荐' description='板块成分股 × 战法信号，按最高分排序' />
+      <PageHeader
+        title='个股推荐'
+        description='三道闸：剔除 ST → 只用回测过关的战法 → 风控排除放量长上影/放量阴线/追高'
+      />
 
       <FilterBar>
         <Field label='板块' htmlFor='rec-sector'>
@@ -76,8 +81,8 @@ export default function RecommendationView() {
         </Field>
         <Field label='策略' htmlFor='rec-strategy'>
           <Select id='rec-strategy' value={strategy} onChange={(e) => setStrategy(e.target.value)}>
-            <option value='all'>全部</option>
-            {STRATEGIES.map((s) => (
+            <option value='all'>全部（仅回测过关）</option>
+            {STRATEGIES.filter((s) => (data?.strategies_used ?? []).includes(s.name)).map((s) => (
               <option key={s.name} value={s.name}>
                 {s.label}
               </option>
@@ -115,6 +120,7 @@ export default function RecommendationView() {
                       <TH>代码</TH>
                       <TH>名称</TH>
                       <TH>触发的信号</TH>
+                      <TH hideBelow='mobileLandscape'>回测评级</TH>
                       <TH align='right'>最高分</TH>
                     </TR>
                   </THead>
@@ -142,6 +148,18 @@ export default function RecommendationView() {
                             ))}
                           </Row>
                         </TD>
+                        <TD hideBelow='mobileLandscape'>
+                          <Row gap='tight'>
+                            {item.ratings.map((r) => {
+                              const meta = ratingMeta(r)
+                              return (
+                                <Badge key={r} tone={meta.tone} size='sm' title={meta.hint}>
+                                  {meta.label}
+                                </Badge>
+                              )
+                            })}
+                          </Row>
+                        </TD>
                         <TD align='right' mono>
                           {Math.max(...item.signals.map((s) => s.score)).toFixed(0)}
                         </TD>
@@ -153,12 +171,31 @@ export default function RecommendationView() {
             </Card>
           )}
 
-          <Caption>
-            {data.names_available
-              ? `已剔除风险警示股票（ST/*ST/退市整理期）${data.excluded_st} 只，不作推荐。`
-              : '名称快照缺失，本次未做 ST 过滤（先跑 scripts/fetch_stock_names.py）。'}
-            点名称进个股详情看 K 线与买点。
-          </Caption>
+          <Stack gap='sm'>
+            <Caption>
+              {data.names_available
+                ? `闸门一：剔除风险警示股票（ST/*ST/退市整理期）${data.excluded_st} 只。`
+                : '闸门一未生效：名称快照缺失（先跑 scripts/fetch_stock_names.py）。'}
+            </Caption>
+            <Caption>
+              闸门二：只用回测过关的战法 —— 本次用了{' '}
+              {data.strategies_used.map((s) => strategyLabel(s)).join('、') || '（无）'}
+              {data.strategies_blocked.length > 0 &&
+                `；被挡掉 ${data.strategies_blocked.map((s) => strategyLabel(s)).join('、')}（四段样本外回测不过关，仅 root 可见）`}
+              。
+            </Caption>
+            {data.excluded_risk.length > 0 && (
+              <Caption>
+                闸门三：风控剔除 {data.excluded_risk.length} 只 ——{' '}
+                {data.excluded_risk
+                  .slice(0, 6)
+                  .map((e) => `${e.name || e.symbol}（${e.reasons.join('、')}）`)
+                  .join('；')}
+                {data.excluded_risk.length > 6 && ' 等'}
+              </Caption>
+            )}
+            <Caption>点名称进个股详情看 K 线与买点。</Caption>
+          </Stack>
         </>
       )}
     </Page>
