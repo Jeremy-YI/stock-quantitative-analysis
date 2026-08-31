@@ -31,7 +31,7 @@ export default function IndicatorPanel({
         {legend && <div className={legendHint}>{legend}</div>}
       </CardHeader>
       <CardContent>
-        {loading && <Skeleton className="h-[520px] w-full" />}
+        {loading && <Skeleton className="h-[280px] w-full mobile-portrait:h-[380px] desktop:h-[520px]" />}
         {!loading && error && (
           <p className="py-10 text-center text-down">{error}</p>
         )}

@@ -11,19 +11,30 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from schemas.sector import SectorFlow, SectorFlowBody, SectorInfo
+from schemas.sector import (
+    EtfFlow,
+    EtfFlowBody,
+    EtfLeader,
+    SectorFlow,
+    SectorFlowBody,
+    SectorInfo,
+)
 
 # 快照里的窗口 key（与 fetch 脚本一致）
 DAYS = {"即时", "3日排行", "5日排行", "10日排行", "20日排行"}
 _SNAPSHOT_PATH = Path(__file__).resolve().parents[4] / "data" / "sector_flow.json"
 _STOCKS_PATH = Path(__file__).resolve().parents[4] / "data" / "sector_stocks.json"
+_ETF_FLOW_PATH = Path(__file__).resolve().parents[4] / "data" / "etf_flow.json"
 
 
 class SectorService:
     """板块资金流查询服务（无状态）。"""
 
-    def __init__(self, snapshot_path: str | None = None) -> None:
+    def __init__(
+        self, snapshot_path: str | None = None, etf_flow_path: str | None = None
+    ) -> None:
         self._path = Path(snapshot_path) if snapshot_path else _SNAPSHOT_PATH
+        self._etf_path = Path(etf_flow_path) if etf_flow_path else _ETF_FLOW_PATH
 
     def sector_flow(self, days: str = "即时") -> SectorFlowBody:
         if days not in DAYS:
@@ -34,6 +45,22 @@ class SectorService:
             days=days,
             top_inflow=[SectorFlow(**x) for x in data.get("top_inflow", [])],
             top_outflow=[SectorFlow(**x) for x in data.get("top_outflow", [])],
+        )
+
+    def etf_flow(self, top: int = 20) -> EtfFlowBody:
+        """ETF 资金流排行（读 data/etf_flow.json，由 scripts/fetch_etf_flow.py 落盘）。
+
+        板块资金看行业，这里看可直接买的载体；快照缺失时返回空体，前端提示暂无数据。
+        """
+        raw = self._load_json(self._etf_path)
+        return EtfFlowBody(
+            date=str(raw.get("date", "")),
+            total=int(raw.get("total", 0)),
+            has_share_flow=bool(raw.get("has_share_flow", False)),
+            flow_available=bool(raw.get("flow_available", True)),
+            leaders=[EtfLeader(**x) for x in raw.get("leaders", [])],
+            top_inflow=[EtfFlow(**x) for x in raw.get("top_inflow", [])[:top]],
+            top_outflow=[EtfFlow(**x) for x in raw.get("top_outflow", [])[:top]],
         )
 
     def list_sectors(self) -> list[SectorInfo]:
@@ -47,8 +74,12 @@ class SectorService:
         return list(stocks.get(name, []))
 
     def _load(self) -> dict:
+        return self._load_json(self._path)
+
+    @staticmethod
+    def _load_json(path: Path) -> dict:
         try:
-            return json.loads(self._path.read_text(encoding="utf-8"))
+            return json.loads(path.read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
 

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 import Nav from '@/components/nav'
 
@@ -9,6 +9,13 @@ export const metadata: Metadata = {
   description: 'A股板块资金与个股推荐看板',
 }
 
+/** 移动端必须的视口声明（没有它手机上会按 980px 缩放渲染，响应式全废）。 */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -16,9 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body>
+      <body className="flex min-h-screen flex-col antialiased">
         <Nav />
-        {children}
+        <div className="flex-1">{children}</div>
       </body>
     </html>
   )

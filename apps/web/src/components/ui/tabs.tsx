@@ -17,6 +17,9 @@ export interface TabsProps {
 /**
  * 轻量分段控件（shadcn Tabs 的简化替代，无 Radix 依赖）。
  * 受控组件：value 指定当前选中项，onValueChange 回调切换。
+ *
+ * 响应式：手机上撑满一行并支持横向滚动（选项多了不会挤成一坨或撑破屏幕），
+ * sm 起收成 inline-flex 贴合内容宽度。
  */
 export default function Tabs({
   value,
@@ -28,7 +31,8 @@ export default function Tabs({
     <div
       role="tablist"
       className={cn(
-        'inline-flex items-center gap-1 rounded-lg bg-muted p-1',
+        'flex w-full max-w-full items-center gap-1 overflow-x-auto overscroll-x-contain rounded-lg bg-muted p-1',
+        'mobile-portrait:inline-flex mobile-portrait:w-auto',
         className
       )}
     >
@@ -43,7 +47,7 @@ export default function Tabs({
             data-active={active || undefined}
             onClick={() => onValueChange(item.value)}
             className={cn(
-              'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
+              'shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-body-sm font-medium transition-colors mobile-portrait:px-4',
               active
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'

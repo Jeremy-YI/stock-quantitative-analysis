@@ -34,13 +34,21 @@ ETF_KEYWORD_OVERRIDES = {
 
 
 def _load_etf_names() -> list[str]:
-    """读本地 ETF 名称表（data/stage17_etf_names.json），返回名称列表。"""
-    p = ROOT / "data" / "stage17_etf_names.json"
-    try:
-        data = json.loads(p.read_text(encoding="utf-8"))
-        return [n for n in data.values() if isinstance(n, str)]
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    """读本地 ETF 名称表，返回名称列表。
+
+    优先用 data/etf_universe.json（scripts/fetch_etf_flow.py 落盘的全市场场内 ETF，
+    ~1600 只，覆盖率高）；拿不到才回退到 data/stage17_etf_names.json。
+    """
+    for rel in ("etf_universe.json", "stage17_etf_names.json"):
+        p = ROOT / "data" / rel
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError):
+            continue
+        names = [n for n in data.values() if isinstance(n, str)]
+        if names:
+            return names
+    return []
 
 
 def _match_etf(sector: str, etf_names: list[str]) -> str | None:
@@ -57,7 +65,13 @@ def _match_etf(sector: str, etf_names: list[str]) -> str | None:
 
 
 def fetch(days: str) -> dict:
-    """抓一个窗口的板块资金流，返回 {top_inflow, top_outflow}。"""
+    """抓一个窗口的板块资金流，返回 {top_inflow, top_outflow}。
+
+    注意两个窗口的字段不一样（同花顺接口就这么给）：
+      即时：行业-涨跌幅（float）、领涨股、领涨股-涨跌幅
+      多日：阶段涨跌幅（字符串带 %），**没有领涨股**
+    以前只读「行业-涨跌幅」，所以 3/5/10/20 日窗口的涨跌幅全是 0，看着像没数据。
+    """
     import akshare as ak  # 延迟导入，仅本脚本需要
 
     etf_names = _load_etf_names()
@@ -65,10 +79,14 @@ def fetch(days: str) -> dict:
     rows = []
     for _, r in df.iterrows():
         sector = str(r["行业"])
+        # 多日窗口用阶段涨跌幅（字符串带 %），即时窗口用行业-涨跌幅
+        change = r.get("行业-涨跌幅")
+        if change is None or (isinstance(change, float) and change != change):
+            change = r.get("阶段涨跌幅")
         rows.append({
             "sector": sector,
             "etf": _match_etf(sector, etf_names),
-            "change_pct": _f(r.get("行业-涨跌幅")),
+            "change_pct": _f(change),
             "inflow": _f(r.get("流入资金")),
             "outflow": _f(r.get("流出资金")),
             "net": _f(r.get("净额")),
@@ -84,9 +102,14 @@ def fetch(days: str) -> dict:
 
 
 def _f(v) -> float:
+    """安全转 float：兼容 '12.24%' 这种带百分号的字符串。"""
     try:
         if v is None or (isinstance(v, float) and v != v):
             return 0.0
+        if isinstance(v, str):
+            v = v.strip().replace("%", "").replace(",", "")
+            if not v or v in {"-", "--"}:
+                return 0.0
         return float(v)
     except (TypeError, ValueError):
         return 0.0

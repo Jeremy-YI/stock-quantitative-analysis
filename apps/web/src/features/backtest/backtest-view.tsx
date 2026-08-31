@@ -182,7 +182,7 @@ export default function BacktestView() {
         </Button>
       </form>
 
-      {loading && <Skeleton className="h-64 w-full max-w-6xl" />}
+      {loading && <Skeleton className="h-64 w-full" />}
       {!loading && error && <p className="text-down">{error}</p>}
 
       {!loading && run && verification && (
@@ -240,7 +240,7 @@ export default function BacktestView() {
             </Card>
           )}
 
-          <div className="grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid w-full grid-cols-1 gap-6 desktop:grid-cols-2">
             <Card>
               <CardHeader className="flex-row items-center justify-between">
                 <CardTitle>收益分布</CardTitle>

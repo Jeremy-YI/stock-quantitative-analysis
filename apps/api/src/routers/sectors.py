@@ -7,7 +7,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Request
 
 from schemas.common import ApiResponse
-from schemas.sector import RecommendationsBody, SectorFlowBody, SectorListBody
+from schemas.sector import EtfFlowBody, RecommendationsBody, SectorFlowBody, SectorListBody
 from services.sector_service import SectorService
 from services.strategy_service import StrategyService
 
@@ -39,6 +39,18 @@ def sector_flow(
 ) -> ApiResponse[SectorFlowBody]:
     """板块资金流：top20 净流入 + top20 净流出。"""
     return ApiResponse(message="ok", body=service.sector_flow(days))
+
+
+@router.get("/sectors/etf-flow", response_model=ApiResponse[EtfFlowBody])
+def etf_flow(
+    top: int = Query(20, ge=1, le=50, description="每侧取前多少名"),
+    service: SectorService = Depends(get_sector_service),
+) -> ApiResponse[EtfFlowBody]:
+    """ETF 资金流：净流入 / 净流出 TOP N（已过滤货币、债券、迷你盘）。
+
+    路径必须写在 /sectors/{name} 之前，否则会被动态段吃掉。
+    """
+    return ApiResponse(message="ok", body=service.etf_flow(top))
 
 
 @router.get("/sectors/{name}/recommendations", response_model=ApiResponse[RecommendationsBody])

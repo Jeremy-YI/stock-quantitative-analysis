@@ -1,20 +1,7 @@
-import * as React from 'react'
+/**
+ * 兼容层：输入框的正式实现在 src/design/field.tsx（TextInput）。
+ * 老代码 import { Input } from '@/components/ui/input' 继续可用。
+ */
+import { TextInput } from '@/design/field'
 
-import { cn } from '@/lib/utils'
-
-const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, type, ...props }, ref) => (
-    <input
-      ref={ref}
-      type={type}
-      className={cn(
-        'flex h-9 w-full rounded-md border border-border bg-background px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary',
-        className
-      )}
-      {...props}
-    />
-  )
-)
-Input.displayName = 'Input'
-
-export { Input }
+export { TextInput as Input }

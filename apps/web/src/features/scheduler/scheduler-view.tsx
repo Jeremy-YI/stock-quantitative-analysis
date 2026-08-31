@@ -25,7 +25,7 @@ export default function SchedulerView() {
         </Button>
       </header>
 
-      {loading && <Skeleton className="h-40 w-full max-w-6xl" />}
+      {loading && <Skeleton className="h-40 w-full" />}
       {!loading && error && <p className="text-down">{error}</p>}
 
       {!loading && !error && (

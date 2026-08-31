@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import path from 'node:path'
 
 /**
@@ -9,7 +9,7 @@ import path from 'node:path'
 const repoRoot = path.resolve(__dirname, '..', '..', '..')
 const outDir = path.join(repoRoot, 'docs', 'screenshots')
 
-async function shoot(page, name: string) {
+async function shoot(page: Page, name: string) {
   await page.screenshot({
     path: path.join(outDir, name),
     fullPage: false,

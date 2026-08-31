@@ -84,10 +84,10 @@ export default function StrategyView() {
         </Button>
       </form>
 
-      {loading && <Skeleton className="h-10 w-full max-w-5xl" />}
+      {loading && <Skeleton className="h-10 w-full" />}
       {!loading && error && <p className="text-down">{error}</p>}
 
-      {scanning && <Skeleton className="h-[300px] w-full max-w-5xl" />}
+      {scanning && <Skeleton className="h-[240px] w-full mobile-portrait:h-[300px]" />}
 
       {!scanning && submittedStrategy && !scanError && (
         <Card className={tableCard}>
@@ -112,7 +112,7 @@ export default function StrategyView() {
       {!scanning && scanError && <p className="text-down">{scanError}</p>}
 
       {selectedSymbol && (
-        <div className="w-full max-w-5xl">
+        <div className="w-full">
           <MacdPanel symbol={selectedSymbol} />
         </div>
       )}

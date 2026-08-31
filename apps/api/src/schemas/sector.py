@@ -32,6 +32,50 @@ class SectorFlowBody(BaseModel):
     top_outflow: list[SectorFlow]   # 净流出前 20（net 为负）
 
 
+class EtfFlow(BaseModel):
+    """单只场内 ETF 的资金流。金额单位：亿元。
+
+    两个口径分开给，前端可切换：
+      net       主力净流入（东财大单口径）——当天盘口强弱
+      share_net 份额变化 × 最新价——申赎的真金白银，需隔日对比，首日为 None
+    """
+
+    code: str                      # ETF 代码
+    name: str                      # ETF 名称
+    price: float                   # 最新价
+    change_pct: float              # 涨跌幅 %
+    net: float | None = None       # 主力净流入（亿）；非交易日/历史不可回溯时为 None
+    net_ratio: float | None = None  # 主力净流入占成交额比 %
+    turnover: float                # 成交额（亿）
+    turnover_rate: float           # 换手率 %
+    mcap: float                    # 流通市值（亿）
+    share_net: float | None = None  # 份额变化估算净申购（亿），无历史时 None
+
+
+class EtfLeader(EtfFlow):
+    """主题龙头 ETF：同一主题里资金最集中（流通市值最大）的那一只。
+
+    参考站点把同一指数下所有 ETF 全列出来，对做决策没必要；
+    这里每个主题只给一只代表标的。
+    """
+
+    category: str   # 大类：宽基 / 科技成长 / 医药消费 / 金融地产 / 周期资源 / 红利防御 / 跨境
+    theme: str      # 主题：半导体/芯片、红利低波…
+    peers: int = 1  # 该主题下共有多少只 ETF（当前展示的是其中最大的）
+
+
+class EtfFlowBody(BaseModel):
+    """ETF 资金流响应体（主题龙头 + 净流入/净流出 TOP N）。"""
+
+    date: str                    # 数据日期（YYYY-MM-DD，快照缺失为空串）
+    total: int                   # 参与排行的 ETF 数（已过滤货币/债券/迷你盘）
+    has_share_flow: bool         # 份额口径是否可用（需要前一日快照）
+    flow_available: bool = True   # 大单口径是否可用（非交易日快照拿不到）
+    leaders: list[EtfLeader] = []  # 主题龙头（按宽基→成长→…的固定顺序）
+    top_inflow: list[EtfFlow]    # 净流入 TOP
+    top_outflow: list[EtfFlow]   # 净流出 TOP
+
+
 class SectorInfo(BaseModel):
     """板块元信息（名称 + 成分股数）。"""
 

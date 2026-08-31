@@ -1,58 +1,243 @@
 /* ============================================================
- * 全局样式 —— Tailwind CSS v4
+ * 全局样式 / 设计令牌 —— Tailwind CSS v4
  *
- * v4 的配置方式变了：不再用 tailwind.config.ts 里的 theme.extend.colors，
- * 而是直接写在这里的 @theme（等价物）。语义色集中在此，组件里禁止散落 hex。
+ * 这里是**设计系统的唯一底座**：断点、字号、颜色、圆角、间距全在这。
+ * 组件层（src/design/*）只消费这些令牌，禁止在业务代码里散落 hex / 写死 px。
+ *
+ * v4 说明：不再用 tailwind.config.ts，主题直接写 @theme。
+ *   - @theme        定义新令牌（会生成对应工具类，如 text-h1 / xs: 断点）
+ *   - @theme inline 把已有 CSS 变量映射成工具类（换主题时只改变量）
  *
  * A股配色约定：红涨绿跌
- *   up      = 红（涨）
- *   down    = 绿（跌）
- *   neutral = 灰（平/中性）
+ *   up = 红（涨）  down = 绿（跌）  neutral = 灰（平）
  * ============================================================ */
 
 @import "tailwindcss";
 
-/* 设计令牌（CSS 变量）：方便将来做暗色模式切换，只改这里即可 */
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --border: oklch(0.922 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --radius: 0.5rem;
+/* ------------------------------------------------------------
+ * 1. 断点（Breakpoint）—— 命名对齐 FreshFarmPicking 的 global-theme.ts
+ * 与 src/design/tokens.ts 的 BREAKPOINTS 必须一致（那边是 JS 侧同一份值）。
+ *
+ *   base            < 448   手机竖屏（无前缀）
+ *   mobile-portrait ≥ 448   大屏手机
+ *   mobile-landscape≥ 766   平板 / 手机横屏
+ *   desktop         ≥ 1200  桌面
+ *   large-device    ≥ 1440  大桌面
+ *
+ * 先把 Tailwind 默认的 sm/md/lg/xl/2xl 清掉，避免两套断点混用。
+ * ---------------------------------------------------------- */
+@theme {
+  --breakpoint-sm: initial;
+  --breakpoint-md: initial;
+  --breakpoint-lg: initial;
+  --breakpoint-xl: initial;
+  --breakpoint-2xl: initial;
 
-  /* A股语义色：红涨绿跌（与 styles/colors.ts 保持一致，供 ECharts 等 JS 场景引用） */
+  --breakpoint-mobile-portrait: 28rem; /* 448px */
+  --breakpoint-mobile-landscape: 47.875rem; /* 766px */
+  --breakpoint-desktop: 75rem; /* 1200px */
+  --breakpoint-large-device: 90rem; /* 1440px */
+
+  /* ----------------------------------------------------------
+   * 2. 排版（Typography）：流式字号
+   * clamp(最小, 随视口缩放, 最大) —— 手机到桌面连续缩放，不写死 px，
+   * 也不需要给每个标题手写 text-h2 mobile-landscape:text-h1 这种阶梯。
+   * -------------------------------------------------------- */
+  --text-display: clamp(1.75rem, 1.15rem + 2.4vw, 2.75rem);
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(1.5rem, 1.1rem + 1.5vw, 2.125rem);
+  --text-h1--line-height: 1.2;
+  --text-h1--letter-spacing: -0.015em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.25rem, 1rem + 0.9vw, 1.625rem);
+  --text-h2--line-height: 1.25;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
+  --text-h3--line-height: 1.3;
+  --text-h3--font-weight: 600;
+
+  --text-h4: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+
+  --text-body-lg: clamp(0.9375rem, 0.9rem + 0.25vw, 1.0625rem);
+  --text-body-lg--line-height: 1.7;
+
+  --text-body: clamp(0.875rem, 0.85rem + 0.15vw, 0.9375rem);
+  --text-body--line-height: 1.65;
+
+  --text-body-sm: 0.8125rem;
+  --text-body-sm--line-height: 1.55;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.45;
+
+  /* 数字/代码用等宽，表格对齐更稳 */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ----------------------------------------------------------
+   * 3. 容器宽度（Container）：不是「固定宽度」，是「最大宽度」
+   * 宽度始终 100%，只在超宽屏收口，避免一行文字拉到 2000px。
+   * -------------------------------------------------------- */
+  --container-page-sm: 40rem; /* 640 阅读流（新闻/AI 解读） */
+  --container-page-md: 56rem; /* 896 常规内容 */
+  --container-page-lg: 75rem; /* 1200 数据看板 */
+  --container-page-xl: 90rem; /* 1440 宽表格 */
+}
+
+/* ------------------------------------------------------------
+ * 4. 颜色（Color）——语义层
+ * 业务只用语义名（surface/foreground/accent/up/down…），
+ * 不直接用 gray-200 / blue-600 这种调色板名，换皮只改这里。
+ * ---------------------------------------------------------- */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  --card: #ffffff;
+  --card-foreground: #171717;
+
+  --surface: #f8fafc; /* 表头、次级面板底色 */
+  --surface-hover: #f1f5f9;
+
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+
+  /* 交互主色（链接、主按钮、选中态） */
+  --accent: #2563eb;
+  --accent-foreground: #ffffff;
+  --accent-soft: #eff6ff;
+  --accent-border: #bfdbfe;
+
+  /* A股语义色：红涨绿跌（与 styles/colors.ts 一致，ECharts 从 TS 侧取） */
   --up: #ef4444;
   --down: #22c55e;
   --neutral: #64748b;
+  --up-soft: #fef2f2;
+  --down-soft: #f0fdf4;
+
+  /* 提示语义 */
+  --warn: #b45309;
+  --warn-soft: #fffbeb;
+  --warn-border: #fde68a;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+  --info: #1d4ed8;
+  --info-soft: #eff6ff;
+  --info-border: #bfdbfe;
+
+  --ring: #93c5fd;
+  --radius: 0.5rem;
 }
 
-/* 把 CSS 变量映射成 Tailwind 工具类（text-up / bg-up / border-up 等） */
+/* 暗色主题（预留：给 <html data-theme="dark"> 即生效，当前未开启）。
+ * 需要做暗色资讯风时只改这一块，组件层零改动。 */
+[data-theme="dark"] {
+  --background: #0a0a0b;
+  --foreground: #ededed;
+  --card: #121214;
+  --card-foreground: #ededed;
+  --surface: #18181b;
+  --surface-hover: #1f1f23;
+  --muted: #1f1f23;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --accent: #3b82f6;
+  --accent-foreground: #0a0a0b;
+  --accent-soft: #172554;
+  --accent-border: #1e3a8a;
+  --up: #f87171;
+  --down: #4ade80;
+  --neutral: #94a3b8;
+  --up-soft: #2a1416;
+  --down-soft: #10261a;
+  --warn: #fbbf24;
+  --warn-soft: #292014;
+  --warn-border: #4d3a14;
+  --danger: #f87171;
+  --danger-soft: #2a1416;
+  --danger-border: #5b1d1d;
+  --info: #60a5fa;
+  --info-soft: #172554;
+  --info-border: #1e3a8a;
+  --ring: #1d4ed8;
+}
+
+/* 把 CSS 变量映射成 Tailwind 工具类（bg-surface / text-up / border-accent-border…） */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
   --color-up: var(--up);
   --color-down: var(--down);
   --color-neutral: var(--neutral);
+  --color-up-soft: var(--up-soft);
+  --color-down-soft: var(--down-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-border: var(--warn-border);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-border: var(--info-border);
+  --color-ring: var(--ring);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
 }
 
-/* 基础排版与背景 */
-body {
-  background-color: var(--background);
-  color: var(--foreground);
+/* ------------------------------------------------------------
+ * 5. 基础层
+ * ---------------------------------------------------------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%; /* iOS 横屏不放大字号 */
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    /* 手机上防止宽表格把整页顶横向滚动（表格自己有 overflow-x 容器） */
+    overflow-wrap: break-word;
+  }
+
+  /* 表格数字默认等宽对齐 */
+  table {
+    font-variant-numeric: tabular-nums;
+  }
 }

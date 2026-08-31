@@ -31,6 +31,7 @@ import {
   strategyCard,
   strategyDesc,
   strategyName,
+  tableWrap,
   td,
   th,
 } from './dashboard-styles'
@@ -106,30 +107,32 @@ function BaselineCard({ b }: { b: DashboardBaseline }) {
       <CardHeader>
         <CardTitle>
           市场基线 · {label}
-          <span className="ml-2 text-xs font-normal text-muted-foreground">
+          <span className="ml-2 text-caption font-normal text-muted-foreground">
             {b.size} 只
           </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <table className={baselineTable}>
-          <thead>
-            <tr>
-              <th className={th}>持有</th>
-              <th className={th}>正收益比例</th>
-              <th className={th}>平均收益</th>
-            </tr>
-          </thead>
-          <tbody>
-            {b.holds.map((h) => (
-              <tr key={h.hold_days}>
-                <td className={td}>{h.hold_days} 日</td>
-                <td className={td}>{pct(h.win_rate)}</td>
-                <td className={td}>{pp(h.avg_return)}</td>
+        <div className={tableWrap}>
+          <table className={baselineTable}>
+            <thead>
+              <tr>
+                <th className={th}>持有</th>
+                <th className={th}>正收益比例</th>
+                <th className={th}>平均收益</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {b.holds.map((h) => (
+                <tr key={h.hold_days}>
+                  <td className={td}>{h.hold_days} 日</td>
+                  <td className={td}>{pct(h.win_rate)}</td>
+                  <td className={td}>{pp(h.avg_return)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </CardContent>
     </Card>
   )
@@ -146,12 +149,12 @@ function RegimeCard({ regime }: { regime: DashboardRegime }) {
         <CardTitle>当前市场环境</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-2 text-sm">
+        <div className="flex flex-col gap-2 text-body-sm">
           <div className={metricRow}>
             <span className={metricLabel}>大盘 20 日</span>
             <span className="font-medium">
               {pct(regime.index_20d_return)}{' '}
-              <span className="text-xs text-muted-foreground">
+              <span className="text-caption text-muted-foreground">
                 {regime.index_20d_label}
               </span>
             </span>
@@ -160,7 +163,7 @@ function RegimeCard({ regime }: { regime: DashboardRegime }) {
             <span className={metricLabel}>市场活跃度</span>
             <span className="font-medium">
               {regime.activity?.toFixed(2) ?? '—'}{' '}
-              <span className="text-xs text-muted-foreground">
+              <span className="text-caption text-muted-foreground">
                 {regime.activity_label}
               </span>
             </span>
@@ -169,7 +172,7 @@ function RegimeCard({ regime }: { regime: DashboardRegime }) {
             <span className={metricLabel}>距 120 日高点</span>
             <span className="font-medium">
               {pct(regime.drawdown)}{' '}
-              <span className="text-xs text-muted-foreground">
+              <span className="text-caption text-muted-foreground">
                 {regime.drawdown_label}
               </span>
             </span>
@@ -193,13 +196,13 @@ export default function DashboardView() {
       <header className={header}>
         <h1 className={pageTitle}>概览</h1>
         {data?.as_of && (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-body-sm text-muted-foreground">
             快照日 {data.as_of}
           </span>
         )}
       </header>
 
-      {loading && <Skeleton className="h-64 w-full max-w-6xl" />}
+      {loading && <Skeleton className="h-64 w-full" />}
       {!loading && error && <p className="text-down">{error}</p>}
 
       {!loading && !error && data && (
@@ -274,15 +277,15 @@ export default function DashboardView() {
                     <div key={r.run_id} className={runRow}>
                       <div>
                         <span className={runJob}>{r.job_name}</span>
-                        <span className="ml-2 text-xs text-muted-foreground">
+                        <span className="ml-2 text-caption text-muted-foreground">
                           {r.trigger}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-caption text-muted-foreground">
                           {formatDuration(r.duration_seconds)}
                         </span>
-                        <span className={`text-sm ${runStatusColor(r.status)}`}>
+                        <span className={`text-body-sm ${runStatusColor(r.status)}`}>
                           {r.status}
                         </span>
                       </div>

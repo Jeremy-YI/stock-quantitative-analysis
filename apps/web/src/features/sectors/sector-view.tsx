@@ -2,14 +2,41 @@
 
 /**
  * 板块资金页：
- * - 上半：窗口选择（即时 / 3日 / 5日 / 10日 / 20日）
- * - 主区：左侧 Top20 资金流入，右侧 Top20 资金流出
- * 每行显示：行业名、净额（亿，红涨绿跌）、行业涨跌幅、领涨股。
+ *  - 窗口选择（即时 / 3日 / 5日 / 10日 / 20日）→ Tabs（手机横向滚动）
+ *  - 主区：Top20 流入 / Top20 流出，手机单列、desktop 起两列
+ *  - 底部：ETF 资金流（独立模块，行业看方向、ETF 看能直接买的标的）
+ *
+ * 两个数据现实（同花顺接口决定的，UI 跟着数据走，不给空占位）：
+ *  1. 「对应 ETF」靠名称匹配，命中率不到一半 → 整列去掉，ETF 看下面的模块
+ *  2. 多日窗口（3/5/10/20 日）没有领涨股，涨跌幅是阶段涨跌 → 该列按窗口显示/隐藏
  */
 import { useState } from 'react'
 import Link from 'next/link'
 
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Grid,
+  Num,
+  Page,
+  PageHeader,
+  StateHint,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  TableScroll,
+  Tabs,
+  Text,
+} from '@/design'
+
 import useSectors from './use-sectors'
+import EtfFlowPanel from './etf-flow-panel'
 import type { SectorFlow } from './types'
 
 const DAYS = ['即时', '3日排行', '5日排行', '10日排行', '20日排行']
@@ -18,37 +45,36 @@ export default function SectorView() {
   const [days, setDays] = useState('即时')
   const { data, loading, error } = useSectors(days)
 
+  const isIntraday = days === '即时'
+
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">板块资金</h1>
+    <Page size='lg'>
+      <PageHeader
+        title='板块资金'
+        description='同花顺行业资金流向 · 点行业名跳到该板块的个股信号'
+      />
 
-      {/* 窗口选择 */}
-      <div className="mb-5 flex gap-2">
-        {DAYS.map((d) => (
-          <button
-            key={d}
-            onClick={() => setDays(d)}
-            className={`px-4 py-1.5 rounded text-sm border ${
-              days === d
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            {d}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        value={days}
+        onValueChange={setDays}
+        items={DAYS.map((d) => ({ value: d, label: d }))}
+      />
 
-      {loading && <p className="text-gray-500">加载中…</p>}
-      {error && <p className="text-red-500">加载失败：{error}</p>}
+      {loading && <StateHint>加载中…</StateHint>}
+      {error && <StateHint kind='error'>加载失败：{error}</StateHint>}
 
       {data && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FlowColumn title="Top20 资金流入" rows={data.top_inflow} positive />
-          <FlowColumn title="Top20 资金流出" rows={data.top_outflow} positive={false} />
-        </div>
+        <>
+          <Grid cols={{ base: 1, desktop: 2 }} gap='lg'>
+            <FlowColumn title='Top20 资金流入' rows={data.top_inflow} isIntraday={isIntraday} />
+            <FlowColumn title='Top20 资金流出' rows={data.top_outflow} isIntraday={isIntraday} />
+          </Grid>
+
+          {/* ETF 资金流：独立模块 */}
+          <EtfFlowPanel />
+        </>
       )}
-    </div>
+    </Page>
   )
 }
 
@@ -56,56 +82,75 @@ export default function SectorView() {
 function FlowColumn({
   title,
   rows,
-  positive,
+  isIntraday,
 }: {
   title: string
   rows: SectorFlow[]
-  positive: boolean
+  isIntraday: boolean
 }) {
+  // 多日窗口没有领涨股，有数据才给这列
+  const hasLeader = rows.some((r) => Boolean(r.leader))
+
   return (
-    <div className="rounded-lg border border-gray-200 overflow-hidden">
-      <h2 className="bg-gray-50 px-4 py-2 font-semibold text-sm border-b border-gray-200">
-        {title}
-      </h2>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-gray-500 text-xs border-b border-gray-100">
-            <th className="text-left px-3 py-2">行业</th>
-            <th className="text-left px-3 py-2">ETF</th>
-            <th className="text-right px-3 py-2">净额(亿)</th>
-            <th className="text-right px-3 py-2">涨跌幅</th>
-            <th className="text-left px-3 py-2">领涨股</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((s) => (
-            <tr key={s.sector} className="border-b border-gray-50 hover:bg-gray-50">
-              <td className="px-3 py-1.5 font-medium">
-                <Link
-                  href={`/recommendations?sector=${encodeURIComponent(s.sector)}`}
-                  className="text-blue-700 hover:underline"
-                  title="点开看成分股 + 信号"
-                >
-                  {s.sector}
-                </Link>
-              </td>
-              <td className="px-3 py-1.5 text-gray-500 text-xs">{s.etf || '—'}</td>
-              <td className={`px-3 py-1.5 text-right font-mono ${s.net >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {s.net >= 0 ? '+' : ''}
-                {s.net.toFixed(2)}
-              </td>
-              <td className={`px-3 py-1.5 text-right ${s.change_pct >= 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {s.change_pct >= 0 ? '+' : ''}
-                {s.change_pct.toFixed(2)}%
-              </td>
-              <td className="px-3 py-1.5 text-gray-600">
-                {s.leader}
-                <span className="text-red-600 ml-1">{s.leader_pct > 0 ? `+${s.leader_pct.toFixed(2)}%` : ''}</span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Card className='overflow-hidden shadow-none'>
+      <CardHeader className='border-b border-border bg-surface'>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className='p-0 mobile-portrait:p-0'>
+        <TableScroll bare>
+          <Table minWidth='sm'>
+            <THead>
+              <TR>
+                <TH>行业</TH>
+                <TH align='right'>净额(亿)</TH>
+                <TH align='right'>{isIntraday ? '涨跌幅' : '阶段涨跌'}</TH>
+                <TH align='right' hideBelow='mobilePortrait'>
+                  家数
+                </TH>
+                {hasLeader && <TH hideBelow='mobileLandscape'>领涨股</TH>}
+              </TR>
+            </THead>
+            <TBody>
+              {rows.map((s) => (
+                <TR key={s.sector} hoverable>
+                  <TD nowrap>
+                    <Link
+                      href={`/recommendations?sector=${encodeURIComponent(s.sector)}`}
+                      className='font-medium text-accent hover:underline'
+                      title='点开看成分股 + 信号'
+                    >
+                      {s.sector}
+                    </Link>
+                  </TD>
+                  <TD align='right'>
+                    <Num value={s.net} weight='medium' />
+                  </TD>
+                  <TD align='right'>
+                    <Num value={s.change_pct} suffix='%' />
+                  </TD>
+                  <TD align='right' hideBelow='mobilePortrait' mono className='text-muted-foreground'>
+                    {s.companies}
+                  </TD>
+                  {hasLeader && (
+                    <TD hideBelow='mobileLandscape' nowrap>
+                      <span className='inline-flex items-center gap-1.5'>
+                        <Text as='span' size='body-sm' tone='muted'>
+                          {s.leader || '—'}
+                        </Text>
+                        {s.leader_pct > 0 && (
+                          <Badge tone='up' size='sm'>
+                            +{s.leader_pct.toFixed(2)}%
+                          </Badge>
+                        )}
+                      </span>
+                    </TD>
+                  )}
+                </TR>
+              ))}
+            </TBody>
+          </Table>
+        </TableScroll>
+      </CardContent>
+    </Card>
   )
 }

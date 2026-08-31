@@ -6,13 +6,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 import useResearch from './use-research'
 import type { ResearchSummary } from './types'
 
-const wrapper = 'flex min-h-screen flex-col items-center gap-6 bg-background p-6'
-const header = 'flex w-full max-w-6xl items-end justify-between'
-const pageTitle = 'text-2xl font-semibold'
-const card = 'w-full max-w-6xl'
-const table = 'w-full text-sm'
-const th = 'px-2 py-1.5 text-left text-xs font-medium text-muted-foreground'
-const td = 'px-2 py-1.5 text-sm'
+const wrapper =
+  'mx-auto flex w-full max-w-[75rem] flex-col gap-4 px-4 py-5 mobile-portrait:gap-6 mobile-portrait:px-6 mobile-portrait:py-7 desktop:px-8 desktop:py-8'
+const header = 'flex w-full flex-col gap-2 mobile-landscape:flex-row mobile-landscape:items-end mobile-landscape:justify-between'
+const pageTitle = 'text-h1'
+const card = 'w-full'
+const table = 'w-full min-w-[24rem] text-body-sm tabular-nums'
+const th =
+  'whitespace-nowrap px-2 py-1.5 text-left text-caption font-medium text-muted-foreground'
+const td = 'px-2 py-1.5 text-body-sm'
 
 function pp(v: number | null | undefined): string {
   if (v === null || v === undefined) return '—'
@@ -168,7 +170,7 @@ export default function ResearchView() {
         )}
       </header>
 
-      {loading && <Skeleton className="h-64 w-full max-w-6xl" />}
+      {loading && <Skeleton className="h-64 w-full" />}
       {!loading && error && <p className="text-down">{error}</p>}
 
       {!loading && !error && data && (

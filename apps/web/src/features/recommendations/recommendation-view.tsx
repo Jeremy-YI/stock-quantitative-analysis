@@ -2,10 +2,33 @@
 
 /**
  * 个股推荐页：
- * - 选板块 + 选策略 + 选日期
- * - 展示该板块里触发所选策略的股票，按分数降序
+ *  - 选板块 + 选策略 + 选日期（FilterBar：手机两列、桌面一行）
+ *  - 展示该板块里触发所选策略的股票，按分数降序
+ * 表格在小屏横滚，「触发的信号」列在手机上仍保留（这是核心信息），
+ * 分数列右对齐等宽。
  */
 import { useEffect, useState } from 'react'
+
+import {
+  Badge,
+  Card,
+  Field,
+  FilterBar,
+  Page,
+  PageHeader,
+  Row,
+  Select,
+  StateHint,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  TableScroll,
+  Text,
+  TextInput,
+} from '@/design'
 
 import { useRecommendations, useSectorList } from './use-recommendations'
 import type { Signal } from './types'
@@ -43,9 +66,8 @@ export default function RecommendationView() {
   const { data, loading, error } = useRecommendations(sector, date)
 
   // 先按策略过滤，再按股票分组
-  const filtered = data?.signals.filter(
-    (s) => strategy === 'all' || s.strategy === strategy
-  ) ?? []
+  const filtered =
+    data?.signals.filter((s) => strategy === 'all' || s.strategy === strategy) ?? []
   const grouped = new Map<string, Signal[]>()
   filtered.forEach((s) => {
     const arr = grouped.get(s.symbol) ?? []
@@ -57,92 +79,89 @@ export default function RecommendationView() {
   )
 
   return (
-    <main className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">个股推荐</h1>
+    <Page size="lg">
+      <PageHeader title="个股推荐" description="板块成分股 × 战法信号，按最高分排序" />
 
-      <div className="mb-5 flex gap-3 items-end flex-wrap">
-        <div>
-          <label className="block text-sm text-gray-500 mb-1">板块</label>
-          <select
-            value={sector}
-            onChange={(e) => setSector(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white"
-          >
+      <FilterBar>
+        <Field label="板块" htmlFor="rec-sector">
+          <Select id="rec-sector" value={sector} onChange={(e) => setSector(e.target.value)}>
             {sectors.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm text-gray-500 mb-1">策略</label>
-          <select
-            value={strategy}
-            onChange={(e) => setStrategy(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white"
-          >
+          </Select>
+        </Field>
+        <Field label="策略" htmlFor="rec-strategy">
+          <Select id="rec-strategy" value={strategy} onChange={(e) => setStrategy(e.target.value)}>
             <option value="all">全部</option>
             {STRATEGIES.map((s) => (
               <option key={s.name} value={s.name}>
                 {s.label}
               </option>
             ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm text-gray-500 mb-1">扫描日</label>
-          <input
+          </Select>
+        </Field>
+        <Field label="扫描日" htmlFor="rec-date">
+          <TextInput
+            id="rec-date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm"
           />
-        </div>
-      </div>
+        </Field>
+      </FilterBar>
 
-      {loading && <p className="text-gray-500">扫描中…</p>}
-      {error && <p className="text-red-500">加载失败：{error}</p>}
+      {loading && <StateHint>扫描中…</StateHint>}
+      {error && <StateHint kind="error">加载失败：{error}</StateHint>}
 
       {data && !loading && (
         <>
-          <p className="text-sm text-gray-500 mb-3">
-            {data.sector} · {strategy === 'all' ? '全部策略' : STRATEGY_LABEL[strategy]} · {data.date} ·{' '}
-            {filtered.length} 条信号 / {stocks.length} 只股票
-          </p>
-          <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-            <thead>
-              <tr className="bg-gray-50 text-gray-500 text-xs">
-                <th className="text-left px-3 py-2">股票</th>
-                <th className="text-left px-3 py-2">触发的信号</th>
-                <th className="text-right px-3 py-2">最高分</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks.map(([symbol, sigs]) => (
-                <tr key={symbol} className="border-t border-gray-100 hover:bg-gray-50">
-                  <td className="px-3 py-2 font-mono font-medium">{symbol}</td>
-                  <td className="px-3 py-2">
-                    <div className="flex flex-wrap gap-1">
-                      {sigs.map((s, i) => (
-                        <span
-                          key={i}
-                          className="text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded px-1.5 py-0.5"
-                        >
-                          {STRATEGY_LABEL[s.strategy] ?? s.strategy}:{s.signal_type}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono">
-                    {Math.max(...sigs.map((s) => s.score)).toFixed(0)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Text size="body-sm" tone="muted">
+            {data.sector} · {strategy === 'all' ? '全部策略' : STRATEGY_LABEL[strategy]} ·{' '}
+            {data.date} · {filtered.length} 条信号 / {stocks.length} 只股票
+          </Text>
+
+          {stocks.length === 0 ? (
+            <StateHint kind="empty">该板块当日没有触发信号</StateHint>
+          ) : (
+            <Card className="overflow-hidden p-0">
+              <TableScroll bare>
+                <Table minWidth="sm">
+                  <THead>
+                    <TR>
+                      <TH>股票</TH>
+                      <TH>触发的信号</TH>
+                      <TH align="right">最高分</TH>
+                    </TR>
+                  </THead>
+                  <TBody>
+                    {stocks.map(([symbol, sigs]) => (
+                      <TR key={symbol} hoverable>
+                        <TD mono nowrap className="font-medium">
+                          {symbol}
+                        </TD>
+                        <TD>
+                          <Row gap='tight'>
+                            {sigs.map((s, i) => (
+                              <Badge key={i} tone="accent" size="sm">
+                                {STRATEGY_LABEL[s.strategy] ?? s.strategy}:{s.signal_type}
+                              </Badge>
+                            ))}
+                          </Row>
+                        </TD>
+                        <TD align="right" mono>
+                          {Math.max(...sigs.map((s) => s.score)).toFixed(0)}
+                        </TD>
+                      </TR>
+                    ))}
+                  </TBody>
+                </Table>
+              </TableScroll>
+            </Card>
+          )}
         </>
       )}
-    </main>
+    </Page>
   )
 }
