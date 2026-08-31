@@ -13,6 +13,7 @@ dependencies = [
     "pydantic>=2.6",
     "pydantic-settings>=2.2",
     "pandas>=2.0",
+    "httpx>=0.27",
     "stock-indicators",
     "stock-datasource",
     "stock-market",
@@ -25,7 +26,6 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
-    "httpx>=0.27",
 ]
 
 # src 布局：main.py 作为顶层模块，其余子目录作为顶层包
