@@ -69,9 +69,9 @@ def main() -> None:
     # 判断
     signal = None
     if latest >= BUY_THRESHOLD:
-        signal = "买入信号（活跃市值代理单日 +%.1f%%，可能对应活跃市值 +4%）" % (latest * 100)
+        signal = "买入信号（活跃市值代理单日 +%.1f%%，可能对应活跃市值 +4%%）" % (latest * 100)
     elif latest <= SELL_THRESHOLD:
-        signal = "卖出信号（活跃市值代理单日 %.1f%%，可能对应活跃市值 -2.3%）" % (latest * 100)
+        signal = "卖出信号（活跃市值代理单日 %.1f%%，可能对应活跃市值 -2.3%%）" % (latest * 100)
 
     if signal:
         print("【活跃市值代理告警】%s（%s）\n近3日代理涨跌：%s。请到指南针确认活跃市值是否真出信号。" % (

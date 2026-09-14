@@ -22,3 +22,17 @@ class InterpretResult(BaseModel):
     symbol: str
     signals: list[Signal]
     interpretation: str
+
+
+class AgentBody(BaseModel):
+    """Agent 问答请求：一只票 + 一个自然语言问题。"""
+
+    symbol: str
+    question: str
+
+
+class AgentResult(BaseModel):
+    """Agent 问答响应：最终答案。"""
+
+    symbol: str
+    answer: str

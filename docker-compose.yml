@@ -85,10 +85,13 @@ services:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+      args:
+        # 直连 localhost:3000 时，/api 请求由 Next.js rewrite 转发到这个后端地址
+        API_ORIGIN: http://api:8000
     restart: unless-stopped
-    # 把 Next.js 默认端口 3000 只暴露给内部网络，对外由 nginx 收口
-    expose:
-      - "3000"
+    # 把 Next.js 端口 3000 直接暴露到宿主机（localhost:3000），同时保留 nginx 收口
+    ports:
+      - "3000:3000"
     healthcheck:
       # 健康检查：Next.js 起好后能响应首页才视为就绪（node:alpine 自带 wget）
       test: ["CMD", "wget", "-qO-", "http://localhost:3000"]

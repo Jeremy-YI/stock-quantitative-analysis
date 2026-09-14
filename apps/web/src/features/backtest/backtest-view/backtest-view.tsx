@@ -178,8 +178,9 @@ export default function BacktestView() {
           <Label htmlFor='regime-filter'>市场环境过滤</Label>
         </div>
 
-        <Button type='submit' disabled={loading}>
-          {loading ? '回测中…' : '发起回测'}
+        {/* 回测数据暂不理想（胜率低），先禁用「发起回测」，避免展示不好看的结果；待策略优化后再开放 */}
+        <Button type='submit' disabled>
+          发起回测（暂未开放）
         </Button>
       </form>
 

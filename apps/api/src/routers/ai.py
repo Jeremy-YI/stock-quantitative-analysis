@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
 
-from schemas.ai import InterpretBody, InterpretResult
+from schemas.ai import AgentBody, AgentResult, InterpretBody, InterpretResult
 from schemas.common import ApiResponse
+from services.agent_service import AgentService
 from services.llm_service import LlmService
 from services.rag_service import RagService
 from services.strategy_service import StrategyService
@@ -23,6 +24,10 @@ def get_strategy_service(request: Request) -> StrategyService:
 
 def get_rag_service(request: Request) -> RagService:
     return request.app.state.rag_service
+
+
+def get_agent_service(request: Request) -> AgentService:
+    return request.app.state.agent_service
 
 
 @router.post("/ai/interpret", response_model=ApiResponse[InterpretResult])
@@ -55,4 +60,17 @@ def interpret(
     return ApiResponse(
         message="ok",
         body=InterpretResult(symbol=body.symbol, signals=signals, interpretation=text),
+    )
+
+
+@router.post("/ai/agent", response_model=ApiResponse[AgentResult])
+def agent(
+    body: AgentBody,
+    agent_service: AgentService = Depends(get_agent_service),
+) -> ApiResponse[AgentResult]:
+    """Agent 问答：模型自动调工具（查指标/查资料）后作答。"""
+    answer = agent_service.run(body.symbol, body.question)
+    return ApiResponse(
+        message="ok",
+        body=AgentResult(symbol=body.symbol, answer=answer),
     )

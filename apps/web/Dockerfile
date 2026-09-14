@@ -18,6 +18,9 @@ WORKDIR /app
 # 复用阶段 1 装好的 node_modules
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# API 转发目标（构建时 baked 进 rewrite）：docker 里后端服务名叫 api，默认本地开发用 8000
+ARG API_ORIGIN=http://localhost:8000
+ENV API_ORIGIN=${API_ORIGIN}
 # 跑 Next.js 生产构建，输出到 .next 目录
 RUN npm run build
 

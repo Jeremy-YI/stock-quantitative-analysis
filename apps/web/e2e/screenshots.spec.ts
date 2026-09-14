@@ -16,10 +16,10 @@ async function shoot(page: Page, name: string) {
   })
 }
 
-test('截图：首页 Dashboard', async ({ page }) => {
+test('截图：首页（产品概览）', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('策略信号与超额胜率')).toBeVisible({ timeout: 30_000 })
-  await expect(page.getByText(/市场基线/).first()).toBeVisible()
+  await expect(page.getByText('市场状态').first()).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByText(/今天怎么做/).first()).toBeVisible()
   await shoot(page, 'dashboard.png')
 })
 
@@ -40,11 +40,10 @@ test('截图：选股结果表', async ({ page }) => {
   await shoot(page, 'strategies.png')
 })
 
-test('截图：回测页（含超额对比）', async ({ page }) => {
-  test.setTimeout(180_000)
+test('截图：回测页（评级表 + 回测入口）', async ({ page }) => {
+  test.setTimeout(60_000)
   await page.goto('/backtest')
-  await page.getByRole('button', { name: '发起回测' }).click()
-  await expect(page.getByText('策略胜率 vs 基线胜率')).toBeVisible({ timeout: 120_000 })
+  await expect(page.getByText('策略回测评级')).toBeVisible({ timeout: 30_000 })
   await shoot(page, 'backtest.png')
 })
 

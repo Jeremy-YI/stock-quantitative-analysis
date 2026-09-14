@@ -36,10 +36,12 @@ from repositories.scan_result_repository import (
     ScanResultRepository,
 )
 from routers import ai, backtest, dashboard, health, indicators, market, research, scheduler, sectors, strategies
+from services.agent_service import AgentService
 from services.backtest_service import BacktestService
 from services.dashboard_service import DashboardService
 from services.indicator_service import IndicatorService
 from services.llm_service import LlmService
+from services.multi_model_service import MultiModelService
 from services.rag_service import RagService
 from services.market_service import MarketService
 from services.research_service import ResearchService
@@ -120,6 +122,21 @@ def create_app(
     )
     app.state.llm_service = LlmService(
         settings.deepseek_api_key, settings.deepseek_base_url, settings.deepseek_model
+    )
+    qwen_llm = LlmService(
+        settings.qwen_api_key, settings.qwen_base_url, settings.qwen_model
+    )
+    multi = (
+        MultiModelService(app.state.llm_service, qwen_llm)
+        if settings.qwen_api_key
+        else None
+    )
+    app.state.agent_service = AgentService(
+        app.state.llm_service,
+        app.state.service,
+        app.state.rag_service,
+        app.state.strategy_service,
+        multi=multi,
     )
 
     _register_exception_handlers(app)

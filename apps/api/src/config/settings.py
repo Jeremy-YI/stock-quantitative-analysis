@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
+    # LLM（Qwen 通义千问，OpenAI 兼容接口）——供多模型并行研判
+    qwen_api_key: str = ""
+    qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    qwen_model: str = "qwen-plus"
 
     @property
     def hsjday_path(self) -> Path:
